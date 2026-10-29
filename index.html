@@ -200,6 +200,12 @@ dialog::backdrop{background:rgba(10,14,20,.5)}
 .warnbox{background:var(--warn-soft);border:1px solid var(--warn);border-radius:10px;padding:10px 12px;margin:8px 0 12px;font-size:14px;font-weight:600}
 .rlist{margin:0 0 12px;padding-inline-start:20px;font-size:14px;line-height:1.7}
 .rlist b{color:var(--danger)}
+.addbtn.one{background:var(--ink);color:var(--bg)}
+body.single .bag.nir, body.single .tabs, body.single .addbag, body.single .l2,
+body.single #eBagField, body.single #kBagField, body.single [data-act="share"]{display:none}
+body.single .bags{grid-template-columns:1fr}
+body.single .item.b-noga, body.single .item.b-nir{border-inline-start:1px solid var(--line)}
+body.single .add{margin-top:0}
 .note{font-size:12px;color:var(--muted);margin-top:12px}
 
 /* keep import */
@@ -235,13 +241,13 @@ dialog::backdrop{background:rgba(10,14,20,.5)}
 
   <section class="bags">
     <button class="bag noga" data-tab="noga" type="button">
-      <div class="bn">🧳 נגה</div>
+      <div class="bn">🧳 <span data-name="noga"></span></div>
       <div class="bc" id="cNoga"></div>
       <div class="bar"><i id="pNoga"></i></div>
       <div class="bp" id="sNoga"></div>
     </button>
     <button class="bag nir" data-tab="nir" type="button">
-      <div class="bn">🧳 ניר</div>
+      <div class="bn">🧳 <span data-name="nir"></span></div>
       <div class="bc" id="cNir"></div>
       <div class="bar"><i id="pNir"></i></div>
       <div class="bp" id="sNir"></div>
@@ -253,8 +259,8 @@ dialog::backdrop{background:rgba(10,14,20,.5)}
   <div class="wrap">
     <nav class="tabs" role="tablist">
       <button class="tab" role="tab" data-tab="all" type="button">הכל<span id="tAll"></span></button>
-      <button class="tab" role="tab" data-tab="noga" type="button">נגה<span id="tNoga"></span></button>
-      <button class="tab" role="tab" data-tab="nir" type="button">ניר<span id="tNir"></span></button>
+      <button class="tab" role="tab" data-tab="noga" type="button"><span data-name="noga"></span><span id="tNoga"></span></button>
+      <button class="tab" role="tab" data-tab="nir" type="button"><span data-name="nir"></span><span id="tNir"></span></button>
     </nav>
     <div class="add">
       <input id="addName" placeholder="הוספת פריט…" enterkeyhint="done" maxlength="80" autocomplete="off" dir="auto">
@@ -273,7 +279,7 @@ dialog::backdrop{background:rgba(10,14,20,.5)}
     </div>
   </div>
   <div class="addbag"><span class="lbl">מוסיפים למזוודה:</span>
-    <div class="seg" id="addBag"><button type="button" data-bag="noga">נגה</button><button type="button" data-bag="nir">ניר</button></div>
+    <div class="seg" id="addBag"><button type="button" data-bag="noga"></button><button type="button" data-bag="nir"></button></div>
   </div>
   <div class="tools">
     <input class="search" id="search" type="search" placeholder="חיפוש" dir="auto">
@@ -294,8 +300,8 @@ dialog::backdrop{background:rgba(10,14,20,.5)}
         <button type="button" data-estep="1" aria-label="יותר">+</button><output id="eQty">1</output><button type="button" data-estep="-1" aria-label="פחות">−</button>
       </div>
     </div>
-    <div class="f"><span>מזוודה</span>
-      <div class="seg" id="eBag"><button type="button" data-bag="noga">נגה</button><button type="button" data-bag="nir">ניר</button></div>
+    <div class="f" id="eBagField"><span>מזוודה</span>
+      <div class="seg" id="eBag"><button type="button" data-bag="noga"></button><button type="button" data-bag="nir"></button></div>
       <div class="hint" id="eHint" hidden>⚠️ העברה למזוודה אחרת תאפס את סימון ״ארוז״</div>
     </div>
     <div class="row">
@@ -312,9 +318,9 @@ dialog::backdrop{background:rgba(10,14,20,.5)}
     <h2>הגדרות</h2>
     <p class="sub" id="menuSub"></p>
     <div class="menu">
-      <div class="sect">סנכרון עם הטלפון השני</div>
+      <div class="sect" id="syncSect">סנכרון עם הטלפון השני</div>
       <button type="button" data-act="share"><span class="ic">📤</span><span>שליחת הרשימה<span class="ds">בוואטסאפ לטלפון השני — שם בוחרים ״טעינת קובץ״ ← מיזוג</span></span></button>
-      <button type="button" data-act="import"><span class="ic">📥</span><span>טעינת קובץ<span class="ds">קובץ שהגיע מהטלפון השני, או שחזור מגיבוי</span></span></button>
+      <button type="button" data-act="import"><span class="ic">📥</span><span>טעינת קובץ<span class="ds" id="importDs">קובץ שהגיע מהטלפון השני, או שחזור מגיבוי</span></span></button>
       <button type="button" data-act="download"><span class="ic">💾</span><span>שמירת גיבוי בהורדות<span class="ds">עותק של הרשימה בתיקיית ההורדות</span></span></button>
 
       <div class="sect">פעולות חד-פעמיות</div>
@@ -337,7 +343,7 @@ dialog::backdrop{background:rgba(10,14,20,.5)}
           <button type="button" data-sort-set="az">א–ת</button>
         </div>
       </div>
-      <button type="button" data-act="owner"><span class="ic">👤</span><span>החלפת בעל הטלפון</span></button>
+      <button type="button" data-act="users"><span class="ic">👥</span><span>משתמשים<span class="ds" id="usersInfo"></span></span></button>
       <button type="button" data-act="clear" class="danger"><span class="ic">🗑</span><span>מחיקת כל הפריטים</span></button>
     </div>
     <div class="row"><button class="btn" type="button" data-act="close">סגירה</button></div>
@@ -377,8 +383,8 @@ dialog::backdrop{background:rgba(10,14,20,.5)}
     <p class="sub" id="kSub">ב-Keep: פותחים את הפתק ← ⋮ ← <b>שליחה</b> ← <b>העתקה ללוח</b>, ומדביקים כאן. או בוחרים קובץ txt.</p>
     <textarea id="kText" placeholder="הדביקו כאן את הרשימה…" dir="auto"></textarea>
     <div class="row"><button class="btn" type="button" id="kFileBtn">📄 בחירת קובץ txt</button></div>
-    <div class="f" style="margin-top:12px"><span>לאיזו מזוודה?</span>
-      <div class="seg" id="kBag"><button type="button" data-bag="noga">נגה</button><button type="button" data-bag="nir">ניר</button></div>
+    <div class="f" id="kBagField" style="margin-top:12px"><span>לאיזו מזוודה?</span>
+      <div class="seg" id="kBag"><button type="button" data-bag="noga"></button><button type="button" data-bag="nir"></button></div>
     </div>
     <div class="kopts">
       <label><input type="checkbox" id="kTitle"> לדלג על השורה הראשונה (כותרת הפתק)</label>
@@ -395,15 +401,21 @@ dialog::backdrop{background:rgba(10,14,20,.5)}
   </div>
 </dialog>
 
-<!-- owner -->
-<dialog id="ownerDlg">
+<!-- users setup -->
+<dialog id="setupDlg">
   <div class="dlg">
-    <h2>של מי הטלפון הזה?</h2>
-    <p class="sub">כל טלפון שומר רשימה משלו. אפשר לשנות אחר כך בהגדרות.</p>
-    <div class="owners">
-      <button type="button" data-owner="noga">נגה</button>
-      <button type="button" data-owner="nir">ניר</button>
+    <h2 id="suTitle">ברוכים הבאים ל-Packing</h2>
+    <p class="sub">כמה אנשים אורזים עם הרשימה הזו?</p>
+    <div class="seg" id="suCount"><button type="button" data-count="1">משתמש אחד</button><button type="button" data-count="2">שני משתמשים</button></div>
+    <label class="f" style="margin-top:14px"><span id="suL1">השם שלך</span><input id="suName1" maxlength="20" dir="auto" autocomplete="off"></label>
+    <label class="f" id="suF2"><span>משתמש/ת 2</span><input id="suName2" maxlength="20" dir="auto" autocomplete="off"></label>
+    <div class="f" id="suOwnerF"><span>הטלפון הזה של:</span>
+      <div class="seg" id="suOwner"><button type="button" data-owner="noga" data-bag="noga"></button><button type="button" data-owner="nir" data-bag="nir"></button></div>
     </div>
+    <p class="note" id="suNote"></p>
+    <div class="hint" id="suErr" hidden></div>
+    <div class="row"><button class="btn main" type="button" id="suSave">שמירה</button><button class="btn" type="button" id="suCancel">ביטול</button></div>
+    <button class="linkbtn" type="button" id="suImport">קיבלת קובץ מהטלפון השני? לטעון אותו כאן</button>
   </div>
 </dialog>
 
@@ -433,16 +445,17 @@ const CATS = [
   ['meds','תרופות','💊'], ['electronics','אלקטרוניקה','🔌'], ['docs','מסמכים','📄'], ['other','אחר','📦']
 ];
 const CAT = Object.fromEntries(CATS.map(c => [c[0], {name:c[1], icon:c[2]}]));
-const BAGS = {noga:'נגה', nir:'ניר'};
+const BAGS = {noga: 1, nir: 1};                       // internal suitcase slots: 1 = "noga" (pink), 2 = "nir" (blue)
+const DEFAULT_USERS = {count: 2, names: {noga: 'נגה', nir: 'ניר'}, ts: 1};   // for lists made before names were configurable
 const FIELDS = ['name','cat','qty','bag','packed','deleted'];
 const MAX_FILE = 5e6, MAX_ITEMS = 5000;
 const ERR = Symbol('read-error');
 
 /* ---------- state ---------- */
-let state = {version:2, owner:null, items:[], lastExport:null};
+let state = {version:3, owner:null, users:null, items:[], lastExport:null};
 const ui = {tab:'all', q:'', unpacked:false, qty:1, cat:'clothes', addBag:null, dupOnly:false, sort:'cat'};
 const heSort = new Intl.Collator('he', {numeric: true, sensitivity: 'base'}).compare;
-let pendingImport = null, pendingFrom = null;
+let pendingImport = null, pendingFrom = null, pendingUsers = null;
 
 const $ = s => document.querySelector(s);
 const uid = () => Date.now().toString(36) + Math.random().toString(36).slice(2, 8);
@@ -450,10 +463,28 @@ const now = () => Date.now();
 const live = () => state.items.filter(i => !i.deleted);
 const byId = id => state.items.find(i => i.id === id);
 const find = id => { const i = byId(id); return i && !i.deleted ? i : null; };
-const defaultBag = () => state.owner || 'nir';
-const curBag = () => ui.addBag || defaultBag();
+const single = () => !!state.users && state.users.count === 1;
+const configured = () => !!state.users && (single() || !!state.owner);
+const nm = slot => (state.users && state.users.names[slot]) || (slot === 'noga' ? 'משתמש/ת 1' : 'משתמש/ת 2');
+const defaultBag = () => single() ? 'noga' : (state.owner || 'noga');
+const curBag = () => single() ? 'noga' : (ui.addBag || defaultBag());
+function cleanUsers(u) {
+  if (!u || typeof u !== 'object') return null;
+  const count = u.count === 1 ? 1 : 2;
+  const names = {};
+  for (const k of ['noga', 'nir']) names[k] = String((u.names && u.names[k]) || '').trim().slice(0, 20);
+  if (!names.noga || (count === 2 && !names.nir)) return null;
+  return {count, names, ts: Number(u.ts) || 0};
+}
+/* names/count sync between phones: the newer setting wins */
+function adoptUsers(u, force) {
+  if (!u || (!force && state.users && u.ts <= state.users.ts)) return false;
+  const same = state.users && JSON.stringify(state.users.names) === JSON.stringify(u.names) && state.users.count === u.count;
+  state.users = {...u, names: {...u.names}};          // "whose phone" stays as it was
+  return !same;
+}
 const normName = n => String(n).trim().replace(/\s+/g, ' ').toLowerCase();
-const dupKey = i => i.bag + '|' + normName(i.name);
+const dupKey = i => (single() ? '' : i.bag + '|') + normName(i.name);
 const esc = s => String(s).replace(/[&<>"']/g, c => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
 const anyDialogOpen = () => !!document.querySelector('dialog[open]');
 
@@ -549,14 +580,14 @@ function commit() { save(); render(); }
 
 function addItem(name) {
   const bag = curBag();
-  const exists = live().some(i => i.bag === bag && normName(i.name) === normName(name));
+  const exists = live().some(i => dupKey(i) === dupKey({bag, name}));
   const it = newItem({name, cat: ui.cat, qty: ui.qty, bag});
   state.items.push(it);
   commit();
   if (exists) {
-    toast(`⚠️ "${name}" כבר קיים במזוודה של ${BAGS[bag]}`, 'הסר', () => { const x = byId(it.id); if (x) touch(x, {deleted: true}); commit(); });
-  } else if (ui.tab !== 'all' && ui.tab !== bag) {
-    toast(`נוסף למזוודה של ${BAGS[bag]}`, 'הצג', () => { ui.tab = bag; render(); });
+    toast(`⚠️ "${name}" כבר קיים ${single() ? 'ברשימה' : 'במזוודה של ' + nm(bag)}`, 'הסר', () => { const x = byId(it.id); if (x) touch(x, {deleted: true}); commit(); });
+  } else if (!single() && ui.tab !== 'all' && ui.tab !== bag) {
+    toast(`נוסף למזוודה של ${nm(bag)}`, 'הצג', () => { ui.tab = bag; render(); });
   }
 }
 function removeItem(id) {
@@ -568,7 +599,7 @@ function moveItem(it, bag) {
   if (it.bag === bag) return;
   const prev = {bag: it.bag, packed: it.packed};
   touch(it, {bag, packed: false}); commit();
-  if (prev.packed) toast(`הועבר למזוודה של ${BAGS[bag]} · סימון ״ארוז״ אופס`, 'בטל', () => {
+  if (prev.packed) toast(`הועבר למזוודה של ${nm(bag)} · סימון ״ארוז״ אופס`, 'בטל', () => {
     const x = find(it.id); if (x) { touch(x, prev); commit(); }
   });
 }
@@ -587,13 +618,17 @@ function dupKeys(items) {
 /* ---------- render ---------- */
 function stats(items) {
   const s = {all: items.length, noga: 0, nir: 0, nogaPacked: 0, nirPacked: 0, nogaQty: 0, nirQty: 0};
-  for (const i of items) { s[i.bag]++; s[i.bag + 'Qty'] += i.qty; if (i.packed) s[i.bag + 'Packed']++; }
+  for (const i of items) { const b = single() ? 'noga' : i.bag; s[b]++; s[b + 'Qty'] += i.qty; if (i.packed) s[b + 'Packed']++; }
   return s;
 }
 
 function render() {
   const items = live();
   const s = stats(items);
+  document.body.classList.toggle('single', single());
+  if (single()) ui.tab = 'all';
+  document.querySelectorAll('[data-name]').forEach(e => e.textContent = nm(e.dataset.name));
+  document.querySelectorAll('#addBag button,#eBag button,#kBag button').forEach(b => b.textContent = nm(b.dataset.bag));
 
   for (const b of ['noga', 'nir']) {
     const B = b === 'noga' ? 'Noga' : 'Nir';
@@ -608,10 +643,12 @@ function render() {
 
   const ab = curBag();
   document.querySelectorAll('#addBag button').forEach(b => b.classList.toggle('on', b.dataset.bag === ab));
-  $('#addBtn').textContent = `הוסף ל${BAGS[ab]}`;
-  $('#addBtn').classList.toggle('noga', ab === 'noga');
+  $('#addBtn').textContent = single() ? 'הוסף' : `הוסף ל${nm(ab)}`;
+  $('#addBtn').classList.toggle('noga', !single() && ab === 'noga');
+  $('#addBtn').classList.toggle('one', single());
   $('#addQty').textContent = ui.qty;
-  $('#ownerBtn').innerHTML = state.owner ? `הטלפון של <b>${BAGS[state.owner]}</b>` : '<b>בחירת בעל הטלפון</b>';
+  $('#ownerBtn').innerHTML = !configured() ? '<b>הגדרת משתמשים</b>'
+    : single() ? `הרשימה של <b>${esc(nm('noga'))}</b>` : `הטלפון של <b>${esc(nm(state.owner))}</b>`;
 
   const host = $('#list');
   if (store.readOnly) {
@@ -629,7 +666,7 @@ function render() {
     (!q || normName(i.name).includes(q)) &&
     (!ui.unpacked || !i.packed));
 
-  const bar = dupCount ? `<div class="dupbar"><span>⚠️ יש <b>${dupCount}</b> פריטים כפולים באותה מזוודה</span><button type="button" data-act="dup-toggle">${ui.dupOnly ? 'הצג הכל' : 'הצג כפולים'}</button></div>` : '';
+  const bar = dupCount ? `<div class="dupbar"><span>⚠️ יש <b>${dupCount}</b> פריטים כפולים ${single() ? 'ברשימה' : 'באותה מזוודה'}</span><button type="button" data-act="dup-toggle">${ui.dupOnly ? 'הצג הכל' : 'הצג כפולים'}</button></div>` : '';
 
   if (!items.length) { host.innerHTML = `<div class="empty"><div class="big">🧳</div>הרשימה ריקה.<br>הוסיפו פריט ראשון למעלה, או ייבאו רשימה מ-Google Keep בהגדרות ☰.</div>`; return; }
   if (!list.length) {
@@ -641,10 +678,10 @@ function render() {
   }
   const row = (i, showCat) => {
     const isDup = dups.has(dupKey(i));
-    const seg = ['noga', 'nir'].map(b => `<button type="button" data-bag="${b}" class="${i.bag === b ? 'on' : ''}">${BAGS[b]}</button>`).join('');
+    const seg = ['noga', 'nir'].map(b => `<button type="button" data-bag="${b}" class="${i.bag === b ? 'on' : ''}">${esc(nm(b))}</button>`).join('');
     return `<div class="item b-${i.bag}${i.packed ? ' packed' : ''}${isDup ? ' isdup' : ''}" data-id="${esc(i.id)}">
         <div class="l1">
-          <button type="button" class="info" aria-label="עריכת ${esc(i.name)}"><span class="nm">${showCat ? `<span class="ci" title="${CAT[i.cat].name}">${CAT[i.cat].icon}</span>` : ''}<span class="t" dir="auto">${esc(i.name)}</span><span class="pen">✏️</span></span>${i.qty > 1 ? `<span class="mt">כמות: ${i.qty}</span>` : ''}${isDup ? `<span class="dup">⚠️ מופיע פעמיים במזוודה של ${BAGS[i.bag]}</span>` : ''}</button>
+          <button type="button" class="info" aria-label="עריכת ${esc(i.name)}"><span class="nm">${showCat ? `<span class="ci" title="${CAT[i.cat].name}">${CAT[i.cat].icon}</span>` : ''}<span class="t" dir="auto">${esc(i.name)}</span><span class="pen">✏️</span></span>${i.qty > 1 ? `<span class="mt">כמות: ${i.qty}</span>` : ''}${isDup ? `<span class="dup">⚠️ מופיע פעמיים ${single() ? 'ברשימה' : 'במזוודה של ' + esc(nm(i.bag))}</span>` : ''}</button>
           <button type="button" class="pk">${i.packed ? '✓ ארוז' : 'סמן כארוז'}</button>
         </div>
         <div class="l2"><span class="lbl">מזוודה:</span><div class="seg">${seg}</div></div>
@@ -719,10 +756,10 @@ function submitEdit() {
 
 /* ---------- export / import ---------- */
 function exportData() {
-  const data = {app: 'packing', version: 2, owner: state.owner, exportedAt: new Date().toISOString(), items: state.items};
+  const data = {app: 'packing', version: 3, owner: state.owner, users: state.users, exportedAt: new Date().toISOString(), items: state.items};
   const d = new Date();
   const stamp = `${d.getFullYear()}-${String(d.getMonth() + 1).padStart(2, '0')}-${String(d.getDate()).padStart(2, '0')}`;
-  return {base: `packing-${state.owner || 'phone'}-${stamp}`, text: JSON.stringify(data)};
+  return {base: `packing-${stamp}`, text: JSON.stringify(data)};
 }
 function markExported() { state.lastExport = now(); save(); }
 
@@ -755,8 +792,11 @@ async function readImport(file) {
   if (!arr) { toast('לא נמצאו פריטים בקובץ'); return; }
   const items = arr.slice(0, MAX_ITEMS).map(cleanItem).filter(Boolean);
   const liveCount = items.filter(i => !i.deleted).length;
+  pendingUsers = data && !Array.isArray(data) ? cleanUsers(data.users) : null;
   pendingImport = items; pendingFrom = data && BAGS[data.owner] ? data.owner : null;
-  const from = data && BAGS[data.owner] ? ` מהטלפון של ${BAGS[data.owner]}` : '';
+  const fu = pendingUsers || state.users;
+  const fromName = pendingFrom && fu && fu.count === 2 ? fu.names[pendingFrom] : '';
+  const from = fromName ? ` מהטלפון של ${fromName}` : '';
   $('#importSub').textContent = `בקובץ${from}: ${liveCount} פריטים. בטלפון הזה: ${live().length}.`;
   $('#importDlg').showModal();
 }
@@ -829,7 +869,7 @@ function titleLooksLikeHeader(text) {
 }
 const keep = {bag: null, rows: []};
 function openKeep(prefill, title) {
-  keep.bag = defaultBag();
+  keep.bag = curBag();
   $('#kText').value = prefill || '';
   $('#kTitle').checked = prefill ? (!title && titleLooksLikeHeader(prefill)) : false;
   $('#kSub').innerHTML = title
@@ -841,9 +881,9 @@ function openKeep(prefill, title) {
 function paintKeep() {
   document.querySelectorAll('#kBag button').forEach(b => b.classList.toggle('on', b.dataset.bag === keep.bag));
   const rows = parseKeep($('#kText').value, $('#kTitle').checked);
-  const existing = new Set(live().filter(i => i.bag === keep.bag).map(i => normName(i.name)));
+  const existing = new Set(live().map(dupKey));
   const skipOn = $('#kSkip').checked;
-  rows.forEach(r => r.skip = skipOn && existing.has(normName(r.name)));
+  rows.forEach(r => r.skip = skipOn && existing.has(dupKey({bag: keep.bag, name: r.name})));
   keep.rows = rows;
   const n = rows.filter(r => !r.skip).length, sk = rows.length - n;
   $('#kCount').textContent = rows.length
@@ -853,7 +893,7 @@ function paintKeep() {
   $('#kPrev').innerHTML = rows.map(r =>
     `<div class="${r.skip ? 'skip' : ''}"><span>${CAT[r.cat].icon}</span><span dir="auto">${esc(r.name)}${r.qty > 1 ? ` ×${r.qty}` : ''}${r.checked ? ' ✓' : ''}</span></div>`).join('');
   $('#kGo').disabled = !n;
-  $('#kGo').textContent = n ? `ייבוא ${n} פריטים ל${BAGS[keep.bag]}` : 'ייבוא';
+  $('#kGo').textContent = n ? `ייבוא ${n} פריטים${single() ? '' : ' ל' + nm(keep.bag)}` : 'ייבוא';
 }
 function doKeepImport() {
   const markPacked = $('#kChecked').checked;
@@ -865,7 +905,7 @@ function doKeepImport() {
   }
   $('#keepDlg').close();
   ui.tab = 'all'; commit();
-  toast(`נוספו ${ids.length} פריטים למזוודה של ${BAGS[keep.bag]}`, 'בטל', () => {
+  toast(`נוספו ${ids.length} פריטים ${single() ? 'לרשימה' : 'למזוודה של ' + nm(keep.bag)}`, 'בטל', () => {
     ids.forEach(id => { const x = byId(id); if (x && !x.deleted) touch(x, {deleted: true}); }); commit();
   });
 }
@@ -921,6 +961,9 @@ function bind() {
   $('#menuBtn').addEventListener('click', () => {
     $('#menuSub').textContent = `${live().length} פריטים בטלפון הזה · ` +
       (state.lastExport ? 'נשלח/נשמר לאחרונה: ' + new Date(state.lastExport).toLocaleString('he-IL', {dateStyle: 'short', timeStyle: 'short'}) : 'עדיין לא נשלח ולא נשמר גיבוי');
+    $('#syncSect').textContent = single() ? 'גיבוי' : 'סנכרון עם הטלפון השני';
+    $('#importDs').textContent = single() ? 'שחזור הרשימה מקובץ גיבוי' : 'קובץ שהגיע מהטלפון השני, או שחזור מגיבוי';
+    $('#usersInfo').textContent = !state.users ? '' : single() ? `משתמש אחד: ${nm('noga')} · אפשר לעבור לשניים` : `${nm('noga')} ו${nm('nir')} · הטלפון הזה של ${nm(state.owner)}`;
     paintTheme();
     $('#menuDlg').showModal();
   });
@@ -942,7 +985,7 @@ function bind() {
         toast('הסימונים אופסו', 'בטל', () => { packed.forEach(i => { const x = find(i.id); if (x) touch(x, {packed: true}); }); commit(); });
       }
     }
-    else if (act === 'owner') $('#ownerDlg').showModal();
+    else if (act === 'users') openSetup(false);
     else if (act === 'clear') {
       const all = live();
       if (!all.length) return;
@@ -952,18 +995,25 @@ function bind() {
       }
     }
   });
-  $('#ownerBtn').addEventListener('click', () => $('#ownerDlg').showModal());
-  document.querySelectorAll('[data-owner]').forEach(b => b.addEventListener('click', () => {
-    state.owner = b.dataset.owner; ui.addBag = state.owner; save(); $('#ownerDlg').close(); render();
-  }));
-  $('#ownerDlg').addEventListener('cancel', e => { if (!state.owner) e.preventDefault(); });
-  $('#ownerDlg').addEventListener('close', () => { if (!state.owner && !store.readOnly) setTimeout(() => $('#ownerDlg').showModal(), 0); });
+  // users setup
+  $('#ownerBtn').addEventListener('click', () => openSetup(!configured()));
+  document.querySelectorAll('#suCount button').forEach(b => b.addEventListener('click', () => { su.count = +b.dataset.count; paintSetup(); }));
+  document.querySelectorAll('#suOwner button').forEach(b => b.addEventListener('click', () => { su.owner = b.dataset.owner; paintSetup(); }));
+  ['#suName1', '#suName2'].forEach(id => $(id).addEventListener('input', paintSetup));
+  $('#suSave').addEventListener('click', saveSetup);
+  $('#suCancel').addEventListener('click', () => $('#setupDlg').close());
+  $('#suImport').addEventListener('click', () => { $('#fileIn').value = ''; $('#fileIn').click(); });
+  $('#setupDlg').addEventListener('cancel', e => { if (!configured()) e.preventDefault(); });
+  $('#setupDlg').addEventListener('close', () => { if (!configured() && !store.readOnly) setTimeout(() => { if (!$('#setupDlg').open) openSetup(true); }, 0); });
 
   // file import
   $('#fileIn').addEventListener('change', e => { const f = e.target.files[0]; if (f) readImport(f); });
-  const runMerge = items => {
+  const runMerge = (items, users) => {
     const r = mergeItems(items);
+    const namesChanged = adoptUsers(users);
     commit();
+    if ($('#setupDlg').open) refreshSetupFromState();
+    else if (!configured()) openSetup(true);          // switched to two users elsewhere: ask whose phone this is
     const parts = [];
     if (r.added) parts.push(`נוספו ${r.added}`);
     if (r.updated) parts.push(`עודכנו ${r.updated}`);
@@ -971,17 +1021,18 @@ function bind() {
     if (r.restored) parts.push(`שוחזרו ${r.restored}`);
     let msg = parts.length ? 'מוזג: ' + parts.join(' · ') : 'אין שינויים חדשים בקובץ';
     if (r.skipped) msg += ` · ${r.skipped} פריטים מהקובץ נמחקו כאן קודם ולא הוחזרו`;
+    if (namesChanged) msg += ' · שמות המשתמשים עודכנו';
     if (dupKeys(live()).size) msg += ' · ⚠️ נמצאו כפילויות';
     toast(msg);
   };
   $('#iMerge').addEventListener('click', () => {
-    const items = pendingImport; $('#importDlg').close();
-    if (items) runMerge(items);
+    const items = pendingImport, users = pendingUsers; $('#importDlg').close();
+    if (items) runMerge(items, users);
   });
 
-  let replaceItems = null;
+  let replaceItems = null, replaceUsers = null;
   $('#iReplace').addEventListener('click', () => {
-    const items = pendingImport, from = pendingFrom;
+    const items = pendingImport, from = pendingFrom, users = pendingUsers;
     $('#importDlg').close();
     if (!items) return;
     const fileLive = items.filter(i => !i.deleted);
@@ -995,24 +1046,27 @@ function bind() {
     if (newerHere) lines.push(`<b>${newerHere} פריטים ששינית כאן אחרי שהקובץ נשמר יחזרו לגרסה הישנה</b> (מזוודה, ״ארוז״, שם)`);
     if (!onlyHere && !newerHere) lines.push('לפי הבדיקה לא יאבד שום פריט — אבל מיזוג עדיין בטוח יותר');
     $('#rList').innerHTML = lines.map(l => `<li>${l}</li>`).join('');
-    const other = from && from !== state.owner;
+    const fu = users || state.users;
+    const other = from && from !== state.owner && fu && fu.count === 2;
     $('#rFrom').hidden = !other;
-    if (other) $('#rFrom').textContent = `הקובץ הזה הגיע מהטלפון של ${BAGS[from]} — כנראה התכוונת למיזוג.`;
-    replaceItems = items;
+    if (other) $('#rFrom').textContent = `הקובץ הזה הגיע מהטלפון של ${fu.names[from]} — כנראה התכוונת למיזוג.`;
+    replaceItems = items; replaceUsers = users;
     $('#replaceDlg').showModal();
   });
-  $('#rMerge').addEventListener('click', () => { const items = replaceItems; $('#replaceDlg').close(); if (items) runMerge(items); });
+  $('#rMerge').addEventListener('click', () => { const items = replaceItems, users = replaceUsers; $('#replaceDlg').close(); if (items) runMerge(items, users); });
   $('#rReplace').addEventListener('click', () => {
     const items = replaceItems; $('#replaceDlg').close();
     if (!items) return;
-    const before = state.items;
-    state.items = items; commit();
-    toast('הרשימה הוחלפה בקובץ', 'בטל', () => { state.items = before; commit(); toast('ההחלפה בוטלה — הרשימה הקודמת חזרה'); });
+    const before = state.items, beforeUsers = state.users, beforeOwner = state.owner;
+    state.items = items;
+    if (users) adoptUsers({...users, ts: Math.max(users.ts, (state.users && state.users.ts || 0) + 1)}, true);
+    commit();
+    toast('הרשימה הוחלפה בקובץ', 'בטל', () => { state.items = before; state.users = beforeUsers; state.owner = beforeOwner; commit(); toast('ההחלפה בוטלה — הרשימה הקודמת חזרה'); });
   });
   $('#rCancel').addEventListener('click', () => $('#replaceDlg').close());
-  $('#replaceDlg').addEventListener('close', () => { replaceItems = null; });
+  $('#replaceDlg').addEventListener('close', () => { replaceItems = null; replaceUsers = null; });
   $('#iCancel').addEventListener('click', () => $('#importDlg').close());
-  $('#importDlg').addEventListener('close', () => { pendingImport = null; pendingFrom = null; });
+  $('#importDlg').addEventListener('close', () => { pendingImport = null; pendingFrom = null; pendingUsers = null; });
 
   // Google Keep
   $('#kText').addEventListener('input', () => {
@@ -1042,10 +1096,67 @@ function bind() {
     if (saved && saved !== ERR && Array.isArray(saved.items)) {
       state.items = saved.items.map(cleanItem).filter(Boolean);
       if (BAGS[saved.owner]) state.owner = saved.owner;
+      const su2 = cleanUsers(saved.users); if (su2) state.users = su2;
       state.lastExport = saved.lastExport || state.lastExport;
       render();
     }
   });
+}
+
+/* ---------- users setup ---------- */
+const su = {count: 2, owner: null};
+function openSetup(first) {
+  refreshSetupFromState();
+  $('#suTitle').textContent = first ? 'ברוכים הבאים ל-Packing' : 'משתמשים';
+  $('#suCancel').hidden = first;
+  $('#suImport').hidden = !first;
+  if (!$('#setupDlg').open) $('#setupDlg').showModal();
+}
+function refreshSetupFromState() {
+  const u = state.users;
+  su.count = u ? u.count : (su.count || 2);
+  su.owner = state.owner || su.owner;
+  $('#suName1').value = u ? u.names.noga : $('#suName1').value;
+  $('#suName2').value = u ? (u.names.nir || '') : $('#suName2').value;
+  paintSetup();
+}
+function paintSetup() {
+  document.querySelectorAll('#suCount button').forEach(b => b.classList.toggle('on', +b.dataset.count === su.count));
+  const two = su.count === 2;
+  $('#suF2').hidden = !two; $('#suOwnerF').hidden = !two;
+  $('#suL1').textContent = two ? 'משתמש/ת 1' : 'השם שלך';
+  const n1 = $('#suName1').value.trim() || 'משתמש/ת 1', n2 = $('#suName2').value.trim() || 'משתמש/ת 2';
+  document.querySelectorAll('#suOwner button').forEach(b => {
+    b.textContent = b.dataset.owner === 'noga' ? n1 : n2;
+    b.classList.toggle('on', b.dataset.owner === su.owner);
+  });
+  $('#suNote').textContent = two
+    ? 'השמות משותפים לשני הטלפונים ועוברים בסנכרון. ״הטלפון הזה של״ נשמר רק כאן.'
+    : 'רשימה אחת, בלי חלוקה למזוודות. אפשר לעבור לשני משתמשים בכל זמן.';
+  $('#suErr').hidden = true;
+}
+async function saveSetup() {
+  const two = su.count === 2;
+  const n1 = $('#suName1').value.trim().slice(0, 20), n2 = $('#suName2').value.trim().slice(0, 20);
+  const err = !n1 ? (two ? 'נא להזין את השם הראשון' : 'נא להזין שם')
+    : two && !n2 ? 'נא להזין את השם השני'
+    : two && normName(n1) === normName(n2) ? 'השמות צריכים להיות שונים'
+    : two && !su.owner ? 'בחרו של מי הטלפון הזה'
+    : '';
+  if (err) { $('#suErr').textContent = '⚠️ ' + err; $('#suErr').hidden = false; return; }
+  const prev = state.users;
+  if (prev && prev.count === 2 && !two) {
+    const moving = live().filter(i => i.bag === 'nir');
+    if (moving.length && !(await confirmBox('מעבר למשתמש אחד', `${moving.length === 1 ? 'פריט אחד' : moving.length + ' פריטים'} מהמזוודה של ${prev.names.nir} יעברו לרשימה של ${n1}.`, 'להעביר'))) return;
+    moving.forEach(i => touch(i, {bag: 'noga'}));
+  }
+  const names = {noga: n1, nir: two ? n2 : ((prev && prev.names.nir) || '')};
+  const changed = !prev || prev.count !== su.count || prev.names.noga !== names.noga || prev.names.nir !== names.nir;
+  state.users = {count: su.count, names, ts: changed ? Math.max(now(), (prev ? prev.ts : 0) + 1) : prev.ts};
+  if (two) state.owner = su.owner;
+  ui.addBag = two ? state.owner : 'noga'; ui.tab = 'all';
+  $('#setupDlg').close();
+  commit();
 }
 
 function paintTheme() {
@@ -1069,6 +1180,7 @@ async function init() {
     store.readOnly = true;                       // don't overwrite a list we couldn't read
   } else if (saved && Array.isArray(saved.items)) {
     state.owner = BAGS[saved.owner] ? saved.owner : null;
+    state.users = cleanUsers(saved.users) || (state.owner ? {...DEFAULT_USERS, names: {...DEFAULT_USERS.names}} : null);
     state.items = saved.items.map(cleanItem).filter(Boolean);
     state.lastExport = saved.lastExport || null;
   }
@@ -1081,7 +1193,7 @@ async function init() {
   if (/SamsungBrowser/i.test(navigator.userAgent)) {
     $('#list').insertAdjacentHTML('beforebegin', `<div class="wrap"><div class="fatal" style="color:var(--warn);border-color:var(--warn)">זה דפדפן סמסונג — לרשימה כאן אין קשר לאפליקציה שהותקנה מ-Chrome.<br>פתחו את הקישור ב-Chrome והוסיפו למסך הבית משם.</div></div>`);
   }
-  if (!state.owner) $('#ownerDlg').showModal();
+  if (!configured()) openSetup(true);
 
   // text shared into the app from Keep (Android share sheet → Packing)
   const sp = new URLSearchParams(location.search);
@@ -1090,8 +1202,8 @@ async function init() {
     history.replaceState(null, '', location.pathname);
     if (t.trim()) {
       const open = () => openKeep(t, title);
-      if (state.owner) open();
-      else $('#ownerDlg').addEventListener('close', function once() { if (state.owner) { $('#ownerDlg').removeEventListener('close', once); setTimeout(open, 0); } });
+      if (configured()) open();
+      else $('#setupDlg').addEventListener('close', function once() { if (configured()) { $('#setupDlg').removeEventListener('close', once); setTimeout(open, 0); } });
     }
   }
 
