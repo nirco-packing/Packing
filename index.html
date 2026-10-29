@@ -1,0 +1,1108 @@
+<!doctype html>
+<html lang="he" dir="rtl">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<meta name="theme-color" content="#f5f2ed">
+<meta name="mobile-web-app-capable" content="yes">
+<link rel="manifest" href="packing.webmanifest">
+<link rel="icon" type="image/png" href="icon-192.png">
+<title>Packing</title>
+<script>
+/* Theme: by local sunrise/sunset (default), or fixed light/dark. Runs before paint. */
+(function () {
+  var PLACES = {
+    'Asia/Jerusalem': [31.78, 35.22], 'Asia/Tel_Aviv': [32.08, 34.78],
+    'Asia/Tokyo': [35.68, 139.69]
+  };
+  function place() {
+    var tz = '';
+    try { tz = Intl.DateTimeFormat().resolvedOptions().timeZone || ''; } catch (e) {}
+    if (PLACES[tz]) return PLACES[tz];
+    var jan = new Date(new Date().getFullYear(), 0, 1);
+    return [32, -jan.getTimezoneOffset() / 4];      // standard-time meridian
+  }
+  function sun(d) {                                 // NOAA approximation → local minutes
+    var p = place(), lat = p[0] * Math.PI / 180, lon = p[1];
+    var start = new Date(d.getFullYear(), 0, 0), doy = Math.floor((d - start) / 864e5);
+    var g = 2 * Math.PI / 365 * (doy - 1);
+    var eq = 229.18 * (0.000075 + 0.001868 * Math.cos(g) - 0.032077 * Math.sin(g) - 0.014615 * Math.cos(2 * g) - 0.040849 * Math.sin(2 * g));
+    var dec = 0.006918 - 0.399912 * Math.cos(g) + 0.070257 * Math.sin(g) - 0.006758 * Math.cos(2 * g) + 0.000907 * Math.sin(2 * g) - 0.002697 * Math.cos(3 * g) + 0.00148 * Math.sin(3 * g);
+    var x = Math.cos(90.833 * Math.PI / 180) / (Math.cos(lat) * Math.cos(dec)) - Math.tan(lat) * Math.tan(dec);
+    var ha = Math.acos(Math.max(-1, Math.min(1, x))) * 180 / Math.PI;
+    var off = d.getTimezoneOffset();
+    return { rise: 720 - 4 * (lon + ha) - eq - off, set: 720 - 4 * (lon - ha) - eq - off };
+  }
+  function mode() { try { return localStorage.getItem('packing-theme') || 'auto'; } catch (e) { return 'auto'; } }
+  function info() {
+    var d = new Date(), s = sun(d), m = d.getHours() * 60 + d.getMinutes();
+    var night = m < s.rise || m >= s.set;
+    var next = night ? s.rise : s.set;
+    var hh = Math.floor((next % 1440 + 1440) % 1440 / 60), mm = Math.round(((next % 60) + 60) % 60);
+    if (mm === 60) { mm = 0; hh = (hh + 1) % 24; }
+    return { night: night, next: (hh < 10 ? '0' : '') + hh + ':' + (mm < 10 ? '0' : '') + mm };
+  }
+  function apply() {
+    var md = mode(), dark = md === 'dark' || (md === 'auto' && info().night);
+    var root = document.documentElement;
+    root.setAttribute('data-theme', dark ? 'dark' : 'light');
+    var meta = document.querySelector('meta[name="theme-color"]');
+    if (meta) meta.setAttribute('content', dark ? '#13161b' : '#f5f2ed');
+  }
+  window.PackingTheme = {
+    apply: apply, info: info, mode: mode,
+    set: function (m) { try { localStorage.setItem('packing-theme', m); } catch (e) {} apply(); }
+  };
+  apply();
+  setInterval(apply, 60000);
+  document.addEventListener('visibilitychange', function () { if (!document.hidden) apply(); });
+})();
+</script>
+<style>
+:root{
+  color-scheme:light;
+  --bg:#f5f2ed; --surface:#ffffff; --surface-2:#faf8f5; --ink:#1d2430; --muted:#646c79; --line:#e3ddd3;
+  --noga:#c2405f; --noga-fill:#c2405f; --noga-soft:#fbe6ec;
+  --nir:#2b6fc2; --nir-fill:#2b6fc2; --nir-soft:#e2edfb;
+  --ok:#23825a; --danger:#c73e3e; --warn:#a85208; --warn-soft:#fdf0e1;
+  --toast:#1d2430; --toast-line:transparent;
+  --shadow:0 1px 2px rgba(20,25,35,.06),0 4px 14px rgba(20,25,35,.05);
+  --r:14px;
+}
+:root[data-theme="dark"]{
+  color-scheme:dark;
+  --bg:#13161b; --surface:#1d222a; --surface-2:#191d24; --ink:#eef1f5; --muted:#9aa3ae; --line:#2e353f;
+  --noga:#ec7391; --noga-fill:#b83d5e; --noga-soft:#3a2129;
+  --nir:#6aa6ec; --nir-fill:#2f6bb8; --nir-soft:#1b2b40;
+  --ok:#2a8a5f; --danger:#ef6b6b; --warn:#f0a54a; --warn-soft:#3a2a17;
+  --toast:#2c3440; --toast-line:#3d4652;
+  --shadow:0 1px 2px rgba(0,0,0,.3);
+}
+*{box-sizing:border-box;-webkit-tap-highlight-color:transparent}
+html,body{margin:0;background:var(--bg);color:var(--ink)}
+body{font-family:system-ui,"Segoe UI",Roboto,"Noto Sans Hebrew",Arial,sans-serif;font-size:16px;line-height:1.4;
+  padding:env(safe-area-inset-top) 0 calc(env(safe-area-inset-bottom) + 96px);transition:background .3s}
+button,input,select,textarea{font:inherit;color:inherit}
+button{cursor:pointer}
+.wrap{max-width:640px;margin:0 auto;padding:0 16px}
+
+/* header */
+.top{display:flex;align-items:center;justify-content:space-between;padding:14px 0 6px}
+.top h1{margin:0;font-size:24px;font-weight:800;letter-spacing:-.3px}
+.owner{border:0;background:transparent;color:var(--muted);font-size:13px;padding:8px 0;min-height:40px}
+.owner b{color:var(--ink)}
+.icon-btn{width:44px;height:44px;border-radius:12px;border:1px solid var(--line);background:var(--surface);font-size:20px;line-height:1}
+
+/* suitcase cards */
+.bags{display:grid;grid-template-columns:1fr 1fr;gap:10px;margin:6px 0 12px}
+.bag{border:1px solid var(--line);background:var(--surface);border-radius:var(--r);padding:12px;text-align:right;box-shadow:var(--shadow);position:relative;overflow:hidden}
+.bag::before{content:"";position:absolute;inset:0 0 auto 0;height:4px;background:var(--c)}
+.bag.noga{--c:var(--noga);--f:var(--noga-fill);--s:var(--noga-soft)} .bag.nir{--c:var(--nir);--f:var(--nir-fill);--s:var(--nir-soft)}
+.bag.active{outline:2px solid var(--c);outline-offset:-1px}
+.bag .bn{font-weight:800;font-size:17px;color:var(--c);display:flex;align-items:center;gap:6px}
+.bag .bc{font-size:13px;color:var(--muted);margin-top:2px}
+.bar{height:7px;border-radius:9px;background:var(--s);margin-top:10px;overflow:hidden}
+.bar i{display:block;height:100%;width:0;background:var(--f);border-radius:9px;transition:width .3s}
+.bag .bp{font-size:12px;color:var(--muted);margin-top:5px}
+
+/* sticky: tabs + add row only */
+.sticky{position:sticky;top:0;z-index:5;background:var(--bg);padding:8px 0 10px;border-bottom:1px solid var(--line);transition:background .3s}
+.tabs{display:flex;gap:6px;overflow-x:auto;scrollbar-width:none;padding-bottom:2px}
+.tabs::-webkit-scrollbar{display:none}
+.tab{flex:0 0 auto;min-height:40px;border:1px solid var(--line);background:var(--surface);border-radius:999px;padding:0 15px;font-size:15px;font-weight:600;white-space:nowrap}
+.tab span{color:var(--muted);font-weight:500;margin-inline-start:5px}
+.tab[aria-selected="true"]{background:var(--ink);color:var(--bg);border-color:var(--ink)}
+.tab[aria-selected="true"] span{color:inherit;opacity:.8}
+.tab[data-tab="noga"][aria-selected="true"]{background:var(--noga-fill);border-color:var(--noga-fill);color:#fff}
+.tab[data-tab="nir"][aria-selected="true"]{background:var(--nir-fill);border-color:var(--nir-fill);color:#fff}
+
+.add{display:flex;gap:8px;margin-top:10px}
+.add input{flex:1;min-width:0;height:48px;border-radius:12px;border:1px solid var(--line);background:var(--surface);padding:0 12px}
+input:focus-visible,select:focus-visible,textarea:focus-visible,.search:focus{outline:2px solid var(--nir);outline-offset:-1px}
+.addbtn{height:48px;border:0;border-radius:12px;color:#fff;font-weight:700;padding:0 14px;white-space:nowrap;background:var(--nir-fill)}
+.addbtn.noga{background:var(--noga-fill)}
+
+/* add options (scroll with page) */
+.addopts{display:flex;gap:8px;margin-top:12px;align-items:center}
+.addopts select{flex:1;min-width:0;height:44px;border-radius:10px;border:1px solid var(--line);background:var(--surface);padding:0 8px}
+.stepper{display:flex;align-items:center;border:1px solid var(--line);border-radius:10px;background:var(--surface);height:44px}
+.stepper button{width:44px;height:100%;border:0;background:transparent;font-size:20px}
+.stepper output{min-width:24px;text-align:center;font-weight:700}
+.addbag{display:flex;align-items:center;gap:8px;margin-top:8px}
+.lbl{flex:0 0 auto;font-size:13px;color:var(--muted)}
+
+.tools{display:flex;gap:8px;margin-top:12px}
+.search{flex:1;min-width:0;height:42px;border-radius:10px;border:1px solid var(--line);background:var(--surface);padding:0 10px;font-size:15px}
+.chip{height:42px;border-radius:10px;border:1px solid var(--line);background:var(--surface);padding:0 12px;font-size:14px;white-space:nowrap}
+.chip[aria-pressed="true"]{background:var(--ink);color:var(--bg);border-color:var(--ink)}
+
+/* segmented suitcase switch (rows, add area, settings) */
+.seg{flex:1;display:flex;border:1px solid var(--line);border-radius:10px;overflow:hidden;background:var(--surface)}
+.seg button{flex:1;border:0;background:transparent;height:40px;padding:0 6px;font-size:14px;font-weight:700;color:var(--muted)}
+.seg button+button{border-inline-start:1px solid var(--line)}
+.seg button.on{background:var(--ink);color:var(--bg)}
+.seg button[data-bag="noga"].on{background:var(--noga-fill);color:#fff}
+.seg button[data-bag="nir"].on{background:var(--nir-fill);color:#fff}
+
+/* list */
+.group{margin-top:16px}
+.gh{font-size:13px;font-weight:700;color:var(--muted);margin:0 2px 6px;display:flex;gap:6px;align-items:center}
+.item{background:var(--surface);border:1px solid var(--line);border-radius:12px;padding:10px 12px;margin-bottom:8px;box-shadow:var(--shadow)}
+.item.b-noga{border-inline-start:5px solid var(--noga)}
+.item.b-nir{border-inline-start:5px solid var(--nir)}
+.l1{display:flex;align-items:center;gap:10px}
+.info{flex:1;min-width:0;border:0;background:transparent;text-align:right;padding:2px 0}
+.info .nm{display:flex;align-items:flex-start;gap:6px;font-weight:700;font-size:17px}
+.nm .t{display:-webkit-box;-webkit-line-clamp:2;-webkit-box-orient:vertical;overflow:hidden;overflow-wrap:anywhere;text-align:start}
+.nm .ci{flex:0 0 auto;font-size:15px;margin-top:2px}
+.nm .pen{flex:0 0 auto;font-size:13px;opacity:.5;margin-top:3px}
+.info .mt{display:block;font-size:13px;color:var(--muted)}
+.item.packed .nm .t{color:var(--muted)}
+.pk{flex:0 0 auto;height:42px;border-radius:999px;border:1.5px solid var(--ink);background:transparent;padding:0 14px;font-size:14px;font-weight:700;white-space:nowrap}
+.item.packed .pk{background:var(--ok);border-color:var(--ok);color:#fff}
+.l2{display:flex;align-items:center;gap:8px;margin-top:8px}
+.item.isdup{box-shadow:0 0 0 2px var(--warn)}
+.info .dup{display:block;font-size:13px;font-weight:600;color:var(--warn);margin-top:2px}
+.dupbar{display:flex;align-items:center;justify-content:space-between;gap:10px;background:var(--warn-soft);border:1px solid var(--warn);border-radius:12px;padding:10px 12px;margin-top:14px;font-size:14px}
+.dupbar b{color:var(--warn)}
+.dupbar button{flex:0 0 auto;height:40px;border-radius:9px;border:1px solid var(--warn);background:var(--surface);color:var(--warn);font-weight:700;padding:0 12px}
+.empty{text-align:center;color:var(--muted);padding:40px 16px}
+.empty .big{font-size:40px;margin-bottom:6px}
+.fatal{margin-top:20px;border:1px solid var(--danger);border-radius:12px;padding:16px;color:var(--danger);font-weight:600;text-align:center}
+
+/* dialogs */
+dialog{border:0;border-radius:18px;padding:0;width:min(520px,calc(100vw - 24px));max-height:calc(100dvh - 24px);background:var(--surface);color:var(--ink);box-shadow:0 20px 60px rgba(0,0,0,.3)}
+dialog::backdrop{background:rgba(10,14,20,.5)}
+.dlg{padding:18px}
+.dlg h2{margin:0 0 4px;font-size:19px}
+.dlg p.sub{margin:0 0 14px;color:var(--muted);font-size:14px}
+.f{display:block;margin-bottom:12px}
+.f>span{display:block;font-size:13px;color:var(--muted);margin-bottom:4px}
+.f input,.f select{width:100%;height:46px;border-radius:10px;border:1px solid var(--line);background:var(--surface-2);padding:0 10px}
+.hint{font-size:13px;color:var(--warn);margin-top:6px}
+.row{display:flex;gap:8px;margin-top:6px}
+.row>*{flex:1}
+.btn{min-height:46px;border-radius:12px;border:1px solid var(--line);background:var(--surface-2);font-weight:600;padding:0 12px}
+.btn.danger{color:var(--danger)}
+.btn.main{background:var(--ink);color:var(--bg);border-color:var(--ink)}
+.btn:disabled{opacity:.45}
+.menu>button{display:flex;width:100%;align-items:center;gap:12px;text-align:right;border:0;background:transparent;padding:12px 4px;min-height:52px;border-bottom:1px solid var(--line);font-size:16px}
+.menu .ic{width:28px;text-align:center;font-size:19px;flex:0 0 auto}
+.menu .ds{display:block;font-size:12px;color:var(--muted)}
+.menu .danger{color:var(--danger)}
+.menu .sect{font-size:12px;font-weight:700;color:var(--muted);padding:14px 4px 2px;letter-spacing:.2px}
+.setrow{padding:10px 4px 12px;border-bottom:1px solid var(--line)}
+.setrow .top2{display:flex;align-items:center;gap:12px;margin-bottom:8px}
+.owners{display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-top:8px}
+.owners button{height:76px;border-radius:14px;border:2px solid var(--line);background:var(--surface-2);font-size:20px;font-weight:800}
+.owners [data-owner="noga"]{color:var(--noga)} .owners [data-owner="nir"]{color:var(--nir)}
+.linkbtn{display:block;margin:12px auto 0;min-height:40px;border:0;background:none;color:var(--muted);text-decoration:underline;font-size:13px;padding:0 8px}
+.warnbox{background:var(--warn-soft);border:1px solid var(--warn);border-radius:10px;padding:10px 12px;margin:8px 0 12px;font-size:14px;font-weight:600}
+.rlist{margin:0 0 12px;padding-inline-start:20px;font-size:14px;line-height:1.7}
+.rlist b{color:var(--danger)}
+.note{font-size:12px;color:var(--muted);margin-top:12px}
+
+/* keep import */
+#kText{width:100%;min-height:120px;border-radius:10px;border:1px solid var(--line);background:var(--surface-2);padding:10px;resize:vertical;font-size:15px}
+.kopts{margin:10px 0}
+.kopts label{display:flex;align-items:center;gap:10px;min-height:40px;font-size:14px}
+.kopts input{width:20px;height:20px;flex:0 0 auto}
+.kprev{border:1px solid var(--line);border-radius:10px;background:var(--surface-2);max-height:180px;overflow:auto;padding:6px 10px;font-size:14px}
+.kprev div{padding:4px 0;border-bottom:1px solid var(--line);display:flex;gap:6px}
+.kprev div:last-child{border-bottom:0}
+.kprev .skip{color:var(--muted);text-decoration:line-through}
+.kcount{font-size:14px;font-weight:700;margin:12px 0 6px}
+
+/* toast: full-width bar above the bottom */
+.toast{position:fixed;left:12px;right:12px;bottom:calc(env(safe-area-inset-bottom) + 16px);max-width:616px;margin:0 auto;
+  transform:translateY(20px);opacity:0;pointer-events:none;background:var(--toast);border:1px solid var(--toast-line);color:#fff;
+  border-radius:14px;padding:6px 8px 6px 14px;min-height:52px;font-size:14px;display:flex;gap:12px;align-items:center;justify-content:space-between;
+  transition:.2s;z-index:50;box-shadow:0 8px 24px rgba(0,0,0,.25)}
+.toast.show{opacity:1;transform:none;pointer-events:auto}
+.toast span{padding:8px 0}
+.toast button{flex:0 0 auto;min-height:40px;border:0;border-radius:10px;background:rgba(255,255,255,.12);color:#9cc8ff;font-weight:700;padding:0 14px}
+</style>
+</head>
+<body>
+<div class="wrap">
+  <header class="top">
+    <div>
+      <h1>Packing</h1>
+      <button class="owner" id="ownerBtn" type="button"></button>
+    </div>
+    <button class="icon-btn" id="menuBtn" type="button" aria-label="הגדרות">☰</button>
+  </header>
+
+  <section class="bags">
+    <button class="bag noga" data-tab="noga" type="button">
+      <div class="bn">🧳 נגה</div>
+      <div class="bc" id="cNoga"></div>
+      <div class="bar"><i id="pNoga"></i></div>
+      <div class="bp" id="sNoga"></div>
+    </button>
+    <button class="bag nir" data-tab="nir" type="button">
+      <div class="bn">🧳 ניר</div>
+      <div class="bc" id="cNir"></div>
+      <div class="bar"><i id="pNir"></i></div>
+      <div class="bp" id="sNir"></div>
+    </button>
+  </section>
+</div>
+
+<div class="sticky">
+  <div class="wrap">
+    <nav class="tabs" role="tablist">
+      <button class="tab" role="tab" data-tab="all" type="button">הכל<span id="tAll"></span></button>
+      <button class="tab" role="tab" data-tab="noga" type="button">נגה<span id="tNoga"></span></button>
+      <button class="tab" role="tab" data-tab="nir" type="button">ניר<span id="tNir"></span></button>
+    </nav>
+    <div class="add">
+      <input id="addName" placeholder="הוספת פריט…" enterkeyhint="done" maxlength="80" autocomplete="off" dir="auto">
+      <button class="addbtn" type="button" id="addBtn">הוסף</button>
+    </div>
+  </div>
+</div>
+
+<div class="wrap">
+  <div class="addopts">
+    <select id="addCat" aria-label="קטגוריה"></select>
+    <div class="stepper" aria-label="כמות">
+      <button type="button" data-step="1" aria-label="יותר">+</button>
+      <output id="addQty">1</output>
+      <button type="button" data-step="-1" aria-label="פחות">−</button>
+    </div>
+  </div>
+  <div class="addbag"><span class="lbl">מוסיפים למזוודה:</span>
+    <div class="seg" id="addBag"><button type="button" data-bag="noga">נגה</button><button type="button" data-bag="nir">ניר</button></div>
+  </div>
+  <div class="tools">
+    <input class="search" id="search" type="search" placeholder="חיפוש" dir="auto">
+    <button class="chip" id="unpackedBtn" type="button" aria-pressed="false">רק לא ארוז</button>
+  </div>
+</div>
+
+<main class="wrap" id="list"></main>
+
+<!-- edit item -->
+<dialog id="editDlg">
+  <div class="dlg">
+    <h2>עריכת פריט</h2>
+    <label class="f"><span>שם</span><input id="eName" maxlength="80" dir="auto"></label>
+    <label class="f"><span>קטגוריה</span><select id="eCat"></select></label>
+    <div class="f"><span>כמות</span>
+      <div class="stepper" style="width:max-content">
+        <button type="button" data-estep="1" aria-label="יותר">+</button><output id="eQty">1</output><button type="button" data-estep="-1" aria-label="פחות">−</button>
+      </div>
+    </div>
+    <div class="f"><span>מזוודה</span>
+      <div class="seg" id="eBag"><button type="button" data-bag="noga">נגה</button><button type="button" data-bag="nir">ניר</button></div>
+      <div class="hint" id="eHint" hidden>⚠️ העברה למזוודה אחרת תאפס את סימון ״ארוז״</div>
+    </div>
+    <div class="row">
+      <button class="btn main" type="button" id="eSave">שמירה</button>
+      <button class="btn" type="button" id="eCancel">ביטול</button>
+    </div>
+    <div class="row"><button class="btn danger" type="button" id="eDelete">מחיקת הפריט</button></div>
+  </div>
+</dialog>
+
+<!-- settings -->
+<dialog id="menuDlg">
+  <div class="dlg">
+    <h2>הגדרות</h2>
+    <p class="sub" id="menuSub"></p>
+    <div class="menu">
+      <div class="sect">סנכרון עם הטלפון השני</div>
+      <button type="button" data-act="share"><span class="ic">📤</span><span>שליחת הרשימה<span class="ds">בוואטסאפ לטלפון השני — שם בוחרים ״טעינת קובץ״ ← מיזוג</span></span></button>
+      <button type="button" data-act="import"><span class="ic">📥</span><span>טעינת קובץ<span class="ds">קובץ שהגיע מהטלפון השני, או שחזור מגיבוי</span></span></button>
+      <button type="button" data-act="download"><span class="ic">💾</span><span>שמירת גיבוי בהורדות<span class="ds">עותק של הרשימה בתיקיית ההורדות</span></span></button>
+
+      <div class="sect">פעולות חד-פעמיות</div>
+      <button type="button" data-act="keep"><span class="ic">📝</span><span>ייבוא רשימה מ-Google Keep<span class="ds">הדבקה או קובץ txt — הפריטים נוספים פעם אחת</span></span></button>
+      <button type="button" data-act="unpack"><span class="ic">↺</span><span>איפוס סימוני ״ארוז״<span class="ds">הפריטים נשארים, רק הסימונים מתאפסים</span></span></button>
+
+      <div class="sect">תצוגה</div>
+      <div class="setrow">
+        <div class="top2"><span class="ic">🌗</span><span>ערכת צבעים<span class="ds" id="themeInfo"></span></span></div>
+        <div class="seg" id="themeSeg">
+          <button type="button" data-theme-set="auto">יום / לילה</button>
+          <button type="button" data-theme-set="light">בהיר</button>
+          <button type="button" data-theme-set="dark">כהה</button>
+        </div>
+      </div>
+      <div class="setrow">
+        <div class="top2"><span class="ic">🔤</span><span>מיון<span class="ds" id="sortInfo"></span></span></div>
+        <div class="seg" id="sortSeg">
+          <button type="button" data-sort-set="cat">לפי קטגוריה</button>
+          <button type="button" data-sort-set="az">א–ת</button>
+        </div>
+      </div>
+      <button type="button" data-act="owner"><span class="ic">👤</span><span>החלפת בעל הטלפון</span></button>
+      <button type="button" data-act="clear" class="danger"><span class="ic">🗑</span><span>מחיקת כל הפריטים</span></button>
+    </div>
+    <div class="row"><button class="btn" type="button" data-act="close">סגירה</button></div>
+  </div>
+</dialog>
+
+<!-- import choice -->
+<dialog id="importDlg">
+  <div class="dlg">
+    <h2>טעינת קובץ</h2>
+    <p class="sub" id="importSub"></p>
+    <div class="row"><button class="btn main" type="button" id="iMerge">מיזוג (מומלץ)</button></div>
+    <p class="note" style="margin:4px 0 12px">מיזוג: פריטים חדשים נוספים, ושינויים מהטלפון השני עוברים לכאן. זו הדרך הנכונה לסנכרן — היא לא מוחקת את הרשימה שבטלפון הזה.</p>
+    <div class="row"><button class="btn" type="button" id="iCancel">ביטול</button></div>
+    <button class="linkbtn" type="button" id="iReplace">שחזור מגיבוי (החלפת הכל)…</button>
+  </div>
+</dialog>
+
+<!-- replace warning -->
+<dialog id="replaceDlg">
+  <div class="dlg">
+    <h2>⚠️ להחליף את כל הרשימה?</h2>
+    <div class="warnbox" id="rFrom" hidden></div>
+    <p class="sub" style="margin-bottom:8px">החלפה <b>מוחקת</b> את הרשימה שבטלפון הזה ושמה במקומה את הקובץ:</p>
+    <ul class="rlist" id="rList"></ul>
+    <p class="sub">החלפה מיועדת רק לשחזור גיבוי שלך. <b>לסנכרון עם הטלפון השני — תמיד מיזוג</b>: הוא מוסיף ומעדכן, ולא מוחק כלום מהטלפון הזה.</p>
+    <div class="row"><button class="btn main" type="button" id="rMerge">מיזוג במקום (מומלץ)</button></div>
+    <div class="row"><button class="btn danger" type="button" id="rReplace">כן, להחליף את הכל</button></div>
+    <div class="row"><button class="btn" type="button" id="rCancel">ביטול</button></div>
+  </div>
+</dialog>
+
+<!-- Google Keep import -->
+<dialog id="keepDlg">
+  <div class="dlg">
+    <h2>ייבוא מ-Google Keep</h2>
+    <p class="sub" id="kSub">ב-Keep: פותחים את הפתק ← ⋮ ← <b>שליחה</b> ← <b>העתקה ללוח</b>, ומדביקים כאן. או בוחרים קובץ txt.</p>
+    <textarea id="kText" placeholder="הדביקו כאן את הרשימה…" dir="auto"></textarea>
+    <div class="row"><button class="btn" type="button" id="kFileBtn">📄 בחירת קובץ txt</button></div>
+    <div class="f" style="margin-top:12px"><span>לאיזו מזוודה?</span>
+      <div class="seg" id="kBag"><button type="button" data-bag="noga">נגה</button><button type="button" data-bag="nir">ניר</button></div>
+    </div>
+    <div class="kopts">
+      <label><input type="checkbox" id="kTitle"> לדלג על השורה הראשונה (כותרת הפתק)</label>
+      <label><input type="checkbox" id="kSkip" checked> לדלג על פריטים שכבר קיימים במזוודה</label>
+      <label><input type="checkbox" id="kChecked"> פריטים שסומנו ✓ ב-Keep — לסמן כ״ארוז״</label>
+    </div>
+    <div class="kcount" id="kCount"></div>
+    <div class="kprev" id="kPrev"></div>
+    <p class="note">הקטגוריה נקבעת אוטומטית לפי השם, ואפשר לתקן אחר כך בעריכה.</p>
+    <div class="row">
+      <button class="btn main" type="button" id="kGo" disabled>ייבוא</button>
+      <button class="btn" type="button" id="kCancel">ביטול</button>
+    </div>
+  </div>
+</dialog>
+
+<!-- owner -->
+<dialog id="ownerDlg">
+  <div class="dlg">
+    <h2>של מי הטלפון הזה?</h2>
+    <p class="sub">כל טלפון שומר רשימה משלו. אפשר לשנות אחר כך בהגדרות.</p>
+    <div class="owners">
+      <button type="button" data-owner="noga">נגה</button>
+      <button type="button" data-owner="nir">ניר</button>
+    </div>
+  </div>
+</dialog>
+
+<!-- confirm -->
+<dialog id="confirmDlg">
+  <div class="dlg">
+    <h2 id="cTitle"></h2>
+    <p class="sub" id="cText"></p>
+    <div class="row">
+      <button class="btn danger" type="button" id="cYes"></button>
+      <button class="btn" type="button" id="cNo">ביטול</button>
+    </div>
+  </div>
+</dialog>
+
+<input type="file" id="fileIn" hidden>
+<input type="file" id="kFile" hidden>
+<div class="toast" id="toast" role="status"><span id="toastText"></span><button type="button" id="toastAct" hidden></button></div>
+
+<script>
+(() => {
+'use strict';
+
+/* ---------- constants ---------- */
+const CATS = [
+  ['clothes','בגדים','👕'], ['shoes','הנעלה','👟'], ['toiletries','טואלטיקה','🧴'],
+  ['meds','תרופות','💊'], ['electronics','אלקטרוניקה','🔌'], ['docs','מסמכים','📄'], ['other','אחר','📦']
+];
+const CAT = Object.fromEntries(CATS.map(c => [c[0], {name:c[1], icon:c[2]}]));
+const BAGS = {noga:'נגה', nir:'ניר'};
+const FIELDS = ['name','cat','qty','bag','packed','deleted'];
+const MAX_FILE = 5e6, MAX_ITEMS = 5000;
+const ERR = Symbol('read-error');
+
+/* ---------- state ---------- */
+let state = {version:2, owner:null, items:[], lastExport:null};
+const ui = {tab:'all', q:'', unpacked:false, qty:1, cat:'clothes', addBag:null, dupOnly:false, sort:'cat'};
+const heSort = new Intl.Collator('he', {numeric: true, sensitivity: 'base'}).compare;
+let pendingImport = null, pendingFrom = null;
+
+const $ = s => document.querySelector(s);
+const uid = () => Date.now().toString(36) + Math.random().toString(36).slice(2, 8);
+const now = () => Date.now();
+const live = () => state.items.filter(i => !i.deleted);
+const byId = id => state.items.find(i => i.id === id);
+const find = id => { const i = byId(id); return i && !i.deleted ? i : null; };
+const defaultBag = () => state.owner || 'nir';
+const curBag = () => ui.addBag || defaultBag();
+const normName = n => String(n).trim().replace(/\s+/g, ' ').toLowerCase();
+const dupKey = i => i.bag + '|' + normName(i.name);
+const esc = s => String(s).replace(/[&<>"']/g, c => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
+const anyDialogOpen = () => !!document.querySelector('dialog[open]');
+
+/* ---------- storage (IndexedDB, localStorage fallback) ---------- */
+const store = {
+  db: null, readOnly: false, warned: false,
+  async open() {
+    if (!('indexedDB' in window)) return null;
+    return new Promise(res => {
+      try {
+        const r = indexedDB.open('mizvadot', 1);           // internal name kept so existing data stays
+        r.onupgradeneeded = () => r.result.createObjectStore('kv');
+        r.onsuccess = () => { this.db = r.result; res(this.db); };
+        r.onerror = () => res(null);
+        r.onblocked = () => res(null);
+      } catch { res(null); }
+    });
+  },
+  lsGet(key) { try { const v = localStorage.getItem('mizvadot:' + key); return v ? JSON.parse(v) : undefined; } catch { return undefined; } },
+  async get(key) {
+    const ls = this.lsGet(key);
+    if (this.db) {
+      let v;
+      try {
+        v = await new Promise((res, rej) => {
+          const q = this.db.transaction('kv').objectStore('kv').get(key);
+          q.onsuccess = () => res(q.result); q.onerror = () => rej(q.error);
+        });
+      } catch { return ls !== undefined ? ls : ERR; }      // never pretend the list is empty
+      if (ls && typeof ls === 'object' && (!v || (ls.savedAt || 0) > (v.savedAt || 0))) return ls;
+      return v;
+    }
+    return ls;
+  },
+  async set(key, val) {
+    if (this.readOnly) return;
+    let ok = false;
+    if (this.db) {
+      try {
+        await new Promise((res, rej) => {
+          const tx = this.db.transaction('kv', 'readwrite');
+          tx.objectStore('kv').put(val, key);
+          tx.oncomplete = res; tx.onerror = () => rej(tx.error); tx.onabort = () => rej(tx.error);
+        });
+        ok = true;
+        try { localStorage.removeItem('mizvadot:' + key); } catch {}
+      } catch {}
+    }
+    if (!ok) { try { localStorage.setItem('mizvadot:' + key, JSON.stringify(val)); ok = true; } catch {} }
+    if (!ok && !this.warned) { this.warned = true; toast('הדפדפן הזה לא מאפשר שמירה — הרשימה תימחק בסגירה'); }
+  }
+};
+const save = () => { state.savedAt = now(); return store.set('state', state); };
+
+/* ---------- items ---------- */
+function cleanItem(it) {
+  if (!it || typeof it !== 'object' || it.id == null) return null;
+  const id = String(it.id);
+  if (!/^[A-Za-z0-9_-]{1,64}$/.test(id)) return null;
+  const base = Number(it.updatedAt) || 0;
+  const ts = {};
+  for (const f of FIELDS) ts[f] = Number(it.ts && it.ts[f]) || base;
+  const out = {
+    id,
+    name: String(it.name ?? '').trim().slice(0, 80) || 'פריט',
+    cat: CAT[it.cat] ? it.cat : 'other',
+    qty: Math.min(99, Math.max(1, parseInt(it.qty, 10) || 1)),
+    bag: BAGS[it.bag] ? it.bag : defaultBag(),
+    packed: !!it.packed,
+    deleted: !!it.deleted,
+    ts
+  };
+  out.updatedAt = Math.max(base, ...FIELDS.map(f => ts[f]));
+  return out;
+}
+function newItem(fields) {
+  const t = now(), ts = {};
+  FIELDS.forEach(f => ts[f] = t);
+  return {id: uid(), name: '', cat: 'other', qty: 1, bag: defaultBag(), packed: false, deleted: false, ...fields, ts, updatedAt: t};
+}
+/* change fields; each changed field gets its own timestamp, always later than the item's last one */
+function touch(it, patch) {
+  const t = Math.max(now(), (it.updatedAt || 0) + 1);
+  let changed = false;
+  for (const k of Object.keys(patch)) {
+    if (!FIELDS.includes(k) || it[k] === patch[k]) continue;
+    it[k] = patch[k]; it.ts[k] = t; changed = true;
+  }
+  if (changed) it.updatedAt = t;
+  return changed;
+}
+function commit() { save(); render(); }
+
+function addItem(name) {
+  const bag = curBag();
+  const exists = live().some(i => i.bag === bag && normName(i.name) === normName(name));
+  const it = newItem({name, cat: ui.cat, qty: ui.qty, bag});
+  state.items.push(it);
+  commit();
+  if (exists) {
+    toast(`⚠️ "${name}" כבר קיים במזוודה של ${BAGS[bag]}`, 'הסר', () => { const x = byId(it.id); if (x) touch(x, {deleted: true}); commit(); });
+  } else if (ui.tab !== 'all' && ui.tab !== bag) {
+    toast(`נוסף למזוודה של ${BAGS[bag]}`, 'הצג', () => { ui.tab = bag; render(); });
+  }
+}
+function removeItem(id) {
+  const it = find(id); if (!it) return;
+  touch(it, {deleted: true}); commit();
+  toast(`"${it.name}" נמחק`, 'בטל', () => { const x = byId(id); if (x && x.deleted) { touch(x, {deleted: false}); commit(); } });
+}
+function moveItem(it, bag) {
+  if (it.bag === bag) return;
+  const prev = {bag: it.bag, packed: it.packed};
+  touch(it, {bag, packed: false}); commit();
+  if (prev.packed) toast(`הועבר למזוודה של ${BAGS[bag]} · סימון ״ארוז״ אופס`, 'בטל', () => {
+    const x = find(it.id); if (x) { touch(x, prev); commit(); }
+  });
+}
+function togglePacked(it) {
+  touch(it, {packed: !it.packed}); commit();
+  if (ui.unpacked && it.packed) toast(`"${it.name}" סומן כארוז`, 'בטל', () => { const x = find(it.id); if (x) { touch(x, {packed: false}); commit(); } });
+}
+
+/* ---------- duplicates ---------- */
+function dupKeys(items) {
+  const c = new Map();
+  for (const i of items) c.set(dupKey(i), (c.get(dupKey(i)) || 0) + 1);
+  return new Set([...c].filter(([, n]) => n > 1).map(([k]) => k));
+}
+
+/* ---------- render ---------- */
+function stats(items) {
+  const s = {all: items.length, noga: 0, nir: 0, nogaPacked: 0, nirPacked: 0, nogaQty: 0, nirQty: 0};
+  for (const i of items) { s[i.bag]++; s[i.bag + 'Qty'] += i.qty; if (i.packed) s[i.bag + 'Packed']++; }
+  return s;
+}
+
+function render() {
+  const items = live();
+  const s = stats(items);
+
+  for (const b of ['noga', 'nir']) {
+    const B = b === 'noga' ? 'Noga' : 'Nir';
+    const n = s[b], p = s[b + 'Packed'];
+    $('#c' + B).textContent = n ? `${n} פריטים · ${s[b + 'Qty']} יח׳` : 'ריקה';
+    $('#p' + B).style.width = n ? (p / n * 100) + '%' : '0';
+    $('#s' + B).textContent = n ? (p === n ? 'הכל ארוז ✓' : `${p} מתוך ${n} ארוזים`) : '—';
+  }
+  $('#tAll').textContent = s.all; $('#tNoga').textContent = s.noga; $('#tNir').textContent = s.nir;
+  document.querySelectorAll('.tab').forEach(t => t.setAttribute('aria-selected', t.dataset.tab === ui.tab));
+  document.querySelectorAll('.bag').forEach(t => t.classList.toggle('active', t.dataset.tab === ui.tab));
+
+  const ab = curBag();
+  document.querySelectorAll('#addBag button').forEach(b => b.classList.toggle('on', b.dataset.bag === ab));
+  $('#addBtn').textContent = `הוסף ל${BAGS[ab]}`;
+  $('#addBtn').classList.toggle('noga', ab === 'noga');
+  $('#addQty').textContent = ui.qty;
+  $('#ownerBtn').innerHTML = state.owner ? `הטלפון של <b>${BAGS[state.owner]}</b>` : '<b>בחירת בעל הטלפון</b>';
+
+  const host = $('#list');
+  if (store.readOnly) {
+    host.innerHTML = `<div class="fatal">שגיאה בטעינת הרשימה מהזיכרון של הטלפון.<br>שום דבר לא נמחק — סגרו את האפליקציה לגמרי ופתחו שוב.</div>`;
+    return;
+  }
+
+  const inTab = items.filter(i => ui.tab === 'all' || i.bag === ui.tab);
+  const dups = dupKeys(items);
+  const dupCount = inTab.filter(i => dups.has(dupKey(i))).length;
+  if (!dupCount) ui.dupOnly = false;
+  const q = normName(ui.q);
+  const list = inTab.filter(i =>
+    (!ui.dupOnly || dups.has(dupKey(i))) &&
+    (!q || normName(i.name).includes(q)) &&
+    (!ui.unpacked || !i.packed));
+
+  const bar = dupCount ? `<div class="dupbar"><span>⚠️ יש <b>${dupCount}</b> פריטים כפולים באותה מזוודה</span><button type="button" data-act="dup-toggle">${ui.dupOnly ? 'הצג הכל' : 'הצג כפולים'}</button></div>` : '';
+
+  if (!items.length) { host.innerHTML = `<div class="empty"><div class="big">🧳</div>הרשימה ריקה.<br>הוסיפו פריט ראשון למעלה, או ייבאו רשימה מ-Google Keep בהגדרות ☰.</div>`; return; }
+  if (!list.length) {
+    const allPacked = ui.unpacked && !q && !ui.dupOnly && inTab.length && inTab.every(i => i.packed);
+    host.innerHTML = bar + (allPacked
+      ? `<div class="empty"><div class="big">✅</div>הכל ארוז!</div>`
+      : `<div class="empty"><div class="big">🔍</div>אין פריטים כאן</div>`);
+    return;
+  }
+  const row = (i, showCat) => {
+    const isDup = dups.has(dupKey(i));
+    const seg = ['noga', 'nir'].map(b => `<button type="button" data-bag="${b}" class="${i.bag === b ? 'on' : ''}">${BAGS[b]}</button>`).join('');
+    return `<div class="item b-${i.bag}${i.packed ? ' packed' : ''}${isDup ? ' isdup' : ''}" data-id="${esc(i.id)}">
+        <div class="l1">
+          <button type="button" class="info" aria-label="עריכת ${esc(i.name)}"><span class="nm">${showCat ? `<span class="ci" title="${CAT[i.cat].name}">${CAT[i.cat].icon}</span>` : ''}<span class="t" dir="auto">${esc(i.name)}</span><span class="pen">✏️</span></span>${i.qty > 1 ? `<span class="mt">כמות: ${i.qty}</span>` : ''}${isDup ? `<span class="dup">⚠️ מופיע פעמיים במזוודה של ${BAGS[i.bag]}</span>` : ''}</button>
+          <button type="button" class="pk">${i.packed ? '✓ ארוז' : 'סמן כארוז'}</button>
+        </div>
+        <div class="l2"><span class="lbl">מזוודה:</span><div class="seg">${seg}</div></div>
+      </div>`;
+  };
+  let html = bar;
+  if (ui.sort === 'az') {
+    /* one alphabetical list; packed items keep their place */
+    list.sort((a, b) => heSort(a.name, b.name));
+    html += `<section class="group">${list.map(i => row(i, true)).join('')}</section>`;
+  } else {
+    list.sort((a, b) => (a.packed - b.packed) || heSort(a.name, b.name));
+    for (const [key, name, icon] of CATS) {
+      const g = list.filter(i => i.cat === key);
+      if (!g.length) continue;
+      html += `<section class="group"><div class="gh">${icon} ${name} · ${g.length}</div>${g.map(i => row(i, false)).join('')}</section>`;
+    }
+  }
+  host.innerHTML = html;
+}
+
+/* ---------- toast ---------- */
+let toastTimer;
+function toast(text, actLabel, actFn) {
+  $('#toastText').textContent = text;
+  const b = $('#toastAct');
+  b.hidden = !actLabel;
+  b.textContent = actLabel || '';
+  b.onclick = () => { $('#toast').classList.remove('show'); b.onclick = null; actFn && actFn(); };
+  $('#toast').classList.add('show');
+  clearTimeout(toastTimer);
+  toastTimer = setTimeout(() => { $('#toast').classList.remove('show'); b.onclick = null; }, actLabel ? 6000 : 3000);
+}
+
+/* ---------- confirm ---------- */
+function confirmBox(title, text, yes) {
+  return new Promise(res => {
+    $('#cTitle').textContent = title; $('#cText').textContent = text; $('#cYes').textContent = yes;
+    const d = $('#confirmDlg');
+    let done = false; const fin = v => { if (!done) { done = true; res(v); } };
+    $('#cYes').onclick = () => { fin(true); d.close(); };
+    $('#cNo').onclick = () => { fin(false); d.close(); };
+    d.addEventListener('close', () => fin(false), {once: true});
+    d.showModal();
+  });
+}
+
+/* ---------- edit dialog ---------- */
+let editId = null, editQty = 1, editBag = 'nir';
+function openEdit(id) {
+  const it = find(id); if (!it) return;
+  editId = id; editQty = it.qty; editBag = it.bag;
+  $('#eName').value = it.name; $('#eCat').value = it.cat;
+  paintEdit(); $('#editDlg').showModal();
+}
+function paintEdit() {
+  const it = find(editId);
+  $('#eQty').textContent = editQty;
+  document.querySelectorAll('#eBag button').forEach(b => b.classList.toggle('on', b.dataset.bag === editBag));
+  $('#eHint').hidden = !(it && it.packed && editBag !== it.bag);
+}
+function submitEdit() {
+  const it = find(editId); const name = $('#eName').value.trim();
+  if (!name) { $('#eName').focus(); return; }
+  if (it) {
+    const packed = editBag === it.bag ? it.packed : false;
+    touch(it, {name: name.slice(0, 80), cat: $('#eCat').value, qty: editQty, bag: editBag, packed});
+    commit();
+  }
+  $('#editDlg').close();
+}
+
+/* ---------- export / import ---------- */
+function exportData() {
+  const data = {app: 'packing', version: 2, owner: state.owner, exportedAt: new Date().toISOString(), items: state.items};
+  const d = new Date();
+  const stamp = `${d.getFullYear()}-${String(d.getMonth() + 1).padStart(2, '0')}-${String(d.getDate()).padStart(2, '0')}`;
+  return {base: `packing-${state.owner || 'phone'}-${stamp}`, text: JSON.stringify(data)};
+}
+function markExported() { state.lastExport = now(); save(); }
+
+async function shareFile() {
+  const {base, text} = exportData();
+  /* Chrome on Android only shares certain file types; .json is not one of them, .txt is. */
+  const file = new File([text], base + '.txt', {type: 'text/plain'});
+  if (navigator.canShare && navigator.canShare({files: [file]})) {
+    try { await navigator.share({files: [file], title: 'Packing'}); markExported(); return; }
+    catch (e) { if (e && e.name === 'AbortError') return; }
+  }
+  downloadFile(); toast('השליחה לא נתמכת כאן — הקובץ נשמר בהורדות');
+}
+function downloadFile() {
+  const {base, text} = exportData();
+  const a = document.createElement('a');
+  a.href = URL.createObjectURL(new Blob([text], {type: 'application/json'}));
+  a.download = base + '.json';
+  document.body.appendChild(a); a.click(); a.remove();
+  setTimeout(() => URL.revokeObjectURL(a.href), 4000);
+  markExported(); toast('נשמר בהורדות: ' + a.download);
+}
+
+async function readImport(file) {
+  if (file.size > MAX_FILE) { toast('הקובץ גדול מדי'); return; }
+  let data;
+  try { data = JSON.parse(await file.text()); }
+  catch { toast('זה לא קובץ של Packing. לרשימה מ-Keep: הגדרות ← ייבוא מ-Google Keep'); return; }
+  const arr = Array.isArray(data) ? data : data && Array.isArray(data.items) ? data.items : null;
+  if (!arr) { toast('לא נמצאו פריטים בקובץ'); return; }
+  const items = arr.slice(0, MAX_ITEMS).map(cleanItem).filter(Boolean);
+  const liveCount = items.filter(i => !i.deleted).length;
+  pendingImport = items; pendingFrom = data && BAGS[data.owner] ? data.owner : null;
+  const from = data && BAGS[data.owner] ? ` מהטלפון של ${BAGS[data.owner]}` : '';
+  $('#importSub').textContent = `בקובץ${from}: ${liveCount} פריטים. בטלפון הזה: ${live().length}.`;
+  $('#importDlg').showModal();
+}
+function mergeItems(incoming) {
+  const map = new Map(state.items.map(i => [i.id, i]));
+  let added = 0, updated = 0, removed = 0, restored = 0, skipped = 0;
+  for (const it of incoming) {
+    const cur = map.get(it.id);
+    if (!cur) { state.items.push(it); map.set(it.id, it); if (!it.deleted) added++; continue; }
+    const wasDeleted = cur.deleted;
+    let changed = false;
+    for (const f of FIELDS) {
+      const a = cur.ts[f] || 0, b = it.ts[f] || 0;
+      if (b > a || (b === a && String(it[f]) > String(cur[f]))) {
+        if (cur[f] !== it[f]) changed = true;
+        cur[f] = it[f]; cur.ts[f] = b;
+      }
+    }
+    cur.updatedAt = Math.max(...FIELDS.map(f => cur.ts[f]));
+    if (!wasDeleted && cur.deleted) removed++;
+    else if (wasDeleted && !cur.deleted) restored++;
+    else if (changed && !cur.deleted) updated++;
+    if (cur.deleted && !it.deleted) skipped++;
+  }
+  return {added, updated, removed, restored, skipped};
+}
+
+/* ---------- Google Keep import ---------- */
+const KEYWORDS = {
+  clothes: ['חולצ','מכנס','תחתונ','גרב','חזיי','שמל','חצאית','סווטשירט','סוודר','מעיל','ג׳קט',"ג'קט",'גקט','פיג׳מ',"פיג'מ",'פיגמ','בגד','כובע','צעיף','כפפ','טייץ','גופי','חליפ','עניב','ז׳קט',"ז'קט",'קפוצ','טרנינג','ברמוד','ג׳ינס',"ג'ינס",'גינס','חגור','shirt','pants','sock','jacket','coat','dress','jeans','hoodie','sweater','underwear','hat'],
+  shoes: ['נעל','סנדל','כפכפ','מגפ','shoe','sandal','boot','sneaker','slipper'],
+  toiletries: ['מברשת','משחת','שמפו','מרכך','סבון','דאודורנט','בושם','קרם','איפור','מגבת','מגבו','משקפ','מסקרה','שפתון','גילוח','תער','מסרק','חוט דנטלי','קיסמי','ספוג','לחות','הגנה','מקלחת','toothbrush','toothpaste','shampoo','soap','deodorant','razor','cream','lotion','sunscreen','makeup'],
+  meds: ['תרופ','כדור','אקמול','אדוויל','נורופן','פלסטר','ויטמינ','משכך','מרשם','אנטיהיסטמין','טיפות','med','pill','vitamin','aspirin','tylenol','advil','ibuprofen','bandaid'],
+  electronics: ['מטען','כבל','אוזני','טלפון','מחשב','לפטופ','טאבלט','אייפד','מצלמ','סוללה','סוללת','מתאם','שעון','קינדל','פן','מייבש','מחליק','מפצל','power bank','charger','cable','adapter','laptop','camera','headphone','earbud','airpods','ipad','kindle','tablet','phone','battery'],
+  docs: ['דרכון','ויזה','כרטיס','ביטוח','רישיון','תעוד','מסמכ','אשרה','ארנק','כסף','מזומן','אשראי','הזמנ','שובר','passport','visa','ticket','insurance','license','wallet','cash','booking']
+};
+const finals = s => s.toLowerCase().replace(/[ךםןףץ]/g, c => ({'ך':'כ','ם':'מ','ן':'נ','ף':'פ','ץ':'צ'}[c]));
+const KW = Object.entries(KEYWORDS).map(([cat, ws]) => [cat, ws.map(finals)]);
+function guessCat(name) {
+  const n = finals(name);                           // "דרכון" must also match "דרכונים"
+  for (const [cat, words] of KW) if (words.some(w => n.includes(w))) return cat;
+  return 'other';
+}
+const MARK = /^\s*(?:\[\s*([xX✓✔])?\s*\]|([☐□○◻⬜•·▪◦●■\-–—*+>])|([☑☒✓✔✅]))\s*/;
+function parseKeep(text, skipTitle) {
+  let lines = String(text || '').split(/\r?\n/).map(l => l.trim()).filter(Boolean);
+  if (skipTitle) lines = lines.slice(1);
+  const out = [], seen = new Set();
+  for (let line of lines) {
+    let checked = false;
+    const m = line.match(MARK);
+    if (m) { checked = !!(m[1] || m[3]); line = line.slice(m[0].length).trim(); }
+    line = line.replace(/^\d{1,2}[.)]\s+/, '');                       // "1. item"
+    let qty = 1, mm;
+    if ((mm = line.match(/^(.+?)\s*[x×*]\s*(\d{1,2})$/i)) || (mm = line.match(/^(.+?)\s*\((\d{1,2})\)$/))) { line = mm[1]; qty = +mm[2]; }
+    else if ((mm = line.match(/^(\d{1,2})\s*[x×*]?\s+(.+)$/i))) { qty = +mm[1]; line = mm[2]; }
+    line = line.replace(/\s+/g, ' ').trim().slice(0, 80);
+    if (!line || !/[\p{L}\p{N}]/u.test(line)) continue;
+    const key = normName(line);
+    if (seen.has(key)) continue;
+    seen.add(key);
+    out.push({name: line, qty: Math.min(99, Math.max(1, qty)), checked, cat: guessCat(line)});
+  }
+  return out;
+}
+function titleLooksLikeHeader(text) {
+  const lines = String(text || '').split(/\r?\n/).map(l => l.trim()).filter(Boolean);
+  if (lines.length < 2) return false;
+  return !MARK.test(lines[0]) && lines.slice(1).some(l => MARK.test(l));
+}
+const keep = {bag: null, rows: []};
+function openKeep(prefill, title) {
+  keep.bag = defaultBag();
+  $('#kText').value = prefill || '';
+  $('#kTitle').checked = prefill ? (!title && titleLooksLikeHeader(prefill)) : false;
+  $('#kSub').innerHTML = title
+    ? `מתוך הפתק <b>${esc(title)}</b>. בדקו את הרשימה ובחרו מזוודה.`
+    : 'ב-Keep: פותחים את הפתק ← ⋮ ← <b>שליחה</b> ← <b>העתקה ללוח</b>, ומדביקים כאן. או בוחרים קובץ txt.';
+  paintKeep();
+  $('#keepDlg').showModal();
+}
+function paintKeep() {
+  document.querySelectorAll('#kBag button').forEach(b => b.classList.toggle('on', b.dataset.bag === keep.bag));
+  const rows = parseKeep($('#kText').value, $('#kTitle').checked);
+  const existing = new Set(live().filter(i => i.bag === keep.bag).map(i => normName(i.name)));
+  const skipOn = $('#kSkip').checked;
+  rows.forEach(r => r.skip = skipOn && existing.has(normName(r.name)));
+  keep.rows = rows;
+  const n = rows.filter(r => !r.skip).length, sk = rows.length - n;
+  $('#kCount').textContent = rows.length
+    ? `נמצאו ${rows.length} פריטים${sk ? ` · ${sk} כבר קיימים ויידלגו` : ''}`
+    : ($('#kText').value.trim() ? 'לא נמצאו פריטים' : '');
+  $('#kPrev').hidden = !rows.length;
+  $('#kPrev').innerHTML = rows.map(r =>
+    `<div class="${r.skip ? 'skip' : ''}"><span>${CAT[r.cat].icon}</span><span dir="auto">${esc(r.name)}${r.qty > 1 ? ` ×${r.qty}` : ''}${r.checked ? ' ✓' : ''}</span></div>`).join('');
+  $('#kGo').disabled = !n;
+  $('#kGo').textContent = n ? `ייבוא ${n} פריטים ל${BAGS[keep.bag]}` : 'ייבוא';
+}
+function doKeepImport() {
+  const markPacked = $('#kChecked').checked;
+  const add = keep.rows.filter(r => !r.skip);
+  const ids = [];
+  for (const r of add) {
+    const it = newItem({name: r.name, cat: r.cat, qty: r.qty, bag: keep.bag, packed: markPacked && r.checked});
+    state.items.push(it); ids.push(it.id);
+  }
+  $('#keepDlg').close();
+  ui.tab = 'all'; commit();
+  toast(`נוספו ${ids.length} פריטים למזוודה של ${BAGS[keep.bag]}`, 'בטל', () => {
+    ids.forEach(id => { const x = byId(id); if (x && !x.deleted) touch(x, {deleted: true}); }); commit();
+  });
+}
+
+/* ---------- events ---------- */
+function bind() {
+  document.querySelectorAll('[data-tab]').forEach(b => b.addEventListener('click', () => {
+    ui.tab = (b.classList.contains('bag') && ui.tab === b.dataset.tab) ? 'all' : b.dataset.tab;
+    if (BAGS[ui.tab]) ui.addBag = ui.tab;
+    render();
+  }));
+
+  const submitAdd = () => {
+    const inp = $('#addName'); const name = inp.value.trim();
+    if (!name) { inp.focus(); return; }
+    addItem(name.slice(0, 80)); inp.value = ''; ui.qty = 1; $('#addQty').textContent = 1; inp.focus();
+  };
+  $('#addBtn').addEventListener('click', submitAdd);
+  $('#addName').addEventListener('keydown', e => { if (e.key === 'Enter' && !e.isComposing) { e.preventDefault(); submitAdd(); } });
+  // keep the phone keyboard open while tapping these
+  document.querySelectorAll('#addBtn,.stepper button,#addBag button').forEach(b => b.addEventListener('pointerdown', e => e.preventDefault()));
+  document.querySelectorAll('#addBag button').forEach(b => b.addEventListener('click', () => { ui.addBag = b.dataset.bag; render(); }));
+  $('#addCat').addEventListener('change', e => { ui.cat = e.target.value; store.set('lastCat', ui.cat); });
+  document.querySelectorAll('[data-step]').forEach(b => b.addEventListener('click', () => {
+    ui.qty = Math.min(99, Math.max(1, ui.qty + +b.dataset.step)); $('#addQty').textContent = ui.qty;
+  }));
+  $('#search').addEventListener('input', e => { ui.q = e.target.value; render(); });
+  $('#unpackedBtn').addEventListener('click', e => {
+    ui.unpacked = !ui.unpacked; e.currentTarget.setAttribute('aria-pressed', ui.unpacked); render();
+  });
+
+  $('#list').addEventListener('click', e => {
+    if (e.target.closest('[data-act="dup-toggle"]')) { ui.dupOnly = !ui.dupOnly; render(); return; }
+    const row = e.target.closest('.item'); if (!row) return;
+    const it = find(row.dataset.id); if (!it) return;
+    const bagBtn = e.target.closest('.seg button');
+    if (bagBtn) { moveItem(it, bagBtn.dataset.bag); return; }
+    if (e.target.closest('.pk')) { togglePacked(it); return; }
+    if (e.target.closest('.info')) openEdit(it.id);
+  });
+
+  // edit dialog
+  document.querySelectorAll('[data-estep]').forEach(b => b.addEventListener('click', () => {
+    editQty = Math.min(99, Math.max(1, editQty + +b.dataset.estep)); paintEdit();
+  }));
+  document.querySelectorAll('#eBag button').forEach(b => b.addEventListener('click', () => { editBag = b.dataset.bag; paintEdit(); }));
+  $('#eSave').addEventListener('click', submitEdit);
+  $('#eName').addEventListener('keydown', e => { if (e.key === 'Enter' && !e.isComposing) { e.preventDefault(); submitEdit(); } });
+  $('#eCancel').addEventListener('click', () => $('#editDlg').close());
+  $('#eDelete').addEventListener('click', () => { $('#editDlg').close(); removeItem(editId); });
+
+  // settings
+  $('#menuBtn').addEventListener('click', () => {
+    $('#menuSub').textContent = `${live().length} פריטים בטלפון הזה · ` +
+      (state.lastExport ? 'נשלח/נשמר לאחרונה: ' + new Date(state.lastExport).toLocaleString('he-IL', {dateStyle: 'short', timeStyle: 'short'}) : 'עדיין לא נשלח ולא נשמר גיבוי');
+    paintTheme();
+    $('#menuDlg').showModal();
+  });
+  document.querySelectorAll('[data-theme-set]').forEach(b => b.addEventListener('click', () => { PackingTheme.set(b.dataset.themeSet); paintTheme(); }));
+  document.querySelectorAll('[data-sort-set]').forEach(b => b.addEventListener('click', () => { ui.sort = b.dataset.sortSet; store.set('sort', ui.sort); paintTheme(); render(); }));
+  $('#menuDlg').addEventListener('click', async e => {
+    const b = e.target.closest('[data-act]'); if (!b) return;
+    const act = b.dataset.act;
+    $('#menuDlg').close();
+    if (act === 'share') shareFile();
+    else if (act === 'download') downloadFile();
+    else if (act === 'import') { $('#fileIn').value = ''; $('#fileIn').click(); }
+    else if (act === 'keep') openKeep('');
+    else if (act === 'unpack') {
+      const packed = live().filter(i => i.packed);
+      if (!packed.length) { toast('אין פריטים מסומנים כארוזים'); return; }
+      if (await confirmBox('איפוס סימוני ״ארוז״', `${packed.length} פריטים יסומנו כלא ארוזים. השיוך למזוודות נשאר.`, 'איפוס')) {
+        packed.forEach(i => touch(i, {packed: false})); commit();
+        toast('הסימונים אופסו', 'בטל', () => { packed.forEach(i => { const x = find(i.id); if (x) touch(x, {packed: true}); }); commit(); });
+      }
+    }
+    else if (act === 'owner') $('#ownerDlg').showModal();
+    else if (act === 'clear') {
+      const all = live();
+      if (!all.length) return;
+      if (await confirmBox('מחיקת כל הפריטים', `${all.length} פריטים יימחקו מהטלפון הזה — ובסנכרון הבא גם מהטלפון השני.`, 'מחיקה')) {
+        all.forEach(i => touch(i, {deleted: true})); commit();
+        toast('כל הפריטים נמחקו', 'בטל', () => { all.forEach(i => { const x = byId(i.id); if (x && x.deleted) touch(x, {deleted: false}); }); commit(); });
+      }
+    }
+  });
+  $('#ownerBtn').addEventListener('click', () => $('#ownerDlg').showModal());
+  document.querySelectorAll('[data-owner]').forEach(b => b.addEventListener('click', () => {
+    state.owner = b.dataset.owner; ui.addBag = state.owner; save(); $('#ownerDlg').close(); render();
+  }));
+  $('#ownerDlg').addEventListener('cancel', e => { if (!state.owner) e.preventDefault(); });
+  $('#ownerDlg').addEventListener('close', () => { if (!state.owner && !store.readOnly) setTimeout(() => $('#ownerDlg').showModal(), 0); });
+
+  // file import
+  $('#fileIn').addEventListener('change', e => { const f = e.target.files[0]; if (f) readImport(f); });
+  const runMerge = items => {
+    const r = mergeItems(items);
+    commit();
+    const parts = [];
+    if (r.added) parts.push(`נוספו ${r.added}`);
+    if (r.updated) parts.push(`עודכנו ${r.updated}`);
+    if (r.removed) parts.push(`נמחקו ${r.removed}`);
+    if (r.restored) parts.push(`שוחזרו ${r.restored}`);
+    let msg = parts.length ? 'מוזג: ' + parts.join(' · ') : 'אין שינויים חדשים בקובץ';
+    if (r.skipped) msg += ` · ${r.skipped} פריטים מהקובץ נמחקו כאן קודם ולא הוחזרו`;
+    if (dupKeys(live()).size) msg += ' · ⚠️ נמצאו כפילויות';
+    toast(msg);
+  };
+  $('#iMerge').addEventListener('click', () => {
+    const items = pendingImport; $('#importDlg').close();
+    if (items) runMerge(items);
+  });
+
+  let replaceItems = null;
+  $('#iReplace').addEventListener('click', () => {
+    const items = pendingImport, from = pendingFrom;
+    $('#importDlg').close();
+    if (!items) return;
+    const fileLive = items.filter(i => !i.deleted);
+    if (!fileLive.length) { toast('הקובץ ריק — לא הוחלף דבר'); return; }
+    const fileById = new Map(items.map(i => [i.id, i]));
+    const here = live();
+    const onlyHere = here.filter(i => { const f = fileById.get(i.id); return !f || f.deleted; }).length;
+    const newerHere = here.filter(i => { const f = fileById.get(i.id); return f && !f.deleted && i.updatedAt > f.updatedAt; }).length;
+    const lines = [`הרשימה עכשיו: <b>${here.length}</b> פריטים · בקובץ: ${fileLive.length} פריטים`];
+    if (onlyHere) lines.push(`<b>${onlyHere} פריטים שנמצאים רק בטלפון הזה יימחקו</b>`);
+    if (newerHere) lines.push(`<b>${newerHere} פריטים ששינית כאן אחרי שהקובץ נשמר יחזרו לגרסה הישנה</b> (מזוודה, ״ארוז״, שם)`);
+    if (!onlyHere && !newerHere) lines.push('לפי הבדיקה לא יאבד שום פריט — אבל מיזוג עדיין בטוח יותר');
+    $('#rList').innerHTML = lines.map(l => `<li>${l}</li>`).join('');
+    const other = from && from !== state.owner;
+    $('#rFrom').hidden = !other;
+    if (other) $('#rFrom').textContent = `הקובץ הזה הגיע מהטלפון של ${BAGS[from]} — כנראה התכוונת למיזוג.`;
+    replaceItems = items;
+    $('#replaceDlg').showModal();
+  });
+  $('#rMerge').addEventListener('click', () => { const items = replaceItems; $('#replaceDlg').close(); if (items) runMerge(items); });
+  $('#rReplace').addEventListener('click', () => {
+    const items = replaceItems; $('#replaceDlg').close();
+    if (!items) return;
+    const before = state.items;
+    state.items = items; commit();
+    toast('הרשימה הוחלפה בקובץ', 'בטל', () => { state.items = before; commit(); toast('ההחלפה בוטלה — הרשימה הקודמת חזרה'); });
+  });
+  $('#rCancel').addEventListener('click', () => $('#replaceDlg').close());
+  $('#replaceDlg').addEventListener('close', () => { replaceItems = null; });
+  $('#iCancel').addEventListener('click', () => $('#importDlg').close());
+  $('#importDlg').addEventListener('close', () => { pendingImport = null; pendingFrom = null; });
+
+  // Google Keep
+  $('#kText').addEventListener('input', () => {
+    if (!$('#kTitle').dataset.touched) $('#kTitle').checked = titleLooksLikeHeader($('#kText').value);
+    paintKeep();
+  });
+  $('#kTitle').addEventListener('change', e => { e.target.dataset.touched = '1'; paintKeep(); });
+  $('#kSkip').addEventListener('change', paintKeep);
+  document.querySelectorAll('#kBag button').forEach(b => b.addEventListener('click', () => { keep.bag = b.dataset.bag; paintKeep(); }));
+  $('#kFileBtn').addEventListener('click', () => { $('#kFile').value = ''; $('#kFile').click(); });
+  $('#kFile').addEventListener('change', async e => {
+    const f = e.target.files[0]; if (!f) return;
+    if (f.size > MAX_FILE) { toast('הקובץ גדול מדי'); return; }
+    const t = await f.text();
+    if (/^\s*[{[]/.test(t) && /"items"\s*:/.test(t)) { toast('זה קובץ סנכרון של Packing — טוענים אותו ב״טעינת קובץ״'); return; }
+    $('#kText').value = t; delete $('#kTitle').dataset.touched;
+    $('#kTitle').checked = titleLooksLikeHeader(t); paintKeep();
+  });
+  $('#kGo').addEventListener('click', doKeepImport);
+  $('#kCancel').addEventListener('click', () => $('#keepDlg').close());
+  $('#keepDlg').addEventListener('close', () => { delete $('#kTitle').dataset.touched; });
+
+  // another window (installed app + browser tab) may have saved: reload when we come back
+  document.addEventListener('visibilitychange', async () => {
+    if (document.hidden || store.readOnly || anyDialogOpen()) return;
+    const saved = await store.get('state');
+    if (saved && saved !== ERR && Array.isArray(saved.items)) {
+      state.items = saved.items.map(cleanItem).filter(Boolean);
+      if (BAGS[saved.owner]) state.owner = saved.owner;
+      state.lastExport = saved.lastExport || state.lastExport;
+      render();
+    }
+  });
+}
+
+function paintTheme() {
+  document.querySelectorAll('[data-sort-set]').forEach(b => b.classList.toggle('on', b.dataset.sortSet === ui.sort));
+  $('#sortInfo').textContent = ui.sort === 'az' ? 'רשימה אחת לפי א–ב, בלי קבוצות' : 'בקבוצות לפי קטגוריה, הארוזים יורדים למטה';
+  const m = PackingTheme.mode(), inf = PackingTheme.info();
+  document.querySelectorAll('[data-theme-set]').forEach(b => b.classList.toggle('on', b.dataset.themeSet === m));
+  $('#themeInfo').textContent = m === 'auto'
+    ? `לפי השעה: עכשיו ${inf.night ? 'לילה — כהה' : 'יום — בהיר'} · מתחלף ב-${inf.next}`
+    : (m === 'dark' ? 'תמיד כהה' : 'תמיד בהיר');
+}
+
+/* ---------- init ---------- */
+async function init() {
+  const opts = CATS.map(([k, n, i]) => `<option value="${k}">${i} ${n}</option>`).join('');
+  $('#addCat').innerHTML = opts; $('#eCat').innerHTML = opts;
+
+  await store.open();
+  const saved = await store.get('state');
+  if (saved === ERR) {
+    store.readOnly = true;                       // don't overwrite a list we couldn't read
+  } else if (saved && Array.isArray(saved.items)) {
+    state.owner = BAGS[saved.owner] ? saved.owner : null;
+    state.items = saved.items.map(cleanItem).filter(Boolean);
+    state.lastExport = saved.lastExport || null;
+  }
+  const lc = await store.get('lastCat'); if (lc !== ERR && CAT[lc]) ui.cat = lc;
+  const so = await store.get('sort'); if (so === 'az' || so === 'cat') ui.sort = so;
+  $('#addCat').value = ui.cat;
+
+  bind(); render();
+  if (store.readOnly) return;
+  if (/SamsungBrowser/i.test(navigator.userAgent)) {
+    $('#list').insertAdjacentHTML('beforebegin', `<div class="wrap"><div class="fatal" style="color:var(--warn);border-color:var(--warn)">זה דפדפן סמסונג — לרשימה כאן אין קשר לאפליקציה שהותקנה מ-Chrome.<br>פתחו את הקישור ב-Chrome והוסיפו למסך הבית משם.</div></div>`);
+  }
+  if (!state.owner) $('#ownerDlg').showModal();
+
+  // text shared into the app from Keep (Android share sheet → Packing)
+  const sp = new URLSearchParams(location.search);
+  if (sp.has('text') || sp.has('title')) {
+    const t = sp.get('text') || '', title = sp.get('title') || '';
+    history.replaceState(null, '', location.pathname);
+    if (t.trim()) {
+      const open = () => openKeep(t, title);
+      if (state.owner) open();
+      else $('#ownerDlg').addEventListener('close', function once() { if (state.owner) { $('#ownerDlg').removeEventListener('close', once); setTimeout(open, 0); } });
+    }
+  }
+
+  if (navigator.storage && navigator.storage.persist) navigator.storage.persist().catch(() => {});
+  try {
+    if ('serviceWorker' in navigator && (location.protocol === 'https:' || location.hostname === 'localhost'))
+      navigator.serviceWorker.register('sw.js').catch(() => {});
+  } catch {}
+}
+init();
+})();
+</script>
+</body>
+</html>
