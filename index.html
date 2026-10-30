@@ -65,7 +65,7 @@
   --p1:#c2405f; --p1-fill:#c2405f; --p1-soft:#fbe6ec;
   --p2:#2b6fc2; --p2-fill:#2b6fc2; --p2-soft:#e2edfb;
   --ok:#23825a; --danger:#c73e3e; --warn:#a85208; --warn-soft:#fdf0e1;
-  --toast:#1d2430; --toast-line:transparent; --fill:#ebe6de; --box:#b2aa9e;
+  --toast:#1d2430; --toast-line:transparent; --fill:#ebe6de; --box:#b2aa9e; --danger-fill:#c73e3e;
   --shadow:0 1px 2px rgba(20,25,35,.06),0 4px 14px rgba(20,25,35,.05);
   --r:14px;
 }
@@ -75,7 +75,7 @@
   --p1:#ec7391; --p1-fill:#b83d5e; --p1-soft:#3a2129;
   --p2:#6aa6ec; --p2-fill:#2f6bb8; --p2-soft:#1b2b40;
   --ok:#23784f; --danger:#ef6b6b; --warn:#f0a54a; --warn-soft:#3a2a17;
-  --toast:#2c3440; --toast-line:#3d4652; --fill:#262c35; --box:#5d6672;
+  --toast:#2c3440; --toast-line:#3d4652; --fill:#262c35; --box:#5d6672; --danger-fill:#b83a3a;
   --shadow:0 1px 2px rgba(0,0,0,.3);
 }
 *{box-sizing:border-box;-webkit-tap-highlight-color:transparent}
@@ -90,7 +90,8 @@ button{cursor:pointer}
 /* header */
 .top{display:flex;align-items:center;gap:10px;padding:10px 0 4px}
 .top h1{margin:0;font-size:21px;font-weight:800;letter-spacing:-.3px}
-.owner{border:0;background:var(--fill);color:var(--muted);font-size:13px;padding:0 12px;min-height:32px;border-radius:999px;max-width:55%;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.owner{border:0;background:var(--fill);color:var(--muted);font-size:13px;padding:0 12px;height:44px;line-height:44px;border-radius:999px;max-width:58%;white-space:nowrap;overflow:hidden}
+.owner b{display:inline-block;max-width:9em;overflow:hidden;text-overflow:ellipsis;vertical-align:top}
 .owner b{color:var(--ink)}
 .icon-btn{flex:0 0 auto;width:44px;height:44px;border-radius:12px;border:0;background:transparent;font-size:20px;line-height:1}
 .top .icon-btn{margin-inline-start:auto}
@@ -99,7 +100,7 @@ button{cursor:pointer}
 .tiles{display:flex;gap:8px}
 .tile{flex:1;min-width:0;display:flex;flex-direction:column;align-items:stretch;gap:1px;border:0;background:var(--surface);border-radius:12px;padding:7px 10px 8px;text-align:start;min-height:56px;box-shadow:inset 0 0 0 1px var(--line);--c:var(--ink);--f:var(--ink);--s:var(--fill)}
 .tile.p1{--c:var(--p1);--f:var(--p1-fill);--s:var(--p1-soft)} .tile.p2{--c:var(--p2);--f:var(--p2-fill);--s:var(--p2-soft)}
-.tile .tn{font-weight:800;font-size:15px;color:var(--c);white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.tile .tn{font-weight:800;font-size:15px;color:var(--c);white-space:nowrap;overflow:hidden;text-overflow:ellipsis;text-align:right}
 .tile .tc{font-size:12px;color:var(--muted);font-weight:600;white-space:nowrap}
 .tile[aria-selected="true"]{box-shadow:inset 0 0 0 2px var(--c);background:var(--s)}
 .tile.all[aria-selected="true"]{background:var(--surface)}
@@ -115,17 +116,22 @@ textarea.one{display:block;resize:none;overflow:hidden;white-space:pre;line-heig
 input:focus-visible,select:focus-visible,textarea:focus-visible,.search:focus{outline:2px solid var(--p2);outline-offset:-1px}
 .addbtn{height:48px;max-width:45%;overflow:hidden;text-overflow:ellipsis;border:0;border-radius:12px;color:#fff;font-weight:700;padding:0 14px;white-space:nowrap;background:var(--p2-fill)}
 .addbtn.p1{background:var(--p1-fill)}
-.addbtn .bn{display:inline-block;max-width:7.5em;overflow:hidden;text-overflow:ellipsis;vertical-align:bottom}
+.addbtn{display:inline-flex;align-items:center;justify-content:center}
+.addbtn .bn{display:inline-block;min-width:2.5em;max-width:6em;overflow:hidden;text-overflow:ellipsis;vertical-align:bottom}
 
 /* add options: only while adding */
 .addmore{display:none}
 .adding .addmore{display:block}
+.adding .tile .tc,.adding .tile .bar{display:none}
+.adding .tile{min-height:0;padding-block:8px}
 .addopts{display:flex;gap:6px;margin-top:8px;align-items:center}
 .pill{height:44px;border:0;border-radius:999px;background:var(--fill)}
 .addopts select{flex:1;min-width:0;padding:0 12px;font-size:14px;font-weight:600}
 .stepper{display:flex;align-items:center}
 .stepper button{width:42px;height:100%;border:0;background:transparent;font-size:20px}
 .stepper output{min-width:20px;text-align:center;font-weight:700}
+.estep{height:48px}
+.estep button{width:52px;font-size:22px}
 .addpk{flex:0 0 auto;padding:0 12px;font-size:14px;font-weight:700;white-space:nowrap}
 .addpk::before{content:'☐ '}
 .addpk[aria-pressed="true"]{background:var(--ok);color:#fff}
@@ -139,23 +145,24 @@ input:focus-visible,select:focus-visible,textarea:focus-visible,.search:focus{ou
 .sh.hid{color:var(--muted)}
 .hrow{display:flex;align-items:center;gap:10px;padding:6px 12px;min-height:48px;border:1px dashed var(--line);border-radius:12px;margin-bottom:6px;color:var(--muted)}
 .hrow .t{flex:1;min-width:0;overflow-wrap:anywhere}
-.hrow .who{font-size:13px}
-.hrow .back{flex:0 0 auto;height:40px;border-radius:999px;border:1.5px solid var(--line);background:var(--surface);padding:0 14px;font-weight:700;color:var(--ink)}
+.hrow .back{flex:0 0 auto;height:44px;border-radius:999px;border:1.5px solid var(--line);background:var(--surface);padding:0 14px;font-weight:700;color:var(--ink)}
 .clr.all{display:block;margin:4px 0 0;min-height:40px;border-radius:10px;border:1px solid var(--line);background:var(--surface);padding:0 14px;font-weight:600}
 .selecting .more{display:none}
 .selecting #list{padding-bottom:130px}
 .selbox{flex:0 0 auto;width:36px;height:36px;margin:4px;border-radius:50%;border:2px solid var(--ink);background:var(--surface);font-size:18px;font-weight:800;color:#fff;padding:0}
 .selbox.on{background:var(--ink);color:var(--bg)}
 .item.chosen{background:var(--fill)}
+.item.chosen .q{background:var(--surface)}
 .selecting .item.packed{opacity:.55}
 .selbar{position:fixed;left:0;right:0;bottom:0;z-index:20;background:var(--surface);border-top:1px solid var(--line);box-shadow:0 -4px 16px rgba(0,0,0,.12);padding:10px 16px calc(env(safe-area-inset-bottom) + 10px)}
 .selbar .sl1{display:flex;align-items:center;justify-content:space-between;gap:8px;max-width:616px;margin:0 auto 8px;font-weight:700}
 .selbar .sl2{display:flex;gap:8px;max-width:616px;margin:0 auto}
-.selbar .lnk{border:0;background:transparent;color:var(--p2);font-weight:700;min-height:40px;padding:0 4px}
+.selbar .lnk{border:0;background:transparent;color:var(--p2);font-weight:700;min-height:44px;padding:0 4px}
 .selbar .go{flex:1;height:48px;border:0;border-radius:12px;background:var(--ink);color:var(--bg);font-weight:800;font-size:16px}
 .selbar .go:disabled{opacity:.4}
 .selbar .no{flex:0 0 auto;height:48px;border:1px solid var(--line);border-radius:12px;background:var(--surface);padding:0 16px;font-weight:700}
 .selecting .toast{bottom:calc(env(safe-area-inset-bottom) + 130px)}
+dialog .toast{bottom:calc(env(safe-area-inset-bottom) + 96px)}
 .lbl{flex:0 0 auto;font-size:13px;color:var(--muted)}
 
 .tools{display:flex;gap:8px;margin-top:10px;align-items:center}
@@ -174,11 +181,11 @@ input:focus-visible,select:focus-visible,textarea:focus-visible,.search:focus{ou
 
 /* segmented suitcase switch (rows, add area, settings) */
 .seg{flex:1;display:flex;border:1px solid var(--line);border-radius:10px;overflow:hidden;background:var(--surface)}
-.seg button{flex:1;border:0;background:transparent;height:40px;padding:0 6px;font-size:14px;font-weight:700;color:var(--muted)}
+.seg button{flex:1;border:0;background:transparent;height:44px;padding:0 6px;font-size:14px;font-weight:700;color:var(--muted)}
 .seg button+button{border-inline-start:1px solid var(--line)}
 .seg button.on{background:var(--ink);color:var(--bg)}
 .seg.soft{border:0;background:var(--fill);padding:3px;border-radius:12px;gap:2px}
-.seg.soft button{height:38px;border-radius:9px}
+.seg.soft button{height:42px;border-radius:9px}
 .seg.soft button+button{border:0}
 .seg.soft button.on{background:var(--surface);color:var(--ink);box-shadow:0 1px 2px rgba(0,0,0,.14)}
 #showSeg button[data-show-set="done"].on{color:var(--ok)}
@@ -201,7 +208,7 @@ input:focus-visible,select:focus-visible,textarea:focus-visible,.search:focus{ou
 .info .from{display:block;font-size:12px}
 .who{flex:0 0 auto;font-size:12px;font-weight:700;border-radius:999px;padding:3px 9px;white-space:nowrap;max-width:6.5em;overflow:hidden;text-overflow:ellipsis}
 .who.p1{background:var(--p1-soft);color:var(--p1)} .who.p2{background:var(--p2-soft);color:var(--p2)}
-.more{flex:0 0 auto;width:40px;height:44px;border:0;background:transparent;color:var(--muted);font-size:18px}
+.more{flex:0 0 auto;width:44px;height:44px;border:0;background:transparent;color:var(--muted);font-size:18px}
 .pk{flex:0 0 auto;width:44px;height:44px;border:0;background:transparent;display:grid;place-items:center;padding:0}
 .pk i{width:24px;height:24px;border-radius:7px;border:2px solid var(--box);display:grid;place-items:center;font-style:normal;font-size:15px;font-weight:900;color:#fff}
 .item.packed{background:var(--surface-2)}
@@ -252,10 +259,10 @@ dialog::backdrop{background:rgba(10,14,20,.5)}
 .seg button[data-bag="both"].on{background:var(--ink);color:var(--bg)}
 .addbtn.both{background:var(--ink);color:var(--bg)}
 body.single #eCopy,
-body.single .tile.p1, body.single .tile.p2, body.single .addbag, body.single .who,
+body.single .tiles, body.single .addbag, body.single .who,
 body.single #eBagField, body.single #kBagField, body.single [data-act="share"]{display:none}
 .note{font-size:12px;color:var(--muted);margin-top:12px}
-.btn.dangerfill{background:var(--danger);color:#fff;border-color:var(--danger)}
+.btn.dangerfill{background:var(--danger-fill);color:#fff;border-color:var(--danger-fill)}
 .rlist .nb{font-weight:700}
 .empty .clr{margin-top:12px;min-height:40px;border-radius:10px;border:1px solid var(--line);background:var(--surface);padding:0 14px;font-weight:600}
 .dhead{position:sticky;top:0;z-index:2;display:flex;align-items:center;justify-content:space-between;gap:8px;background:var(--surface);margin:-18px -18px 0;padding:12px 18px 4px 8px}
@@ -289,7 +296,7 @@ body.single #eBagField, body.single #kBagField, body.single [data-act="share"]{d
 .toast:not(:popover-open){display:none}
 .toast.show{opacity:1;transform:none;pointer-events:auto}
 .toast span{padding:8px 0}
-.toast button{flex:0 0 auto;min-height:40px;border:0;border-radius:10px;background:rgba(255,255,255,.12);color:#9cc8ff;font-weight:700;padding:0 14px}
+.toast button{flex:0 0 auto;min-height:44px;border:0;border-radius:10px;background:rgba(255,255,255,.12);color:#9cc8ff;font-weight:700;padding:0 14px}
 .seg button[data-who="both"].on{background:var(--ink);color:var(--bg)}
 body.single #pWhoF{display:none}
 #printArea{display:none}
@@ -328,8 +335,8 @@ body.single #pWhoF{display:none}
   <div class="wrap">
     <nav class="tiles" role="tablist">
       <button class="tab tile all" role="tab" data-tab="all" type="button"><span class="tn" id="nAll">הכל</span><span class="tc" id="tAll"></span><span class="bar"><i id="pAll"></i></span></button>
-      <button class="tab tile p1" role="tab" data-tab="p1" type="button"><span class="tn" data-name="p1"></span><span class="tc" id="tP1"></span><span class="bar"><i id="pP1"></i></span></button>
-      <button class="tab tile p2" role="tab" data-tab="p2" type="button"><span class="tn" data-name="p2"></span><span class="tc" id="tP2"></span><span class="bar"><i id="pP2"></i></span></button>
+      <button class="tab tile p1" role="tab" data-tab="p1" type="button"><span class="tn" dir="auto" data-name="p1"></span><span class="tc" id="tP1"></span><span class="bar"><i id="pP1"></i></span></button>
+      <button class="tab tile p2" role="tab" data-tab="p2" type="button"><span class="tn" dir="auto" data-name="p2"></span><span class="tc" id="tP2"></span><span class="bar"><i id="pP2"></i></span></button>
     </nav>
     <div class="addzone" id="addZone">
       <div class="add">
@@ -390,13 +397,14 @@ body.single #pWhoF{display:none}
     <div class="hint" id="eErr" hidden style="margin:-6px 0 10px">⚠️ צריך שם לפריט</div>
     <label class="f"><span>קטגוריה</span><select id="eCat"></select></label>
     <div class="f"><span>כמות</span>
-      <div class="stepper" style="width:max-content">
+      <div class="stepper pill estep" style="width:max-content">
         <button type="button" data-estep="1" aria-label="יותר">+</button><output id="eQty">1</output><button type="button" data-estep="-1" aria-label="פחות">−</button>
       </div>
     </div>
     <div class="f" id="eBagField"><span>מזוודה</span>
       <div class="seg" id="eBag"><button type="button" data-bag="p1"></button><button type="button" data-bag="p2"></button></div>
       <div class="hint" id="eHint" hidden>⚠️ העברה למזוודה אחרת תאפס את סימון ״ארוז״</div>
+      <div class="hint" id="eTwin" hidden style="color:var(--muted)">שינוי שם, קטגוריה וכמות יחול גם על העותק במזוודה השנייה</div>
     </div>
     <div class="row"><button class="btn" type="button" id="eCopy"></button></div>
     <div class="row"><button class="btn" type="button" id="eSkip">🙈 לא לנסיעה הזו (נשמר לפעם הבאה)</button></div>
@@ -578,7 +586,7 @@ const CAT = Object.assign(Object.create(null), Object.fromEntries(CATS.map(c => 
 const BAGS = Object.assign(Object.create(null), {p1: 1, p2: 1});                       // internal suitcase slots: 1 = "p1" (pink), 2 = "p2" (blue)
 const defaultUsers = () => ({count: 2, names: {p1: 'משתמש/ת 1', p2: 'משתמש/ת 2'}, ts: {count: 1, p1: 1, p2: 1}, sid: '', links: {}});   // lists made before names were configurable
 const FIELDS = ['name','cat','qty','bag','packed','deleted','skip'];   // skip = not for this trip (kept for next time)
-const APP_VERSION = '2.1', APP_DATE = '30.10.2026';   // shown at the bottom of settings — bump on every release
+const APP_VERSION = '2.2', APP_DATE = '30.10.2026';   // shown at the bottom of settings — bump on every release
 const MAX_FILE = 5e6, MAX_ITEMS = 5000, MAX_FUTURE = 864e5 * 366;
 const ERR = Symbol('read-error');
 
@@ -599,7 +607,8 @@ const iso = s => '\u2068' + String(s).replace(/([A-Za-z0-9])([^\sA-Za-z0-9\u0590
 const pre = (l, s) => (/^[A-Za-z0-9]/.test(s) ? l + '-' : l) + `<bdi class="bn">${esc(s)}</bdi>`;   // "לדנה", "ל-Dan" (HTML)
 const and = s => (/^[A-Za-z0-9]/.test(s) ? 'ו-' : 'ו') + iso(s);   // "ודנה", but "ו-Dan"              // keep a Latin/Hebrew name from scrambling the sentence around it
 const live = () => state.items.filter(i => !i.deleted);
-const active = () => state.items.filter(i => !i.deleted && !i.skip);   // what this trip's list shows
+const hiddenNow = i => i.skip && !i.packed;               // hidden from this trip (if the other phone packed it meanwhile, packed wins)
+const active = () => state.items.filter(i => !i.deleted && !hiddenNow(i));   // what this trip's list shows
 const byId = id => state.items.find(i => i.id === id);
 const find = id => { const i = byId(id); return i && !i.deleted ? i : null; };
 const single = () => !!state.users && state.users.count === 1;
@@ -803,11 +812,11 @@ function newItem(fields) {
   return {id: uid(), name: '', cat: 'other', qty: 1, bag: defaultBag(), packed: false, deleted: false, skip: false, ...fields, ts, updatedAt: t};
 }
 /* change fields; each changed field gets its own timestamp, always later than the item's last one */
-function touch(it, patch) {
+function touch(it, patch, restamp = []) {               // restamp: fields to date now even if unchanged
   const t = Math.max(now(), (it.updatedAt || 0) + 1);
   let changed = false;
   for (const k of Object.keys(patch)) {
-    if (!FIELDS.includes(k) || it[k] === patch[k]) continue;
+    if (!FIELDS.includes(k) || (it[k] === patch[k] && !restamp.includes(k))) continue;
     it[k] = patch[k]; it.ts[k] = t; changed = true;
   }
   if (changed) it.updatedAt = t;
@@ -815,16 +824,27 @@ function touch(it, patch) {
 }
 function commit() { if (store.readOnly) return; save(); render(); }
 
+/* bring back an item hidden from this trip instead of adding a second copy; fields.qty only when the user gave one */
 function addOrRevive(fields) {
-  const old = state.items.find(i => !i.deleted && i.skip && dupKey(i) === dupKey(fields));
-  if (old) { touch(old, {skip: false, packed: !!fields.packed, qty: fields.qty || old.qty}); return {it: old, revived: true}; }
-  const it = newItem(fields); state.items.push(it); return {it, revived: false};
+  const same = i => single() ? normName(i.name) === normName(fields.name) : dupKey(i) === dupKey(fields);
+  const old = state.items.find(i => !i.deleted && hiddenNow(i) && same(i));
+  if (old) {
+    const prev = {skip: true, deleted: false, packed: old.packed, qty: old.qty};
+    touch(old, {skip: false, deleted: false, packed: !!fields.packed, ...(fields.qty ? {qty: fields.qty} : {})}, ['deleted']);   // a fresh 'not deleted' beats an older delete from the other phone
+    return {it: old, revived: true, prev};
+  }
+  const {qty, ...rest} = fields;
+  const it = newItem({...rest, qty: qty || 1}); state.items.push(it); return {it, revived: false};
 }
+const undoAdds = res => res.forEach(r => { const x = byId(r.it.id); if (!x) return; r.revived ? touch(x, r.prev) : !x.deleted && touch(x, {deleted: true}); });
 function addItem(name) {
   const bag = curBag(), bags = targets(bag);
   const cat = ui.cat === 'auto' ? guessCat(name) : ui.cat;
   const dupBags = bags.filter(b => active().some(i => dupKey(i) === dupKey({bag: b, name})));
-  const res = bags.map(b => addOrRevive({name, cat, qty: ui.qty, bag: b, packed: ui.addPacked}));
+  const res = bags.map(b => {
+    if (dupBags.includes(b)) { const it = newItem({name, cat, qty: ui.qty, bag: b, packed: ui.addPacked}); state.items.push(it); return {it, revived: false}; }
+    return addOrRevive({name, cat, qty: ui.qty !== 1 ? ui.qty : undefined, bag: b, packed: ui.addPacked});
+  });
   const made = res.map(r => r.it), revived = res.some(r => r.revived);
   commit();
   if (dupBags.length) {
@@ -833,6 +853,8 @@ function addItem(name) {
     toast(`⚠️ "${iso(name)}" כבר קיים ${where}`, 'הסר', () => { extra.forEach(it => { const x = byId(it.id); if (x) touch(x, {deleted: true}); }); commit(); });
   } else if (ui.show === 'done' && !ui.addPacked) {                 // added while only packed items are shown
     toast(`נוסף: "${iso(name)}" — כרגע מוצגים רק פריטים ארוזים`, 'הצג', () => { ui.show = 'todo'; resetOrder(); render(); });
+  } else if (ui.show === 'todo' && ui.addPacked) {                 // added as packed while only unpacked items are shown
+    toast(`נוסף כארוז ✓: "${iso(name)}" — כרגע מוצג רק מה שנשאר`, 'הצג', () => { ui.show = 'done'; resetOrder(); render(); });
   } else if (revived) {
     toast(`"${iso(name)}" חזר לרשימה — הוא היה מוסתר מהנסיעה הזו`);
   } else if (!single() && ui.tab !== 'all' && !bags.includes(ui.tab)) {
@@ -844,14 +866,16 @@ function addItem(name) {
   }
 }
 /* ---------- not for this trip ---------- */
+const hiddenHere = () => { const q = normName(ui.q); return state.items.filter(i => !i.deleted && hiddenNow(i) && (ui.tab === 'all' || i.bag === ui.tab) && (!q || normName(i.name).includes(q))); };
 function paintSel() {
   const on = !!ui.sel;
   $('#selBar').hidden = !on;
   if (!on) return;
   const n = ui.sel.size;
-  $('#selN').textContent = n ? (n === 1 ? 'נבחר פריט אחד' : `נבחרו ${n} פריטים`) : 'סמנו פריטים שלא צריך בנסיעה הזו';
+  const vis = [...document.querySelectorAll('#list .item:not(.packed)')].map(r => r.dataset.id), vs = new Set(vis);
+  const off = [...ui.sel].filter(id => !vs.has(id)).length;
+  $('#selN').textContent = n ? (n === 1 ? 'נבחר פריט אחד' : `נבחרו ${n} פריטים`) + (off ? ` · ${off} לא מוצגים כאן` : '') : 'סמנו פריטים שלא צריך בנסיעה הזו';
   $('#selSkip').disabled = !n;
-  const vis = [...document.querySelectorAll('#list .item:not(.packed)')].map(r => r.dataset.id);
   $('#selAll').hidden = !vis.length;
   $('#selAll').textContent = vis.length && vis.every(id => ui.sel.has(id)) ? 'ניקוי הבחירה' : 'בחירת כל מה שלא נארז';
 }
@@ -887,7 +911,7 @@ function moveItem(it, bag) {
 }
 function togglePacked(it) {
   if (!ui.frozen.has(it.id)) ui.frozen.set(it.id, it.packed);   // keep the row where it is until the view changes
-  touch(it, {packed: !it.packed}); commit();
+  touch(it, it.packed && it.skip ? {packed: false, skip: false} : {packed: !it.packed}); commit();   // unpacking a packed+hidden item keeps it on the list
 }
 
 /* ---------- duplicates ---------- */
@@ -914,7 +938,7 @@ function render() {
   document.querySelectorAll('[data-name]').forEach(e => e.textContent = single() && e.dataset.name === 'p1' ? nm(solo()) : nm(e.dataset.name));
   document.querySelectorAll('#addBag button,#eBag button,#kBag button').forEach(b => { if (b.dataset.bag !== 'both') b.textContent = nm(b.dataset.bag); });
 
-  const tileTxt = (p, n) => !n ? 'ריקה' : p === n ? `הכל ארוז ✓ · ${n}` : `${p}/${n} ארוזים`;
+  const tileTxt = (p, n, all) => !n ? (all ? 'אין פריטים' : 'ריקה') : p === n ? `הכל ארוז ✓ · ${n}` : `${p}/${n} ארוזים`;
   for (const b of ['p1', 'p2']) {
     const B = b === 'p1' ? 'P1' : 'P2', n = s[b], p = s[b + 'Packed'];
     $('#t' + B).textContent = tileTxt(p, n);
@@ -922,7 +946,7 @@ function render() {
   }
   const allP = s.p1Packed + s.p2Packed;
   $('#nAll').textContent = single() ? nm(solo()) : 'הכל';
-  $('#tAll').textContent = tileTxt(allP, s.all); $('#pAll').style.width = s.all ? (allP / s.all * 100) + '%' : '0';
+  $('#tAll').textContent = tileTxt(allP, s.all, true); $('#pAll').style.width = s.all ? (allP / s.all * 100) + '%' : '0';
   document.querySelectorAll('.tab').forEach(t => t.setAttribute('aria-selected', t.dataset.tab === ui.tab));
 
   const ab = curBag();
@@ -938,7 +962,7 @@ function render() {
   document.querySelectorAll('[data-show-set]').forEach(b => b.classList.toggle('on', b.dataset.showSet === ui.show));
   $('#showSeg').classList.toggle('all3', ui.show === 'all');
   $('#ownerBtn').innerHTML = !configured() ? '<b>הגדרת משתמשים</b>'
-    : single() ? `הרשימה של <b><bdi>${esc(nm(solo()))}</bdi></b>` : `הטלפון של <b><bdi>${esc(nm(state.owner))}</bdi></b>`;
+    : single() ? `הרשימה של <b dir="auto">${esc(nm(solo()))}</b>` : `הטלפון של <b dir="auto">${esc(nm(state.owner))}</b>`;
 
   const host = $('#list');
   if (store.readOnly) {
@@ -955,19 +979,20 @@ function render() {
     (!ui.dupOnly || dups.has(dupKey(i))) &&
     (!q || normName(i.name).includes(q)) &&
     (ui.show === 'all' || ui.frozen.has(i.id) || (ui.show === 'todo' ? !i.packed : i.packed)));   // a row just tapped stays until the view changes
-  if (ui.sel) { const on = new Set(list.filter(i => !i.packed).map(i => i.id)); for (const id of [...ui.sel]) if (!on.has(id)) ui.sel.delete(id); }
+  if (ui.sel) for (const id of [...ui.sel]) { const x = find(id); if (!x || x.packed || hiddenNow(x)) ui.sel.delete(id); }
 
   const bar = dupCount ? `<div class="dupbar"><span>⚠️ יש <b>${dupCount}</b> פריטים כפולים ${single() ? 'ברשימה' : 'באותה מזוודה'}</span><button type="button" data-act="dup-toggle">${ui.dupOnly ? 'הצג הכל' : 'הצג כפולים'}</button></div>` : '';
 
-  const todoN = inTab.filter(i => !i.packed).length, doneN = inTab.length - todoN;
+  const inView = q ? inTab.filter(i => normName(i.name).includes(q)) : inTab;
+  const todoN = inView.filter(i => !i.packed).length, doneN = inView.length - todoN;
   $('#showSeg [data-show-set="todo"]').textContent = `נשאר · ${todoN}`;
   $('#showSeg [data-show-set="done"]').textContent = `ארוז ✓ · ${doneN}`;
-  const hid = state.items.filter(i => !i.deleted && i.skip && (ui.tab === 'all' || i.bag === ui.tab) && (!q || normName(i.name).includes(q)))
+  const hid = hiddenHere()
     .sort((a, b) => heSort(a.name, b.name));
-  const hidHtml = !hid.length ? '' : `<section class="group sect-st"><button type="button" class="sh hid" data-act="hid-toggle" aria-expanded="${ui.hidOpen}">🙈 לא בנסיעה הזו <span class="n">· ${hid.length}</span><span class="ar">${ui.hidOpen ? 'הסתר ▴' : 'הצג ▾'}</span></button>`
-    + (ui.hidOpen ? hid.map(i => `<div class="hrow" data-hid="${esc(i.id)}"><span>${CAT[i.cat].icon}</span><span class="t" dir="auto">${bidi(i.name)}</span>${!single() && ui.tab === 'all' ? `<span class="who"><bdi>${esc(nm(i.bag))}</bdi></span>` : ''}<button type="button" class="back" data-act="unskip">החזרה</button></div>`).join('')
+  const hidHtml = !hid.length ? '' : `<section class="group sect-st"><button type="button" class="sh hid" data-act="hid-toggle" aria-expanded="${ui.hidOpen}">🙈 לא בנסיעה הזו <span class="n">· ${hid.length}</span><span class="ar">${ui.hidOpen ? 'סגירה ▴' : 'פתיחה ▾'}</span></button>`
+    + (ui.hidOpen ? hid.map(i => `<div class="hrow" data-hid="${esc(i.id)}"><span>${CAT[i.cat].icon}</span><span class="t" dir="auto">${bidi(i.name)}</span>${!single() && ui.tab === 'all' ? `<span class="who ${i.bag}" dir="auto">${esc(nm(i.bag))}</span>` : ''}<button type="button" class="back" data-act="unskip">החזרה</button></div>`).join('')
       + (hid.length > 1 ? `<button type="button" class="clr all" data-act="unskip-all">החזרת כל ה-${hid.length} לרשימה</button>` : '') : '') + `</section>`;
-  if (!items.length && !hid.length) { host.innerHTML = `<div class="empty"><div class="big">🧳</div>הרשימה ריקה.<br>הוסיפו פריט ראשון למעלה, או ייבאו רשימה מ‑Google Keep בהגדרות ☰.</div>`; return; }
+  if (!items.length && !hid.length) { host.innerHTML = `<div class="empty"><div class="big">🧳</div>הרשימה ריקה.<br>הוסיפו פריט ראשון למעלה, או ייבאו רשימה מ‑Google Keep בהגדרות ☰.</div>`; paintSel(); return; }
   if (!list.length) {
     const allPacked = ui.show === 'todo' && !q && !ui.dupOnly && inTab.length && inTab.every(i => i.packed);
     const noneYet = ui.show === 'done' && !q && !ui.dupOnly && inTab.length && !doneN;
@@ -987,7 +1012,7 @@ function render() {
     return `<div class="item b-${i.bag}${i.packed ? ' packed' : ''}${isDup ? ' isdup' : ''}${ch ? ' chosen' : ''}" data-id="${esc(i.id)}">
         <div class="l1">${ctl}
           <button type="button" class="info" aria-label="עריכת ${esc(i.name)}"><span class="nm">${showCat ? `<span class="ci" title="${CAT[i.cat].name}">${CAT[i.cat].icon}</span>` : ''}<span class="t" dir="auto">${bidi(i.name)}</span>${i.qty > 1 ? `<span class="mt q" dir="ltr">×${i.qty}</span>` : ''}</span>${single() && i.bag !== solo() ? `<span class="mt from">מהמזוודה של <bdi>${esc(nm(i.bag))}</bdi></span>` : ''}${isDup ? `<span class="dup">⚠️ מופיע פעמיים ${single() ? 'ברשימה' : 'במזוודה של <bdi>' + esc(nm(i.bag)) + '</bdi>'}</span>` : ''}</button>
-          ${two ? `<span class="who ${i.bag}"><bdi>${esc(nm(i.bag))}</bdi></span>` : ''}
+          ${two ? `<span class="who ${i.bag}" dir="auto">${esc(nm(i.bag))}</span>` : ''}
           <button type="button" class="more" aria-label="עריכה">⋯</button>
         </div>
       </div>`;
@@ -1068,7 +1093,7 @@ function confirmBox(title, text, yes) {
 let editId = null, editQty = 1, editBag = 'p2', editTwin = null;
 function openEdit(id, twin = null) {
   const it = find(id); if (!it) return;
-  editId = id; editTwin = twin; editQty = it.qty; editBag = it.bag;
+  editId = id; editTwin = twin; $('#eTwin').hidden = !(twin && find(twin)); editQty = it.qty; editBag = it.bag;
   $('#eName').value = it.name; $('#eCat').value = it.cat; $('#eErr').hidden = true;
   paintEdit(); $('#editDlg').showModal();
 }
@@ -1086,22 +1111,26 @@ function paintEdit() {
 function copyToOther() {
   const it = find(editId); const name = $('#eName').value.trim();
   if (!it || !name) return;
-  submitEdit();                                          // keep any edits made in the dialog
+  submitEdit(true);                                      // keep any edits made in the dialog
   const src = find(it.id) || it;
-  const copy = newItem({name: src.name, cat: src.cat, qty: src.qty, bag: flip(src.bag)});
-  state.items.push(copy); commit();
-  toast(`נוסף גם למזוודה של ${nmI(copy.bag)}`, 'בטל', () => { const x = byId(copy.id); if (x) touch(x, {deleted: true}); commit(); });
+  const r = addOrRevive({name: src.name, cat: src.cat, qty: src.qty, bag: flip(src.bag)});
+  commit();
+  toast(`${r.revived ? 'חזר' : 'נוסף'} גם למזוודה של ${nmI(r.it.bag)}`, 'בטל', () => { undoAdds([r]); commit(); });
 }
-function submitEdit() {
+function submitEdit(quiet) {                             // quiet: the caller shows its own message
   const it = find(editId); const name = $('#eName').value.trim();
   if (!name) { $('#eErr').hidden = false; $('#eName').focus(); return; }
   if (it) {
     const packed = editBag === it.bag ? it.packed : false;
     const prev = editBag !== it.bag ? {bag: it.bag, packed: it.packed} : null;
     touch(it, {name: cut(name, 80), cat: $('#eCat').value, qty: editQty, bag: editBag, packed});
+    const twinHidden = prev ? state.items.find(x => x !== it && !x.deleted && hiddenNow(x) && dupKey(x) === dupKey(it)) : null;
+    if (twinHidden) touch(twinHidden, {deleted: true});
     const nb = editBag;
-    if (prev) setTimeout(() => toast(`"${iso(it.name)}" הועבר למזוודה של ${nmI(nb)}${prev.packed ? ' · סימון ״ארוז״ אופס' : ''}`, 'בטל', () => {
-      const x = find(it.id); if (x) { touch(x, prev); commit(); }
+    if (prev && quiet !== true) setTimeout(() => toast(`"${iso(it.name)}" הועבר למזוודה של ${nmI(nb)}${prev.packed ? ' · סימון ״ארוז״ אופס' : ''}`, 'בטל', () => {
+      const x = find(it.id); if (x) touch(x, prev);
+      if (twinHidden) { const y = byId(twinHidden.id); if (y) touch(y, {deleted: false}); }
+      commit();
     }), 0);
     const tw = editTwin && find(editTwin);                 // just added to both suitcases: fix both copies
     if (tw) touch(tw, {name: cut(name, 80), cat: $('#eCat').value, qty: editQty});
@@ -1298,21 +1327,20 @@ function paintKeep() {
     : ($('#kText').value.trim() ? 'לא נמצאו פריטים' : '');
   $('#kPrev').hidden = !rows.length;
   $('#kPrev').innerHTML = rows.map(r =>
-    `<div class="${r.skip ? 'skip' : ''}"><span>${CAT[r.cat].icon}</span><span dir="auto">${bidi(r.name)}${r.qty > 1 ? ` ×${r.qty}` : ''}${r.checked ? ' ✓' : ''}${bags.length === 2 && r.bags.length === 1 ? ` <small>(רק ל${esc(nm(r.bags[0]))})</small>` : ''}</span></div>`).join('');
+    `<div class="${r.skip ? 'skip' : ''}"><span>${CAT[r.cat].icon}</span><span dir="auto">${bidi(r.name)}${r.qty > 1 ? ` <span dir="ltr">×${r.qty}</span>` : ''}${r.checked ? ' ✓' : ''}${bags.length === 2 && r.bags.length === 1 ? ` <small>(רק ל${esc(nm(r.bags[0]))})</small>` : ''}</span></div>`).join('');
   $('#kGo').disabled = !n;
-  $('#kGo').textContent = !n ? 'ייבוא' : n === 1 ? 'ייבוא פריט אחד' : `ייבוא ${n} פריטים${bags.length === 2 ? ' (בשתיהן)' : ''}`;
+  $('#kGo').textContent = !n ? 'ייבוא' : n === 1 ? 'ייבוא פריט אחד' : `ייבוא ${n} פריטים`;
 }
 function doKeepImport() {
   const markPacked = $('#kChecked').checked;
-  const ids = [];
-  for (const r of keep.rows) for (const b of r.bags) {
-    const {it} = addOrRevive({name: r.name, cat: r.cat, qty: r.qty, bag: b, packed: markPacked && r.checked});
-    ids.push(it.id);
-  }
+  const res = [];
+  for (const r of keep.rows) for (const b of r.bags)
+    res.push(addOrRevive({name: r.name, cat: r.cat, qty: r.qty > 1 ? r.qty : undefined, bag: b, packed: markPacked && r.checked}));
+  const ids = res.map(r => r.it.id);
   $('#keepDlg').close();
   ui.tab = 'all'; resetOrder(); commit();
   toast(`${ids.length === 1 ? 'נוסף פריט אחד' : `נוספו ${ids.length} פריטים`} ${keep.bag === 'both' && !single() ? 'בסך הכל בשתי המזוודות' : whereTo(keep.bag)}`, 'בטל', () => {
-    ids.forEach(id => { const x = byId(id); if (x && !x.deleted) touch(x, {deleted: true}); }); commit();
+    undoAdds(res); commit();
   });
 }
 
@@ -1356,7 +1384,12 @@ function bind() {
   // keep the phone keyboard open while tapping these
   document.querySelectorAll('#addBtn,#addPacked,.stepper button,#addBag button').forEach(b => b.addEventListener('pointerdown', e => e.preventDefault()));
   document.querySelectorAll('#addBag button').forEach(b => b.addEventListener('click', () => { ui.addBag = b.dataset.bag; render(); }));
-  $('#selBtn').addEventListener('click', () => { $('#moreDlg').close(); ui.sel = ui.sel ? null : new Set(); render(); });
+  $('#selBtn').addEventListener('click', () => {
+    $('#moreDlg').close(); ui.sel = ui.sel ? null : new Set();
+    if (ui.sel && ui.show === 'done') ui.show = 'todo';      // packed items can't be picked
+    if (ui.sel && !active().some(i => !i.packed)) { ui.sel = null; toast('אין פריטים שעוד לא נארזו לבחור מהם'); }
+    resetOrder(); render();
+  });
   $('#selCancel').addEventListener('click', endSel);
   $('#selSkip').addEventListener('click', skipSelected);
   $('#selAll').addEventListener('click', () => {
@@ -1389,14 +1422,19 @@ function bind() {
   // add options show only while adding (focus inside the add area, or text typed)
   const addingNow = () => { document.body.classList.toggle('adding', $('#addZone').contains(document.activeElement) || !!$('#addName').value.trim()); };
   $('#addZone').addEventListener('focusin', addingNow);
-  $('#addZone').addEventListener('focusout', () => setTimeout(addingNow, 0));
+  // collapse only after the press that moved focus is over, so the list doesn't shift under the finger mid-tap
+  let ptrDown = false, collapseLater = false;
+  document.addEventListener('pointerdown', () => { ptrDown = true; }, true);
+  const ptrEnd = () => { ptrDown = false; if (collapseLater) { collapseLater = false; setTimeout(addingNow, 0); } };
+  document.addEventListener('pointerup', ptrEnd, true); document.addEventListener('pointercancel', ptrEnd, true);
+  $('#addZone').addEventListener('focusout', () => { if (ptrDown) collapseLater = true; else setTimeout(addingNow, 0); });
   $('#addName').addEventListener('input', addingNow);
 
   $('#list').addEventListener('click', e => {
     if (e.target.closest('[data-act="dup-toggle"]')) { ui.dupOnly = !ui.dupOnly; resetOrder(); render(); return; }
     if (e.target.closest('[data-act="clear-search"]')) { $('#searchClear').click(); return; }
     if (e.target.closest('[data-act="hid-toggle"]')) { ui.hidOpen = !ui.hidOpen; render(); return; }
-    if (e.target.closest('[data-act="unskip-all"]')) { unskip(state.items.filter(i => !i.deleted && i.skip && (ui.tab === 'all' || i.bag === ui.tab))); return; }
+    if (e.target.closest('[data-act="unskip-all"]')) { unskip(hiddenHere()); return; }
     const hr = e.target.closest('[data-act="unskip"]');
     if (hr) { const x = find(hr.closest('.hrow').dataset.hid); if (x) unskip([x]); return; }
     const row = e.target.closest('.item'); if (!row) return;
@@ -1418,10 +1456,11 @@ function bind() {
   $('#eSkip').addEventListener('click', () => {
     const it = find(editId); if (!it) return;
     if (!$('#eName').value.trim()) { $('#eErr').hidden = false; return; }
-    submitEdit();                                          // keep any edits made in the dialog
+    const before = {bag: it.bag, packed: it.packed};
+    submitEdit(true);                                      // keep any edits made in the dialog
     const x = find(it.id); if (!x) return;
     touch(x, {skip: true}); resetOrder(); commit();
-    toast(`"${iso(x.name)}" הוסתר מהנסיעה הזו — נשמר לפעם הבאה`, 'בטל', () => { const y = find(x.id); if (y) { touch(y, {skip: false}); commit(); } });
+    toast(`"${iso(x.name)}" הוסתר מהנסיעה הזו — נשמר לפעם הבאה`, 'בטל', () => { const y = find(x.id); if (y) { touch(y, {skip: false, ...before}); commit(); } });
   });
   // print options
   document.querySelectorAll('#pWho button').forEach(b => b.addEventListener('click', () => { pr.who = b.dataset.who; paintPrint(); }));
@@ -1453,7 +1492,7 @@ function bind() {
     $('#menuDlg').showModal();
   });
   document.querySelectorAll('[data-theme-set]').forEach(b => b.addEventListener('click', () => { PackingTheme.set(b.dataset.themeSet); paintTheme(); }));
-  document.querySelectorAll('[data-sort-set]').forEach(b => b.addEventListener('click', () => { ui.sort = b.dataset.sortSet; store.set('sort', ui.sort); resetOrder(); paintTheme(); render(); }));
+  document.querySelectorAll('[data-sort-set]').forEach(b => b.addEventListener('click', () => { ui.sort = b.dataset.sortSet; store.set('sort', ui.sort); resetOrder(); paintTheme(); render(); if (b.closest('#moreDlg')) $('#moreDlg').close(); }));
   $('#menuDlg').addEventListener('click', async e => {
     const b = e.target.closest('[data-act]'); if (!b) return;
     const act = b.dataset.act;
@@ -1657,7 +1696,7 @@ function paintPrint() {
 }
 function buildPrint() {
   const date = new Date().toLocaleDateString('he-IL', {day: 'numeric', month: 'long', year: 'numeric'});
-  const row = i => `<div class="prow"><span class="pbox">${i.packed ? '✓' : ''}</span><span class="pname" dir="auto">${bidi(i.name)}</span>${i.qty > 1 ? `<span class="pqty">×${i.qty}</span>` : ''}</div>`;
+  const row = i => `<div class="prow"><span class="pbox">${i.packed ? '✓' : ''}</span><span class="pname" dir="auto">${bidi(i.name)}</span>${i.qty > 1 ? `<span class="pqty" dir="ltr">×${i.qty}</span>` : ''}</div>`;
   return printBags().map(b => {
     const all = active().filter(i => single() || i.bag === b);
     const items = printItems(b).sort((x, y) => heSort(x.name, y.name));
@@ -1685,15 +1724,18 @@ function buildPrint() {
 }
 /* also when printing from Chrome's own menu: always print the current list, and name the PDF */
 let titleBefore = null;
+let printFromDlg = false;
 window.addEventListener('beforeprint', () => {
+  if (!printFromDlg) { pr.who = single() ? 'p1' : 'both'; pr.what = 'all'; pr.sort = ui.sort; }   // not from our dialog: the whole list
   $('#printArea').innerHTML = buildPrint();
   if (titleBefore === null) titleBefore = document.title;
   const who = single() ? nm(solo()) : printBags().map(nm).join(' ו');
   document.title = `Packing – ${who} – ${new Date().toLocaleDateString('he-IL')}`.replace(/[\\/:*?"<>|]/g, '.');
 });
-window.addEventListener('afterprint', () => { if (titleBefore !== null) document.title = titleBefore; titleBefore = null; $('#printArea').innerHTML = ''; });
+window.addEventListener('afterprint', () => { printFromDlg = false; if (titleBefore !== null) document.title = titleBefore; titleBefore = null; $('#printArea').innerHTML = ''; });
 function doPrint() {
   $('#printArea').innerHTML = buildPrint();
+  printFromDlg = true;
   $('#printDlg').close();
   setTimeout(() => { try { window.print(); } catch { toast('ההדפסה לא נתמכת כאן'); } }, 60);
 }
