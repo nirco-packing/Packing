@@ -1224,7 +1224,12 @@ function bind() {
   $('#eCancel').addEventListener('click', () => $('#editDlg').close());
   $('#eX').addEventListener('click', () => $('#editDlg').close());
   $('#eName').addEventListener('input', () => { $('#eErr').hidden = true; });
-  $('#eDelete').addEventListener('click', () => { $('#editDlg').close(); removeItem(editId); });
+  $('#eDelete').addEventListener('click', async () => {
+    const it = find(editId); if (!it) return;
+    $('#editDlg').close();
+    const where = single() ? '' : ` מהמזוודה של ${nmI(it.bag)}`;
+    if (await confirmBox(`למחוק את "${iso(it.name)}"?`, `הפריט יימחק${where}${single() ? '' : ' — ובסנכרון הבא גם מהטלפון השני'}.`, 'מחיקה')) removeItem(it.id);
+  });
 
   // settings
   $('#menuBtn').addEventListener('click', () => {
