@@ -168,6 +168,7 @@ input:focus-visible,select:focus-visible,textarea:focus-visible,.search:focus{ou
 .mlbl{font-size:13px;font-weight:700;color:var(--muted);margin:14px 0 6px}
 .mrow{display:flex;align-items:center;gap:12px;width:100%;margin-top:16px;border:0;border-top:1px solid var(--line);background:transparent;padding:14px 2px 2px;text-align:start;font-weight:700}
 .mrow .ic{font-size:20px}
+.mrow .go{margin-inline-start:auto;font-size:22px;color:var(--muted)}
 .ver{text-align:center;font-size:12px;color:var(--muted);padding:14px 0 2px}
 .mrow .ds{display:block;font-size:13px;font-weight:500;color:var(--muted)}
 
@@ -377,7 +378,7 @@ body.single #pWhoF{display:none}
     <div class="seg soft" id="sortSeg" role="group" aria-label="מיון"><button type="button" data-sort-set="cat">לפי קטגוריה</button><button type="button" data-sort-set="az">א–ת</button></div>
     <div class="mlbl">להציג</div>
     <div class="seg soft"><button type="button" data-show-set="todo">מה שנשאר</button><button type="button" data-show-set="done">מה שנארז</button><button type="button" data-show-set="all">הכל</button></div>
-    <button class="mrow" id="selBtn" type="button" aria-pressed="false"><span class="ic">☑️</span><span>בחירה מרובה<span class="ds">לסמן כמה פריטים ולהסתיר אותם מהנסיעה הזו</span></span></button>
+    <button class="mrow" id="selBtn" type="button"><span class="ic">🙈</span><span>בחירה מרובה — לא לנסיעה הזו<span class="ds">לבחור כמה פריטים ולהסתיר אותם מהרשימה עד הנסיעה הבאה</span></span><span class="go">›</span></button>
   </div>
 </dialog>
 
@@ -398,6 +399,7 @@ body.single #pWhoF{display:none}
       <div class="hint" id="eHint" hidden>⚠️ העברה למזוודה אחרת תאפס את סימון ״ארוז״</div>
     </div>
     <div class="row"><button class="btn" type="button" id="eCopy"></button></div>
+    <div class="row"><button class="btn" type="button" id="eSkip">🙈 לא לנסיעה הזו (נשמר לפעם הבאה)</button></div>
     <div class="row"><button class="btn danger" type="button" id="eDelete">מחיקת הפריט</button></div>
     <div class="dfoot"><div class="row">
       <button class="btn main" type="button" id="eSave">שמירה</button>
@@ -576,7 +578,7 @@ const CAT = Object.assign(Object.create(null), Object.fromEntries(CATS.map(c => 
 const BAGS = Object.assign(Object.create(null), {p1: 1, p2: 1});                       // internal suitcase slots: 1 = "p1" (pink), 2 = "p2" (blue)
 const defaultUsers = () => ({count: 2, names: {p1: 'משתמש/ת 1', p2: 'משתמש/ת 2'}, ts: {count: 1, p1: 1, p2: 1}, sid: '', links: {}});   // lists made before names were configurable
 const FIELDS = ['name','cat','qty','bag','packed','deleted','skip'];   // skip = not for this trip (kept for next time)
-const APP_VERSION = '2.0', APP_DATE = '30.10.2026';   // shown at the bottom of settings — bump on every release
+const APP_VERSION = '2.1', APP_DATE = '30.10.2026';   // shown at the bottom of settings — bump on every release
 const MAX_FILE = 5e6, MAX_ITEMS = 5000, MAX_FUTURE = 864e5 * 366;
 const ERR = Symbol('read-error');
 
@@ -953,6 +955,7 @@ function render() {
     (!ui.dupOnly || dups.has(dupKey(i))) &&
     (!q || normName(i.name).includes(q)) &&
     (ui.show === 'all' || ui.frozen.has(i.id) || (ui.show === 'todo' ? !i.packed : i.packed)));   // a row just tapped stays until the view changes
+  if (ui.sel) { const on = new Set(list.filter(i => !i.packed).map(i => i.id)); for (const id of [...ui.sel]) if (!on.has(id)) ui.sel.delete(id); }
 
   const bar = dupCount ? `<div class="dupbar"><span>⚠️ יש <b>${dupCount}</b> פריטים כפולים ${single() ? 'ברשימה' : 'באותה מזוודה'}</span><button type="button" data-act="dup-toggle">${ui.dupOnly ? 'הצג הכל' : 'הצג כפולים'}</button></div>` : '';
 
@@ -974,7 +977,7 @@ function render() {
       : q ? `<div class="empty"><div class="big">🔍</div>לא נמצא "<bdi>${esc(ui.q.trim())}</bdi>"<br><button type="button" class="clr" data-act="clear-search">ניקוי החיפוש</button></div>`
       : hid.length && !inTab.length ? `<div class="empty"><div class="big">🙈</div>כל הפריטים כאן הוסתרו מהנסיעה הזו</div>`
       : `<div class="empty"><div class="big">🔍</div>אין פריטים כאן</div>`) + hidHtml;
-    return;
+    paintSel(); return;
   }
   const two = !single() && ui.tab === 'all';
   const row = (i, showCat) => {
@@ -1078,6 +1081,7 @@ function paintEdit() {
   const has = active().some(i => i.id !== editId && dupKey(i) === dupKey({bag: other, name}));
   $('#eCopy').textContent = has ? `✓ קיים גם במזוודה של ${nmI(other)}` : `➕ להוסיף גם למזוודה של ${nmI(other)}`;
   $('#eCopy').disabled = has || !name;
+  $('#eSkip').hidden = !it || it.packed;                  // only items not packed yet can be left out of the trip
 }
 function copyToOther() {
   const it = find(editId); const name = $('#eName').value.trim();
@@ -1411,6 +1415,14 @@ function bind() {
   }));
   document.querySelectorAll('#eBag button').forEach(b => b.addEventListener('click', () => { editBag = b.dataset.bag; paintEdit(); }));
   $('#eCopy').addEventListener('click', copyToOther);
+  $('#eSkip').addEventListener('click', () => {
+    const it = find(editId); if (!it) return;
+    if (!$('#eName').value.trim()) { $('#eErr').hidden = false; return; }
+    submitEdit();                                          // keep any edits made in the dialog
+    const x = find(it.id); if (!x) return;
+    touch(x, {skip: true}); resetOrder(); commit();
+    toast(`"${iso(x.name)}" הוסתר מהנסיעה הזו — נשמר לפעם הבאה`, 'בטל', () => { const y = find(x.id); if (y) { touch(y, {skip: false}); commit(); } });
+  });
   // print options
   document.querySelectorAll('#pWho button').forEach(b => b.addEventListener('click', () => { pr.who = b.dataset.who; paintPrint(); }));
   document.querySelectorAll('#pWhat button').forEach(b => b.addEventListener('click', () => { pr.what = b.dataset.what; paintPrint(); }));
