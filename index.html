@@ -62,8 +62,8 @@
 :root{
   color-scheme:light;
   --bg:#f5f2ed; --surface:#ffffff; --surface-2:#faf8f5; --ink:#1d2430; --muted:#5a616d; --line:#e3ddd3;
-  --noga:#c2405f; --noga-fill:#c2405f; --noga-soft:#fbe6ec;
-  --nir:#2b6fc2; --nir-fill:#2b6fc2; --nir-soft:#e2edfb;
+  --p1:#c2405f; --p1-fill:#c2405f; --p1-soft:#fbe6ec;
+  --p2:#2b6fc2; --p2-fill:#2b6fc2; --p2-soft:#e2edfb;
   --ok:#23825a; --danger:#c73e3e; --warn:#a85208; --warn-soft:#fdf0e1;
   --toast:#1d2430; --toast-line:transparent;
   --shadow:0 1px 2px rgba(20,25,35,.06),0 4px 14px rgba(20,25,35,.05);
@@ -72,8 +72,8 @@
 :root[data-theme="dark"]{
   color-scheme:dark;
   --bg:#13161b; --surface:#1d222a; --surface-2:#191d24; --ink:#eef1f5; --muted:#9aa3ae; --line:#2e353f;
-  --noga:#ec7391; --noga-fill:#b83d5e; --noga-soft:#3a2129;
-  --nir:#6aa6ec; --nir-fill:#2f6bb8; --nir-soft:#1b2b40;
+  --p1:#ec7391; --p1-fill:#b83d5e; --p1-soft:#3a2129;
+  --p2:#6aa6ec; --p2-fill:#2f6bb8; --p2-soft:#1b2b40;
   --ok:#23784f; --danger:#ef6b6b; --warn:#f0a54a; --warn-soft:#3a2a17;
   --toast:#2c3440; --toast-line:#3d4652;
   --shadow:0 1px 2px rgba(0,0,0,.3);
@@ -98,7 +98,7 @@ button{cursor:pointer}
 .bags{display:grid;grid-template-columns:1fr 1fr;gap:10px;margin:6px 0 12px}
 .bag{border:1px solid var(--line);background:var(--surface);border-radius:var(--r);padding:12px;text-align:right;box-shadow:var(--shadow);position:relative;overflow:hidden}
 .bag::before{content:"";position:absolute;inset:0 0 auto 0;height:4px;background:var(--c)}
-.bag.noga{--c:var(--noga);--f:var(--noga-fill);--s:var(--noga-soft)} .bag.nir{--c:var(--nir);--f:var(--nir-fill);--s:var(--nir-soft)}
+.bag.p1{--c:var(--p1);--f:var(--p1-fill);--s:var(--p1-soft)} .bag.p2{--c:var(--p2);--f:var(--p2-fill);--s:var(--p2-soft)}
 .bag.active{outline:2px solid var(--c);outline-offset:-1px}
 .bag .bn{font-weight:800;font-size:17px;color:var(--c);display:flex;align-items:center;gap:6px}
 .bag .bc{font-size:13px;color:var(--muted);margin-top:2px}
@@ -114,15 +114,15 @@ button{cursor:pointer}
 .tab span{color:var(--muted);font-weight:500;margin-inline-start:5px}
 .tab[aria-selected="true"]{background:var(--ink);color:var(--bg);border-color:var(--ink)}
 .tab[aria-selected="true"] span{color:inherit;opacity:.8}
-.tab[data-tab="noga"][aria-selected="true"]{background:var(--noga-fill);border-color:var(--noga-fill);color:#fff}
-.tab[data-tab="nir"][aria-selected="true"]{background:var(--nir-fill);border-color:var(--nir-fill);color:#fff}
+.tab[data-tab="p1"][aria-selected="true"]{background:var(--p1-fill);border-color:var(--p1-fill);color:#fff}
+.tab[data-tab="p2"][aria-selected="true"]{background:var(--p2-fill);border-color:var(--p2-fill);color:#fff}
 
 .add{display:flex;gap:8px;margin-top:10px}
 textarea.one{display:block;resize:none;overflow:hidden;white-space:pre;line-height:22px;font-size:16px}
 .add textarea{flex:1;min-width:0;height:48px;border-radius:12px;border:1px solid var(--line);background:var(--surface);padding:12px}
-input:focus-visible,select:focus-visible,textarea:focus-visible,.search:focus{outline:2px solid var(--nir);outline-offset:-1px}
-.addbtn{height:48px;max-width:45%;overflow:hidden;text-overflow:ellipsis;border:0;border-radius:12px;color:#fff;font-weight:700;padding:0 14px;white-space:nowrap;background:var(--nir-fill)}
-.addbtn.noga{background:var(--noga-fill)}
+input:focus-visible,select:focus-visible,textarea:focus-visible,.search:focus{outline:2px solid var(--p2);outline-offset:-1px}
+.addbtn{height:48px;max-width:45%;overflow:hidden;text-overflow:ellipsis;border:0;border-radius:12px;color:#fff;font-weight:700;padding:0 14px;white-space:nowrap;background:var(--p2-fill)}
+.addbtn.p1{background:var(--p1-fill)}
 
 /* add options (scroll with page) */
 .addopts{display:flex;gap:8px;margin-top:12px;align-items:center}
@@ -143,15 +143,15 @@ input:focus-visible,select:focus-visible,textarea:focus-visible,.search:focus{ou
 .seg button{flex:1;border:0;background:transparent;height:40px;padding:0 6px;font-size:14px;font-weight:700;color:var(--muted)}
 .seg button+button{border-inline-start:1px solid var(--line)}
 .seg button.on{background:var(--ink);color:var(--bg)}
-.seg button[data-bag="noga"].on{background:var(--noga-fill);color:#fff}
-.seg button[data-bag="nir"].on{background:var(--nir-fill);color:#fff}
+.seg button[data-bag="p1"].on{background:var(--p1-fill);color:#fff}
+.seg button[data-bag="p2"].on{background:var(--p2-fill);color:#fff}
 
 /* list */
 .group{margin-top:16px}
 .gh{font-size:13px;font-weight:700;color:var(--muted);margin:0 2px 6px;display:flex;gap:6px;align-items:center}
 .item{background:var(--surface);border:1px solid var(--line);border-radius:12px;padding:10px 12px;margin-bottom:8px;box-shadow:var(--shadow)}
-.item.b-noga{border-inline-start:5px solid var(--noga)}
-.item.b-nir{border-inline-start:5px solid var(--nir)}
+.item.b-p1{border-inline-start:5px solid var(--p1)}
+.item.b-p2{border-inline-start:5px solid var(--p2)}
 .l1{display:flex;align-items:center;gap:10px}
 .info{flex:1;min-width:0;min-height:44px;align-self:stretch;border:0;background:transparent;text-align:right;padding:2px 0}
 .info .nm{display:flex;align-items:flex-start;gap:6px;font-weight:700;font-size:17px}
@@ -198,7 +198,7 @@ dialog::backdrop{background:rgba(10,14,20,.5)}
 .setrow .top2{display:flex;align-items:center;gap:12px;margin-bottom:8px}
 .owners{display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-top:8px}
 .owners button{height:76px;border-radius:14px;border:2px solid var(--line);background:var(--surface-2);font-size:20px;font-weight:800}
-.owners [data-owner="noga"]{color:var(--noga)} .owners [data-owner="nir"]{color:var(--nir)}
+.owners [data-owner="p1"]{color:var(--p1)} .owners [data-owner="p2"]{color:var(--p2)}
 .linkbtn{display:block;margin:12px auto 0;min-height:40px;border:0;background:none;color:var(--muted);text-decoration:underline;font-size:13px;padding:0 8px}
 .warnbox{background:var(--warn-soft);border:1px solid var(--warn);border-radius:10px;padding:10px 12px;margin:8px 0 12px;font-size:14px;font-weight:600}
 .rlist{margin:0 0 12px;padding-inline-start:20px;font-size:14px;line-height:1.7}
@@ -207,10 +207,10 @@ dialog::backdrop{background:rgba(10,14,20,.5)}
 .seg button[data-bag="both"].on{background:var(--ink);color:var(--bg)}
 .addbtn.both{background:var(--ink);color:var(--bg)}
 body.single #eCopy,
-body.single .bag.nir, body.single .tabs, body.single .addbag, body.single .l2,
+body.single .bag.p2, body.single .tabs, body.single .addbag, body.single .l2,
 body.single #eBagField, body.single #kBagField, body.single [data-act="share"]{display:none}
 body.single .bags{grid-template-columns:1fr}
-body.single .item.b-noga, body.single .item.b-nir{border-inline-start:1px solid var(--line)}
+body.single .item.b-p1, body.single .item.b-p2{border-inline-start:1px solid var(--line)}
 body.single .add{margin-top:0}
 .note{font-size:12px;color:var(--muted);margin-top:12px}
 .btn.dangerfill{background:var(--danger);color:#fff;border-color:var(--danger)}
@@ -224,7 +224,7 @@ body.single .add{margin-top:0}
 .dfoot .row{margin-top:0}
 .menu .sect.danger-sect{margin-top:16px;color:var(--danger)}
 .okbox{background:var(--surface-2);border:1.5px solid var(--ok);border-radius:10px;padding:10px 12px;margin:8px 0 12px;font-size:14px;font-weight:700}
-.bigimport{display:flex;align-items:center;gap:12px;width:100%;text-align:right;min-height:64px;margin:10px 0 14px;border-radius:14px;border:1.5px solid var(--nir);background:var(--nir-soft);color:var(--ink);font-size:16px;font-weight:700;padding:10px 14px}
+.bigimport{display:flex;align-items:center;gap:12px;width:100%;text-align:right;min-height:64px;margin:10px 0 14px;border-radius:14px;border:1.5px solid var(--p2);background:var(--p2-soft);color:var(--ink);font-size:16px;font-weight:700;padding:10px 14px}
 .bigimport .ds{display:block;font-size:13px;font-weight:500;color:var(--muted)}
 .focusrow{outline:2px solid var(--warn);outline-offset:6px;border-radius:10px}
 
@@ -284,17 +284,17 @@ body.single #pWhoF{display:none}
   </header>
 
   <section class="bags">
-    <button class="bag noga" data-tab="noga" type="button">
-      <div class="bn">🧳 <span data-name="noga"></span></div>
-      <div class="bc" id="cNoga"></div>
-      <div class="bar"><i id="pNoga"></i></div>
-      <div class="bp" id="sNoga"></div>
+    <button class="bag p1" data-tab="p1" type="button">
+      <div class="bn">🧳 <span data-name="p1"></span></div>
+      <div class="bc" id="cP1"></div>
+      <div class="bar"><i id="pP1"></i></div>
+      <div class="bp" id="sP1"></div>
     </button>
-    <button class="bag nir" data-tab="nir" type="button">
-      <div class="bn">🧳 <span data-name="nir"></span></div>
-      <div class="bc" id="cNir"></div>
-      <div class="bar"><i id="pNir"></i></div>
-      <div class="bp" id="sNir"></div>
+    <button class="bag p2" data-tab="p2" type="button">
+      <div class="bn">🧳 <span data-name="p2"></span></div>
+      <div class="bc" id="cP2"></div>
+      <div class="bar"><i id="pP2"></i></div>
+      <div class="bp" id="sP2"></div>
     </button>
   </section>
 </div>
@@ -303,8 +303,8 @@ body.single #pWhoF{display:none}
   <div class="wrap">
     <nav class="tabs" role="tablist">
       <button class="tab" role="tab" data-tab="all" type="button">הכל<span id="tAll"></span></button>
-      <button class="tab" role="tab" data-tab="noga" type="button"><span data-name="noga"></span><span id="tNoga"></span></button>
-      <button class="tab" role="tab" data-tab="nir" type="button"><span data-name="nir"></span><span id="tNir"></span></button>
+      <button class="tab" role="tab" data-tab="p1" type="button"><span data-name="p1"></span><span id="tP1"></span></button>
+      <button class="tab" role="tab" data-tab="p2" type="button"><span data-name="p2"></span><span id="tP2"></span></button>
     </nav>
     <div class="add">
       <textarea id="addName" class="one" rows="1" wrap="off" autocomplete="off" placeholder="הוספת פריט…" enterkeyhint="done" maxlength="80" dir="auto"></textarea>
@@ -323,7 +323,7 @@ body.single #pWhoF{display:none}
     </div>
   </div>
   <div class="addbag"><span class="lbl">מוסיפים למזוודה:</span>
-    <div class="seg" id="addBag"><button type="button" data-bag="noga"></button><button type="button" data-bag="nir"></button><button type="button" data-bag="both">שניהם</button></div>
+    <div class="seg" id="addBag"><button type="button" data-bag="p1"></button><button type="button" data-bag="p2"></button><button type="button" data-bag="both">שניהם</button></div>
   </div>
   <div class="tools">
     <button class="chip" id="searchClear" type="button" aria-label="ניקוי החיפוש" hidden>✕</button>
@@ -347,7 +347,7 @@ body.single #pWhoF{display:none}
       </div>
     </div>
     <div class="f" id="eBagField"><span>מזוודה</span>
-      <div class="seg" id="eBag"><button type="button" data-bag="noga"></button><button type="button" data-bag="nir"></button></div>
+      <div class="seg" id="eBag"><button type="button" data-bag="p1"></button><button type="button" data-bag="p2"></button></div>
       <div class="hint" id="eHint" hidden>⚠️ העברה למזוודה אחרת תאפס את סימון ״ארוז״</div>
     </div>
     <div class="row"><button class="btn" type="button" id="eCopy"></button></div>
@@ -434,7 +434,7 @@ body.single #pWhoF{display:none}
     <textarea id="kText" placeholder="הדביקו כאן את הרשימה…" dir="auto"></textarea>
     <div class="row"><button class="btn" type="button" id="kFileBtn">📄 בחירת קובץ txt</button></div>
     <div class="f" id="kBagField" style="margin-top:12px"><span>לאיזו מזוודה?</span>
-      <div class="seg" id="kBag"><button type="button" data-bag="noga"></button><button type="button" data-bag="nir"></button><button type="button" data-bag="both">שניהם</button></div>
+      <div class="seg" id="kBag"><button type="button" data-bag="p1"></button><button type="button" data-bag="p2"></button><button type="button" data-bag="both">שניהם</button></div>
     </div>
     <div class="kopts">
       <label><input type="checkbox" id="kTitle"> לדלג על השורה הראשונה (כותרת הפתק)</label>
@@ -456,7 +456,7 @@ body.single #pWhoF{display:none}
   <div class="dlg">
     <h2>הדפסת הרשימה</h2>
     <div class="f" id="pWhoF" style="margin-top:12px"><span>מה להדפיס</span>
-      <div class="seg" id="pWho"><button type="button" data-who="noga" data-bag="noga"></button><button type="button" data-who="nir" data-bag="nir"></button><button type="button" data-who="both" data-bag="both">שניהם</button></div>
+      <div class="seg" id="pWho"><button type="button" data-who="p1" data-bag="p1"></button><button type="button" data-who="p2" data-bag="p2"></button><button type="button" data-who="both" data-bag="both">שניהם</button></div>
     </div>
     <div class="f"><span>פריטים</span>
       <div class="seg" id="pWhat"><button type="button" data-what="all">כל הפריטים</button><button type="button" data-what="left">רק מה שלא נארז</button></div>
@@ -482,7 +482,7 @@ body.single #pWhoF{display:none}
     <label class="f" style="margin-top:14px"><span id="suL1">השם שלך</span><textarea id="suName1" class="one" rows="1" wrap="off" autocomplete="off" maxlength="20" enterkeyhint="next" dir="auto"></textarea></label>
     <label class="f" id="suF2"><span id="suL2">השם של מי שאורז/ת איתך</span><textarea id="suName2" class="one" rows="1" wrap="off" autocomplete="off" maxlength="20" enterkeyhint="done" dir="auto"></textarea></label>
     <div class="f" id="suOwnerF"><span>הטלפון הזה של:</span>
-      <div class="seg" id="suOwner"><button type="button" data-owner="noga" data-bag="noga"></button><button type="button" data-owner="nir" data-bag="nir"></button></div>
+      <div class="seg" id="suOwner"><button type="button" data-owner="p1" data-bag="p1"></button><button type="button" data-owner="p2" data-bag="p2"></button></div>
     </div>
     <p class="note" id="suNote"></p>
     <div class="hint" id="suErr" hidden></div>
@@ -528,8 +528,8 @@ const CATS = [
   ['meds','תרופות','💊'], ['electronics','אלקטרוניקה','🔌'], ['docs','מסמכים','📄'], ['other','אחר','📦']
 ];
 const CAT = Object.fromEntries(CATS.map(c => [c[0], {name:c[1], icon:c[2]}]));
-const BAGS = {noga: 1, nir: 1};                       // internal suitcase slots: 1 = "noga" (pink), 2 = "nir" (blue)
-const defaultUsers = () => ({count: 2, names: {noga: 'נגה', nir: 'ניר'}, ts: {count: 1, noga: 1, nir: 1}, sid: '', links: {}});   // lists made before names were configurable
+const BAGS = {p1: 1, p2: 1};                       // internal suitcase slots: 1 = "p1" (pink), 2 = "p2" (blue)
+const defaultUsers = () => ({count: 2, names: {p1: 'משתמש/ת 1', p2: 'משתמש/ת 2'}, ts: {count: 1, p1: 1, p2: 1}, sid: '', links: {}});   // lists made before names were configurable
 const FIELDS = ['name','cat','qty','bag','packed','deleted'];
 const MAX_FILE = 5e6, MAX_ITEMS = 5000, MAX_FUTURE = 864e5 * 366;
 const ERR = Symbol('read-error');
@@ -548,20 +548,20 @@ const cut = (s, n) => { s = String(s).slice(0, n); return /[\uD800-\uDBFF]$/.tes
 const clampTs = x => { x = Number(x); return Number.isFinite(x) && x > 0 ? Math.min(x, now() + MAX_FUTURE) : 0; };
 const many = (n, one, pl) => n === 1 ? one : `${n} ${pl}`;
 const iso = s => '\u2068' + s + '\u2069';
-const and = s => (/^[A-Za-z0-9]/.test(s) ? 'ו-' : 'ו') + iso(s);   // "ונגה", but "ו-Nir"              // keep a Latin/Hebrew name from scrambling the sentence around it
+const and = s => (/^[A-Za-z0-9]/.test(s) ? 'ו-' : 'ו') + iso(s);   // "ודנה", but "ו-Dan"              // keep a Latin/Hebrew name from scrambling the sentence around it
 const live = () => state.items.filter(i => !i.deleted);
 const byId = id => state.items.find(i => i.id === id);
 const find = id => { const i = byId(id); return i && !i.deleted ? i : null; };
 const single = () => !!state.users && state.users.count === 1;
 const configured = () => !!state.users && (single() || !!state.owner);
-const nm = slot => (state.users && state.users.names[slot]) || (slot === 'noga' ? 'משתמש/ת 1' : 'משתמש/ת 2');
+const nm = slot => (state.users && state.users.names[slot]) || (slot === 'p1' ? 'משתמש/ת 1' : 'משתמש/ת 2');
 const nmI = slot => iso(nm(slot));
-const flip = b => b === 'noga' ? 'nir' : 'noga';
+const flip = b => b === 'p1' ? 'p2' : 'p1';
 /* one-user mode belongs to this phone's owner: shows their name, and new items go to their own suitcase */
-const solo = () => state.owner || 'noga';
-const defaultBag = () => single() ? solo() : (state.owner || 'noga');
+const solo = () => state.owner || 'p1';
+const defaultBag = () => single() ? solo() : (state.owner || 'p1');
 const curBag = () => single() ? solo() : (ui.addBag || defaultBag());
-const targets = bag => single() ? [solo()] : bag === 'both' ? ['noga', 'nir'] : [bag];   // 'both' = one item in each suitcase
+const targets = bag => single() ? [solo()] : bag === 'both' ? ['p1', 'p2'] : [bag];   // 'both' = one item in each suitcase
 const whereTo = bag => single() ? 'לרשימה' : bag === 'both' ? 'לשתי המזוודות' : 'למזוודה של ' + nmI(bag);
 /* users.sid = this list's identity (shared by phones that set up from each other's file);
    users.links = other identities met before, and whether their two people come the other way round */
@@ -570,13 +570,13 @@ function cleanUsers(u, local) {
   if (!u || typeof u !== 'object') return null;
   const count = u.count === 1 ? 1 : 2;
   const names = {};
-  for (const k of ['noga', 'nir']) names[k] = cut(String((u.names && u.names[k]) || '').trim(), 20);
-  if (!names.noga || (count === 2 && !names.nir)) return null;
-  const t = u.ts && typeof u.ts === 'object' ? u.ts : {count: u.ts, noga: u.ts, nir: u.ts};
+  for (const k of ['p1', 'p2']) names[k] = cut(String((u.names && u.names[k]) || '').trim(), 20);
+  if (!names.p1 || (count === 2 && !names.p2)) return null;
+  const t = u.ts && typeof u.ts === 'object' ? u.ts : {count: u.ts, p1: u.ts, p2: u.ts};
   const links = {};
   if (local && u.links && typeof u.links === 'object')
     for (const [k, v] of Object.entries(u.links).slice(0, 20)) if (SID_RE.test(k)) links[k] = !!v;
-  return {count, names, ts: {count: clampTs(t.count), noga: clampTs(t.noga), nir: names.nir ? clampTs(t.nir) : 0},
+  return {count, names, ts: {count: clampTs(t.count), p1: clampTs(t.p1), p2: names.p2 ? clampTs(t.p2) : 0},
     sid: SID_RE.test(String(u.sid || '')) ? String(u.sid) : '', links};
 }
 /* number of users and each name sync between phones separately: the newer change of each wins */
@@ -588,11 +588,11 @@ function adoptUsers(u, force) {
   const val = (x, f) => f === 'count' ? x.count : x.names[f];
   const wins = f => force || u.ts[f] > n.ts[f] || (u.ts[f] === n.ts[f] && String(val(u, f)) > String(val(n, f)));
   if (wins('count')) { n.count = u.count; n.ts.count = u.ts.count; }
-  for (const k of ['noga', 'nir']) if (u.names[k] && wins(k)) { n.names[k] = u.names[k]; n.ts[k] = u.ts[k]; }
-  if (n.count === 2 && !n.names.nir && u.names.nir) { n.names.nir = u.names.nir; n.ts.nir = u.ts.nir; }
-  if (n.count === 2 && !n.names.nir) n.count = 1;
+  for (const k of ['p1', 'p2']) if (u.names[k] && wins(k)) { n.names[k] = u.names[k]; n.ts[k] = u.ts[k]; }
+  if (n.count === 2 && !n.names.p2 && u.names.p2) { n.names.p2 = u.names.p2; n.ts.p2 = u.ts.p2; }
+  if (n.count === 2 && !n.names.p2) n.count = 1;
   state.users = n;
-  return {changed: n.count !== L.count || n.names.noga !== L.names.noga || n.names.nir !== L.names.nir, countChanged: n.count !== L.count};
+  return {changed: n.count !== L.count || n.names.p1 !== L.names.p1 || n.names.p2 !== L.names.p2, countChanged: n.count !== L.count};
 }
 /* Two phones set up separately can have the two people in opposite slots. The first time their lists meet,
    work out who is who (by name, or by asking), then remember it — later renames can't confuse it. */
@@ -602,13 +602,13 @@ function lineage(u) {
   if (!u || !L) return {flip: false};
   if (u.sid && u.sid === L.sid) return {flip: false};
   if (u.sid && L.links && Object.prototype.hasOwnProperty.call(L.links, u.sid)) return {flip: L.links[u.sid]};
-  const two = !!(u.names.nir && L.names.nir);
-  const straight = eqN(u.names.noga, L.names.noga) || (two && eqN(u.names.nir, L.names.nir));
-  const cross = two && (eqN(u.names.noga, L.names.nir) || eqN(u.names.nir, L.names.noga));
+  const two = !!(u.names.p2 && L.names.p2);
+  const straight = eqN(u.names.p1, L.names.p1) || (two && eqN(u.names.p2, L.names.p2));
+  const cross = two && (eqN(u.names.p1, L.names.p2) || eqN(u.names.p2, L.names.p1));
   const flip = cross && !straight ? true : straight && !cross ? false : !two ? false : null;   // null → ask
   return {flip, first: true};
 }
-const flipUsers = u => ({...u, names: {noga: u.names.nir, nir: u.names.noga}, ts: {count: u.ts.count, noga: u.ts.nir, nir: u.ts.noga}});
+const flipUsers = u => ({...u, names: {p1: u.names.p2, p2: u.names.p1}, ts: {count: u.ts.count, p1: u.ts.p2, p2: u.ts.p1}});
 function flipLocal() {                                  // turn this phone's list around once, to match the other phone
   state.items = state.items.map(i => ({...i, bag: flip(i.bag), ts: {...i.ts}}));
   state.users = flipUsers(state.users);
@@ -700,6 +700,35 @@ const save = () => { state.savedAt = now(); return store.set('state', state); };
 const flushLocal = () => { if (store.readOnly) return; try { state.savedAt = now(); localStorage.setItem('mizvadot:state', JSON.stringify(state)); } catch {} };
 
 /* ---------- items ---------- */
+/* Lists and files from before the suitcase ids were renamed: map the two old ids to p1/p2 by their position
+   (order in users.names; without names, the original first id sorts after the second). */
+function upgradeIds(o) {
+  if (!o || typeof o !== 'object') return o;
+  const known = k => k === 'p1' || k === 'p2';
+  const arr = Array.isArray(o) ? o : Array.isArray(o.items) ? o.items : [];
+  const U = !Array.isArray(o) && o.users && typeof o.users === 'object' && o.users.names && typeof o.users.names === 'object' ? o.users : null;
+  let old = U ? Object.keys(U.names).filter(k => !known(k)).slice(0, 2) : [];
+  if (old.length < 2) {
+    const seen = new Set(old);
+    arr.forEach(i => { if (i && typeof i.bag === 'string' && !known(i.bag)) seen.add(i.bag); });
+    if (!Array.isArray(o) && typeof o.owner === 'string' && !known(o.owner)) seen.add(o.owner);
+    old = old.length ? [old[0], ...[...seen].filter(k => k !== old[0])].slice(0, 2) : [...seen].sort().reverse().slice(0, 2);
+  }
+  if (!old.length) return o;
+  const map = {[old[0]]: 'p1'}; if (old[1]) map[old[1]] = 'p2';
+  const conv = k => map[k] || k;
+  const items = arr.map(i => i && typeof i === 'object' ? {...i, bag: conv(i.bag)} : i);
+  if (Array.isArray(o)) return items;
+  const out = {...o, items, owner: o.owner == null ? o.owner : conv(o.owner)};
+  if (U) {
+    const names = {}, ts = {};
+    const t = U.ts && typeof U.ts === 'object' ? U.ts : null;
+    for (const [k, v] of Object.entries(U.names)) names[conv(k)] = v;
+    if (t) for (const [k, v] of Object.entries(t)) ts[conv(k)] = v;
+    out.users = {...U, names, ts: t ? ts : U.ts};
+  }
+  return out;
+}
 function cleanItem(it) {
   if (!it || typeof it !== 'object' || it.id == null) return null;
   const id = String(it.id);
@@ -784,8 +813,8 @@ function dupKeys(items) {
 
 /* ---------- render ---------- */
 function stats(items) {
-  const s = {all: items.length, noga: 0, nir: 0, nogaPacked: 0, nirPacked: 0, nogaQty: 0, nirQty: 0};
-  for (const i of items) { const b = single() ? 'noga' : i.bag; s[b]++; s[b + 'Qty'] += i.qty; if (i.packed) s[b + 'Packed']++; }
+  const s = {all: items.length, p1: 0, p2: 0, p1Packed: 0, p2Packed: 0, p1Qty: 0, p2Qty: 0};
+  for (const i of items) { const b = single() ? 'p1' : i.bag; s[b]++; s[b + 'Qty'] += i.qty; if (i.packed) s[b + 'Packed']++; }
   return s;
 }
 
@@ -794,24 +823,24 @@ function render() {
   const s = stats(items);
   document.body.classList.toggle('single', single());
   if (single()) ui.tab = 'all';
-  document.querySelectorAll('[data-name]').forEach(e => e.textContent = single() && e.dataset.name === 'noga' ? nm(solo()) : nm(e.dataset.name));
+  document.querySelectorAll('[data-name]').forEach(e => e.textContent = single() && e.dataset.name === 'p1' ? nm(solo()) : nm(e.dataset.name));
   document.querySelectorAll('#addBag button,#eBag button,#kBag button').forEach(b => { if (b.dataset.bag !== 'both') b.textContent = nm(b.dataset.bag); });
 
-  for (const b of ['noga', 'nir']) {
-    const B = b === 'noga' ? 'Noga' : 'Nir';
+  for (const b of ['p1', 'p2']) {
+    const B = b === 'p1' ? 'P1' : 'P2';
     const n = s[b], p = s[b + 'Packed'];
     $('#c' + B).textContent = n ? many(n, 'פריט אחד', 'פריטים') + (s[b + 'Qty'] !== n ? ` · ${s[b + 'Qty']} יחידות` : '') : 'ריקה';
     $('#p' + B).style.width = n ? (p / n * 100) + '%' : '0';
     $('#s' + B).textContent = n ? (p === n ? 'הכל ארוז ✓' : `${p} מתוך ${n} ארוזים`) : '—';
   }
-  $('#tAll').textContent = s.all; $('#tNoga').textContent = s.noga; $('#tNir').textContent = s.nir;
+  $('#tAll').textContent = s.all; $('#tP1').textContent = s.p1; $('#tP2').textContent = s.p2;
   document.querySelectorAll('.tab').forEach(t => t.setAttribute('aria-selected', t.dataset.tab === ui.tab));
   document.querySelectorAll('.bag').forEach(t => t.classList.toggle('active', t.dataset.tab === ui.tab));
 
   const ab = curBag();
   document.querySelectorAll('#addBag button').forEach(b => b.classList.toggle('on', b.dataset.bag === ab));
   $('#addBtn').textContent = single() ? 'הוסף' : ab === 'both' ? 'הוסף לשניהם' : `הוסף ל${nmI(ab)}`;
-  $('#addBtn').classList.toggle('noga', !single() && ab === 'noga');
+  $('#addBtn').classList.toggle('p1', !single() && ab === 'p1');
   $('#addBtn').classList.toggle('one', single());
   $('#addBtn').classList.toggle('both', !single() && ab === 'both');
   $('#addQty').textContent = ui.qty;
@@ -848,7 +877,7 @@ function render() {
   }
   const row = (i, showCat) => {
     const isDup = dups.has(dupKey(i));
-    const seg = ['noga', 'nir'].map(b => `<button type="button" data-bag="${b}" class="${i.bag === b ? 'on' : ''}">${esc(nm(b))}</button>`).join('');
+    const seg = ['p1', 'p2'].map(b => `<button type="button" data-bag="${b}" class="${i.bag === b ? 'on' : ''}">${esc(nm(b))}</button>`).join('');
     return `<div class="item b-${i.bag}${i.packed ? ' packed' : ''}${isDup ? ' isdup' : ''}" data-id="${esc(i.id)}">
         <div class="l1">
           <button type="button" class="info" aria-label="עריכת ${esc(i.name)}"><span class="nm">${showCat ? `<span class="ci" title="${CAT[i.cat].name}">${CAT[i.cat].icon}</span>` : ''}<span class="t" dir="auto">${esc(i.name)}</span><span class="pen">✏️</span></span>${i.qty > 1 ? `<span class="mt">כמות: ${i.qty}</span>` : ''}${isDup ? `<span class="dup">⚠️ מופיע פעמיים ${single() ? 'ברשימה' : 'במזוודה של <bdi>' + esc(nm(i.bag)) + '</bdi>'}</span>` : ''}</button>
@@ -909,7 +938,7 @@ function confirmBox(title, text, yes) {
 }
 
 /* ---------- edit dialog ---------- */
-let editId = null, editQty = 1, editBag = 'nir';
+let editId = null, editQty = 1, editBag = 'p2';
 function openEdit(id) {
   const it = find(id); if (!it) return;
   editId = id; editQty = it.qty; editBag = it.bag;
@@ -981,7 +1010,7 @@ function downloadFile() {
 async function readImport(file) {
   if (file.size > MAX_FILE) { toast('הקובץ גדול מדי'); return; }
   let data;
-  try { data = JSON.parse(await file.text()); }
+  try { data = upgradeIds(JSON.parse(await file.text())); }
   catch { toast('זה לא קובץ של Packing. לרשימה מ-Keep: הגדרות ← ייבוא מ-Google Keep'); return; }
   const arr = Array.isArray(data) ? data : data && Array.isArray(data.items) ? data.items : null;
   if (!arr) { toast('לא נמצאו פריטים בקובץ'); return; }
@@ -1011,8 +1040,8 @@ async function readImport(file) {
 function askWho(u) {
   return new Promise(res => {
     const L = state.users, d = $('#whoDlg');
-    $('#whoText').textContent = `ברשימה שהגיעה השמות הם ${iso(u.names.noga)} ${and(u.names.nir)}, ובטלפון הזה ${iso(L.names.noga)} ${and(L.names.nir)}. מי מהם הוא ${iso(L.names.noga)}?`;
-    $('#whoA').textContent = u.names.noga; $('#whoB').textContent = u.names.nir;
+    $('#whoText').textContent = `ברשימה שהגיעה השמות הם ${iso(u.names.p1)} ${and(u.names.p2)}, ובטלפון הזה ${iso(L.names.p1)} ${and(L.names.p2)}. מי מהם הוא ${iso(L.names.p1)}?`;
+    $('#whoA').textContent = u.names.p1; $('#whoB').textContent = u.names.p2;
     let done = false; const fin = v => { if (!done) { done = true; res(v); } };
     $('#whoA').onclick = () => { fin(false); d.close(); };
     $('#whoB').onclick = () => { fin(true); d.close(); };
@@ -1238,7 +1267,7 @@ function bind() {
     $('#syncSect').textContent = single() ? 'גיבוי' : 'סנכרון עם הטלפון השני';
     $('#importLbl').textContent = single() ? 'שחזור מגיבוי' : 'קבלת קובץ';
     $('#importDs').textContent = single() ? 'פתיחת קובץ גיבוי ששמרת' : 'מהטלפון השני, או שחזור מגיבוי';
-    $('#usersInfo').textContent = !state.users ? '' : single() ? `משתמש אחד: ${nmI(solo())} · אפשר לעבור לשניים` : `${nmI('noga')} ${and(nm('nir'))} · הטלפון הזה של ${nmI(state.owner)}`;
+    $('#usersInfo').textContent = !state.users ? '' : single() ? `משתמש אחד: ${nmI(solo())} · אפשר לעבור לשניים` : `${nmI('p1')} ${and(nm('p2'))} · הטלפון הזה של ${nmI(state.owner)}`;
     paintTheme();
     $('#menuDlg').showModal();
   });
@@ -1391,7 +1420,8 @@ function bind() {
     if (document.hidden) { flushLocal(); return; }
     if (store.readOnly || store.failed || anyDialogOpen()) return;
     resetOrder();
-    const saved = await store.get('state');
+    let saved = await store.get('state');
+    if (saved && saved !== ERR) saved = upgradeIds(saved);
     if (saved && saved !== ERR && Array.isArray(saved.items)) {
       state.items = saved.items.map(cleanItem).filter(Boolean);
       if (BAGS[saved.owner]) state.owner = saved.owner;
@@ -1420,10 +1450,10 @@ function bind() {
 
 /* ---------- print ---------- */
 const pr = {who: 'both', what: 'all', sort: 'cat'};
-const printBags = () => single() ? ['noga'] : pr.who === 'both' ? ['noga', 'nir'].filter(b => live().some(i => i.bag === b)) : [pr.who];
+const printBags = () => single() ? ['p1'] : pr.who === 'both' ? ['p1', 'p2'].filter(b => live().some(i => i.bag === b)) : [pr.who];
 const printItems = b => live().filter(i => (single() || i.bag === b) && (pr.what === 'all' || !i.packed));
 function openPrint() {
-  pr.who = single() ? 'noga' : 'both'; pr.what = 'all'; pr.sort = ui.sort;
+  pr.who = single() ? 'p1' : 'both'; pr.what = 'all'; pr.sort = ui.sort;
   document.querySelectorAll('#pWho button').forEach(b => { if (b.dataset.who !== 'both') b.textContent = nm(b.dataset.who); });
   paintPrint(); $('#printDlg').showModal();
 }
@@ -1483,8 +1513,8 @@ function openSetup(first) {
 }
 function fillSetupNames() {
   const u = state.users; if (!u) return;
-  if (su.count === 1) { $('#suName1').value = u.names[state.owner || 'noga'] || u.names.noga; $('#suName2').value = ''; }
-  else { $('#suName1').value = u.names.noga; $('#suName2').value = u.names.nir || ''; }
+  if (su.count === 1) { $('#suName1').value = u.names[state.owner || 'p1'] || u.names.p1; $('#suName2').value = ''; }
+  else { $('#suName1').value = u.names.p1; $('#suName2').value = u.names.p2 || ''; }
 }
 function refreshSetupFromState() {
   const u = state.users;
@@ -1513,12 +1543,12 @@ function paintSetup() {
   $('#suL2').textContent = su.fresh ? 'השם של מי שאורז/ת איתך' : 'משתמש/ת 2';
   const n1 = $('#suName1').value.trim() || 'משתמש/ת 1', n2 = $('#suName2').value.trim() || 'משתמש/ת 2';
   document.querySelectorAll('#suOwner button').forEach(b => {
-    b.textContent = b.dataset.owner === 'noga' ? n1 : n2;
+    b.textContent = b.dataset.owner === 'p1' ? n1 : n2;
     b.classList.toggle('on', b.dataset.owner === su.owner);
   });
   const note = L ? ''
     : two ? 'השמות יופיעו גם בטלפון השני אחרי הסנכרון.'
-    : prev && prev.count === 2 ? `כל הפריטים יוצגו ברשימה אחת. החלוקה בין ${iso(prev.names.noga)} ל${iso(prev.names.nir)} נשמרת, ותחזור אם תעברו שוב לשני משתמשים.`
+    : prev && prev.count === 2 ? `כל הפריטים יוצגו ברשימה אחת. החלוקה בין ${iso(prev.names.p1)} ל${iso(prev.names.p2)} נשמרת, ותחזור אם תעברו שוב לשני משתמשים.`
     : 'רשימה אחת, בלי חלוקה למזוודות. אפשר לעבור לשני משתמשים בכל זמן בהגדרות.';
   $('#suNote').textContent = note; $('#suNote').hidden = !note;
   $('#suCancel').hidden = !configured();
@@ -1527,7 +1557,7 @@ function paintSetup() {
 function saveSetup() {
   const two = su.count === 2;
   const n1 = cut($('#suName1').value.trim(), 20), n2 = cut($('#suName2').value.trim(), 20);
-  if (two && su.fresh) su.owner = 'noga';               // new list: the first name is the person holding this phone
+  if (two && su.fresh) su.owner = 'p1';               // new list: the first name is the person holding this phone
   const err = !n1 ? (two ? 'נא להזין את השם הראשון' : 'נא להזין שם')
     : two && !n2 ? 'נא להזין את השם השני'
     : two && normName(n1) === normName(n2) ? 'השמות צריכים להיות שונים'
@@ -1535,17 +1565,17 @@ function saveSetup() {
     : '';
   if (err) { $('#suErr').textContent = '⚠️ ' + err; $('#suErr').hidden = false; return; }
   const prev = state.users;
-  const me = state.owner || 'noga';
-  const names = two ? {noga: n1, nir: n2} : prev ? {...prev.names, [me]: n1} : {noga: n1, nir: ''};
-  const base = prev ? Math.max(prev.ts.count, prev.ts.noga, prev.ts.nir) : 0;
+  const me = state.owner || 'p1';
+  const names = two ? {p1: n1, p2: n2} : prev ? {...prev.names, [me]: n1} : {p1: n1, p2: ''};
+  const base = prev ? Math.max(prev.ts.count, prev.ts.p1, prev.ts.p2) : 0;
   const t = Math.max(now(), base + 1);
-  const ts = prev ? {...prev.ts} : {count: 0, noga: 0, nir: 0};
+  const ts = prev ? {...prev.ts} : {count: 0, p1: 0, p2: 0};
   if (!prev || prev.count !== su.count) ts.count = t;
-  if (!prev || prev.names.noga !== names.noga) ts.noga = t;
-  if (names.nir && (!prev || prev.names.nir !== names.nir)) ts.nir = t;
+  if (!prev || prev.names.p1 !== names.p1) ts.p1 = t;
+  if (names.p2 && (!prev || prev.names.p2 !== names.p2)) ts.p2 = t;
   state.users = {count: su.count, names, ts, sid: prev && prev.sid ? prev.sid : uid(), links: prev ? {...(prev.links || {})} : {}};
   if (two) state.owner = su.owner;                       // items keep their suitcase, so going back to two users restores the split
-  ui.addBag = two ? state.owner : 'noga'; ui.tab = 'all';
+  ui.addBag = two ? state.owner : 'p1'; ui.tab = 'all';
   su.loaded = null;
   $('#setupDlg').close();
   resetOrder(); commit();
@@ -1567,15 +1597,19 @@ async function init() {
   $('#addCat').innerHTML = '<option value="auto">✨ אוטומטי</option>' + opts; $('#eCat').innerHTML = opts;
 
   await store.open();
-  const saved = await store.get('state');
+  let saved = await store.get('state');
+  const wasOld = saved && saved !== ERR && saved.users && saved.users.names && !('p1' in saved.users.names);
+  if (saved && saved !== ERR) saved = upgradeIds(saved);
   if (saved === ERR) {
     store.readOnly = true;                       // don't overwrite a list we couldn't read
   } else if (saved && Array.isArray(saved.items)) {
     state.owner = BAGS[saved.owner] ? saved.owner : null;
     state.users = cleanUsers(saved.users, true) || (state.owner ? defaultUsers() : null);
-    if (state.users && !state.users.sid) { state.users.sid = uid(); save(); }      // lists from older versions get an identity
+    const noSid = state.users && !state.users.sid;
+    if (noSid) state.users.sid = uid();                                             // lists from older versions get an identity
     state.items = saved.items.map(cleanItem).filter(Boolean);
     state.lastExport = saved.lastExport || null;
+    if (noSid || wasOld) save();                                                    // after the items are back in, so nothing is lost
   }
   const lc = await store.get('lastCat2'); if (lc !== ERR && (CAT[lc] || lc === 'auto')) ui.cat = lc;
   const so = await store.get('sort'); if (so === 'az' || so === 'cat') ui.sort = so;
