@@ -65,7 +65,7 @@
   --p1:#c2405f; --p1-fill:#c2405f; --p1-soft:#fbe6ec;
   --p2:#2b6fc2; --p2-fill:#2b6fc2; --p2-soft:#e2edfb;
   --ok:#23825a; --danger:#c73e3e; --warn:#a85208; --warn-soft:#fdf0e1;
-  --toast:#1d2430; --toast-line:transparent;
+  --toast:#1d2430; --toast-line:transparent; --fill:#ebe6de; --box:#b2aa9e;
   --shadow:0 1px 2px rgba(20,25,35,.06),0 4px 14px rgba(20,25,35,.05);
   --r:14px;
 }
@@ -75,7 +75,7 @@
   --p1:#ec7391; --p1-fill:#b83d5e; --p1-soft:#3a2129;
   --p2:#6aa6ec; --p2-fill:#2f6bb8; --p2-soft:#1b2b40;
   --ok:#23784f; --danger:#ef6b6b; --warn:#f0a54a; --warn-soft:#3a2a17;
-  --toast:#2c3440; --toast-line:#3d4652;
+  --toast:#2c3440; --toast-line:#3d4652; --fill:#262c35; --box:#5d6672;
   --shadow:0 1px 2px rgba(0,0,0,.3);
 }
 *{box-sizing:border-box;-webkit-tap-highlight-color:transparent}
@@ -88,56 +88,49 @@ button{cursor:pointer}
 .wrap{max-width:640px;margin:0 auto;padding:0 16px}
 
 /* header */
-.top{display:flex;align-items:center;justify-content:space-between;padding:14px 0 6px}
-.top h1{margin:0;font-size:24px;font-weight:800;letter-spacing:-.3px}
-.owner{border:0;background:transparent;color:var(--muted);font-size:13px;padding:8px 0;min-height:40px}
+.top{display:flex;align-items:center;gap:10px;padding:10px 0 4px}
+.top h1{margin:0;font-size:21px;font-weight:800;letter-spacing:-.3px}
+.owner{border:0;background:var(--fill);color:var(--muted);font-size:13px;padding:0 12px;min-height:32px;border-radius:999px;max-width:55%;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
 .owner b{color:var(--ink)}
-.icon-btn{width:44px;height:44px;border-radius:12px;border:1px solid var(--line);background:var(--surface);font-size:20px;line-height:1}
-
-/* suitcase cards */
-.bags{display:grid;grid-template-columns:1fr 1fr;gap:10px;margin:6px 0 12px}
-.bag{border:1px solid var(--line);background:var(--surface);border-radius:var(--r);padding:12px;text-align:right;box-shadow:var(--shadow);position:relative;overflow:hidden}
-.bag::before{content:"";position:absolute;inset:0 0 auto 0;height:4px;background:var(--c)}
-.bag.p1{--c:var(--p1);--f:var(--p1-fill);--s:var(--p1-soft)} .bag.p2{--c:var(--p2);--f:var(--p2-fill);--s:var(--p2-soft)}
-.bag.active{outline:2px solid var(--c);outline-offset:-1px}
-.bag .bn{font-weight:800;font-size:17px;color:var(--c);display:flex;align-items:center;gap:6px}
-.bag .bc{font-size:13px;color:var(--muted);margin-top:2px}
-.bar{height:7px;border-radius:9px;background:var(--s);margin-top:10px;overflow:hidden}
+.icon-btn{flex:0 0 auto;width:44px;height:44px;border-radius:12px;border:0;background:transparent;font-size:20px;line-height:1}
+.top .icon-btn{margin-inline-start:auto}
+.icon-btn.soft{background:var(--fill);font-size:18px}
+.icon-btn.soft[aria-pressed="true"]{background:var(--ink);color:var(--bg)}
+.tiles{display:flex;gap:8px}
+.tile{flex:1;min-width:0;display:flex;flex-direction:column;align-items:stretch;gap:1px;border:0;background:var(--surface);border-radius:12px;padding:7px 10px 8px;text-align:start;min-height:56px;box-shadow:inset 0 0 0 1px var(--line);--c:var(--ink);--f:var(--ink);--s:var(--fill)}
+.tile.p1{--c:var(--p1);--f:var(--p1-fill);--s:var(--p1-soft)} .tile.p2{--c:var(--p2);--f:var(--p2-fill);--s:var(--p2-soft)}
+.tile .tn{font-weight:800;font-size:15px;color:var(--c);white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.tile .tc{font-size:12px;color:var(--muted);font-weight:600;white-space:nowrap}
+.tile[aria-selected="true"]{box-shadow:inset 0 0 0 2px var(--c);background:var(--s)}
+.tile.all[aria-selected="true"]{background:var(--surface)}
+.bar{display:block;height:4px;border-radius:9px;background:var(--fill);margin-top:5px;overflow:hidden}
 .bar i{display:block;height:100%;width:0;background:var(--f);border-radius:9px;transition:width .3s}
-.bag .bp{font-size:12px;color:var(--muted);margin-top:5px}
 
-/* sticky: tabs + add row only */
-.sticky{position:sticky;top:0;z-index:5;background:var(--bg);padding:8px 0 10px;border-bottom:1px solid var(--line);transition:background .3s}
-.tabs{display:flex;gap:6px;overflow-x:auto;scrollbar-width:none;padding-bottom:2px}
-.tabs::-webkit-scrollbar{display:none}
-.tab{flex:0 0 auto;min-height:40px;border:1px solid var(--line);background:var(--surface);border-radius:999px;padding:0 15px;font-size:15px;font-weight:600;white-space:nowrap}
-.tab span{color:var(--muted);font-weight:500;margin-inline-start:5px}
-.tab[aria-selected="true"]{background:var(--ink);color:var(--bg);border-color:var(--ink)}
-.tab[aria-selected="true"] span{color:inherit;opacity:.8}
-.tab[data-tab="p1"][aria-selected="true"]{background:var(--p1-fill);border-color:var(--p1-fill);color:#fff}
-.tab[data-tab="p2"][aria-selected="true"]{background:var(--p2-fill);border-color:var(--p2-fill);color:#fff}
+/* sticky: tiles + add row */
+.sticky{position:sticky;top:0;z-index:5;background:var(--bg);padding:6px 0 8px;transition:background .3s}
 
-.add{display:flex;gap:8px;margin-top:10px}
+.add{display:flex;gap:8px;margin-top:8px}
 textarea.one{display:block;resize:none;overflow:hidden;white-space:pre;line-height:22px;font-size:16px}
-.add textarea{flex:1;min-width:0;height:48px;border-radius:12px;border:1px solid var(--line);background:var(--surface);padding:12px}
+.add textarea{flex:1;min-width:0;height:48px;border-radius:12px;border:0;box-shadow:inset 0 0 0 1px var(--line);background:var(--surface);padding:12px}
 input:focus-visible,select:focus-visible,textarea:focus-visible,.search:focus{outline:2px solid var(--p2);outline-offset:-1px}
 .addbtn{height:48px;max-width:45%;overflow:hidden;text-overflow:ellipsis;border:0;border-radius:12px;color:#fff;font-weight:700;padding:0 14px;white-space:nowrap;background:var(--p2-fill)}
 .addbtn.p1{background:var(--p1-fill)}
 .addbtn .bn{display:inline-block;max-width:7.5em;overflow:hidden;text-overflow:ellipsis;vertical-align:bottom}
-.tab [data-name]{display:inline-block;max-width:9em;overflow:hidden;text-overflow:ellipsis;vertical-align:bottom}
 
-/* add options (scroll with page) */
-.addopts{display:flex;gap:8px;margin-top:12px;align-items:center}
-.addopts select{flex:1;min-width:0;height:44px;border-radius:10px;border:1px solid var(--line);background:var(--surface);padding:0 8px}
-.stepper{display:flex;align-items:center;border:1px solid var(--line);border-radius:10px;background:var(--surface);height:44px}
-.stepper button{width:44px;height:100%;border:0;background:transparent;font-size:20px}
-.stepper output{min-width:24px;text-align:center;font-weight:700}
-.addpk{flex:0 0 auto;height:44px;border-radius:10px;border:1.5px solid var(--line);background:var(--surface);padding:0 12px;font-weight:700;white-space:nowrap}
+/* add options: only while adding */
+.addmore{display:none}
+.adding .addmore{display:block}
+.addopts{display:flex;gap:6px;margin-top:8px;align-items:center}
+.pill{height:44px;border:0;border-radius:999px;background:var(--fill)}
+.addopts select{flex:1;min-width:0;padding:0 12px;font-size:14px;font-weight:600}
+.stepper{display:flex;align-items:center}
+.stepper button{width:42px;height:100%;border:0;background:transparent;font-size:20px}
+.stepper output{min-width:20px;text-align:center;font-weight:700}
+.addpk{flex:0 0 auto;padding:0 12px;font-size:14px;font-weight:700;white-space:nowrap}
 .addpk::before{content:'☐ '}
-.addpk[aria-pressed="true"]{background:var(--ok);border-color:var(--ok);color:#fff}
+.addpk[aria-pressed="true"]{background:var(--ok);color:#fff}
 .addpk[aria-pressed="true"]::before{content:'✓ '}
-.addbag{display:flex;align-items:center;gap:8px;margin-top:8px}
-.sortrow .lbl{min-width:0}
+.addbag{display:flex;align-items:center;gap:8px;margin-top:6px}
 .sh{display:flex;width:100%;align-items:center;gap:8px;border:0;background:transparent;padding:6px 2px;margin-top:18px;font-size:16px;font-weight:800;color:var(--ink);text-align:start}
 .sh .n{color:var(--muted);font-weight:700}
 .sh .ar{margin-inline-start:auto;color:var(--muted);font-size:14px;font-weight:700}
@@ -149,11 +142,11 @@ input:focus-visible,select:focus-visible,textarea:focus-visible,.search:focus{ou
 .hrow .who{font-size:13px}
 .hrow .back{flex:0 0 auto;height:40px;border-radius:999px;border:1.5px solid var(--line);background:var(--surface);padding:0 14px;font-weight:700;color:var(--ink)}
 .clr.all{display:block;margin:4px 0 0;min-height:40px;border-radius:10px;border:1px solid var(--line);background:var(--surface);padding:0 14px;font-weight:600}
-.selecting .l2,.selecting .pen{display:none}
+.selecting .more{display:none}
 .selecting #list{padding-bottom:130px}
-.selbox{flex:0 0 auto;width:44px;height:44px;border-radius:10px;border:2px solid var(--ink);background:var(--surface);font-size:22px;font-weight:800;color:#fff}
+.selbox{flex:0 0 auto;width:36px;height:36px;margin:4px;border-radius:50%;border:2px solid var(--ink);background:var(--surface);font-size:18px;font-weight:800;color:#fff;padding:0}
 .selbox.on{background:var(--ink);color:var(--bg)}
-.item.chosen{box-shadow:0 0 0 2px var(--ink)}
+.item.chosen{background:var(--fill)}
 .selecting .item.packed{opacity:.55}
 .selbar{position:fixed;left:0;right:0;bottom:0;z-index:20;background:var(--surface);border-top:1px solid var(--line);box-shadow:0 -4px 16px rgba(0,0,0,.12);padding:10px 16px calc(env(safe-area-inset-bottom) + 10px)}
 .selbar .sl1{display:flex;align-items:center;justify-content:space-between;gap:8px;max-width:616px;margin:0 auto 8px;font-weight:700}
@@ -165,41 +158,57 @@ input:focus-visible,select:focus-visible,textarea:focus-visible,.search:focus{ou
 .selecting .toast{bottom:calc(env(safe-area-inset-bottom) + 130px)}
 .lbl{flex:0 0 auto;font-size:13px;color:var(--muted)}
 
-.tools{display:flex;gap:8px;margin-top:12px}
-.search{flex:1;min-width:0;height:42px;border-radius:10px;border:1px solid var(--line);background:var(--surface);padding:9px 10px;font-size:15px!important}
+.tools{display:flex;gap:8px;margin-top:10px;align-items:center}
+.searchrow{display:flex;gap:8px;margin-top:8px}
+.search{flex:1;min-width:0;height:44px;border-radius:12px;border:0;box-shadow:inset 0 0 0 1px var(--line);background:var(--surface);padding:10px 12px;font-size:15px!important}
 .chip{height:42px;border-radius:10px;border:1px solid var(--line);background:var(--surface);padding:0 12px;font-size:14px;white-space:nowrap}
-.chip[aria-pressed="true"],.chip[data-show="todo"]{background:var(--ink);color:var(--bg);border-color:var(--ink)}
-.chip[data-show="done"]{background:var(--ok);color:#fff;border-color:var(--ok)}
-#unpackedBtn{font-weight:700}
+.chip[aria-pressed="true"]{background:var(--ink);color:var(--bg);border-color:var(--ink)}
+#showSeg .sall{display:none}
+#showSeg.all3 .sall{display:block}
+.mlbl{font-size:13px;font-weight:700;color:var(--muted);margin:14px 0 6px}
+.mrow{display:flex;align-items:center;gap:12px;width:100%;margin-top:16px;border:0;border-top:1px solid var(--line);background:transparent;padding:14px 2px 2px;text-align:start;font-weight:700}
+.mrow .ic{font-size:20px}
+.ver{text-align:center;font-size:12px;color:var(--muted);padding:14px 0 2px}
+.mrow .ds{display:block;font-size:13px;font-weight:500;color:var(--muted)}
 
 /* segmented suitcase switch (rows, add area, settings) */
 .seg{flex:1;display:flex;border:1px solid var(--line);border-radius:10px;overflow:hidden;background:var(--surface)}
 .seg button{flex:1;border:0;background:transparent;height:40px;padding:0 6px;font-size:14px;font-weight:700;color:var(--muted)}
 .seg button+button{border-inline-start:1px solid var(--line)}
 .seg button.on{background:var(--ink);color:var(--bg)}
+.seg.soft{border:0;background:var(--fill);padding:3px;border-radius:12px;gap:2px}
+.seg.soft button{height:38px;border-radius:9px}
+.seg.soft button+button{border:0}
+.seg.soft button.on{background:var(--surface);color:var(--ink);box-shadow:0 1px 2px rgba(0,0,0,.14)}
+#showSeg button[data-show-set="done"].on{color:var(--ok)}
 .seg button[data-bag="p1"].on{background:var(--p1-fill);color:#fff}
 .seg button[data-bag="p2"].on{background:var(--p2-fill);color:#fff}
 
 /* list */
-.group{margin-top:16px}
-.gh{font-size:13px;font-weight:700;color:var(--muted);margin:0 2px 6px;display:flex;gap:6px;align-items:center}
-.item{background:var(--surface);border:1px solid var(--line);border-radius:12px;padding:10px 12px;margin-bottom:8px;box-shadow:var(--shadow)}
-.item.b-p1{border-inline-start:5px solid var(--p1)}
-.item.b-p2{border-inline-start:5px solid var(--p2)}
-.l1{display:flex;align-items:center;gap:10px}
-.info{flex:1;min-width:0;min-height:44px;align-self:stretch;border:0;background:transparent;text-align:right;padding:2px 0}
-.info .nm{display:flex;align-items:flex-start;gap:6px;font-weight:700;font-size:17px}
+.group{margin-top:14px}
+.gh{font-size:13px;font-weight:700;color:var(--muted);margin:0 4px 6px;display:flex;gap:6px;align-items:center}
+.gcard{background:var(--surface);border-radius:14px;overflow:hidden;border:1px solid var(--line)}
+.item{border-top:1px solid var(--line)}
+.item:first-child{border-top:0}
+.l1{display:flex;align-items:center;gap:4px;min-height:52px;padding-inline:4px 2px}
+.info{flex:1;min-width:0;min-height:48px;align-self:stretch;border:0;background:transparent;text-align:start;padding:6px 0;display:flex;flex-direction:column;justify-content:center}
+.info .nm{display:flex;align-items:center;gap:6px;font-weight:500;font-size:16px}
 .nm .t{display:-webkit-box;-webkit-line-clamp:2;-webkit-box-orient:vertical;overflow:hidden;overflow-wrap:anywhere;text-align:start}
-.nm .ci{flex:0 0 auto;font-size:15px;margin-top:2px}
-.nm .pen{flex:0 0 auto;font-size:13px;opacity:.5;margin-top:3px}
-.info .mt{display:block;font-size:13px;color:var(--muted)}
-.info .from{font-size:12px}
-.item.packed .nm .t{color:var(--muted)}
-.pk{flex:0 0 auto;height:42px;border-radius:999px;border:1.5px solid var(--ink);background:transparent;padding:0 14px;font-size:14px;font-weight:700;white-space:nowrap}
-.item.packed .pk{background:var(--ok);border-color:var(--ok);color:#fff}
-.l2{display:flex;align-items:center;gap:8px;margin-top:8px}
-.item.isdup{box-shadow:0 0 0 2px var(--warn)}
-.info .dup{display:block;font-size:13px;font-weight:600;color:var(--warn);margin-top:2px}
+.nm .ci{flex:0 0 auto;font-size:14px}
+.nm .q{flex:0 0 auto;font-size:12px;font-weight:700;color:var(--muted);background:var(--fill);border-radius:999px;padding:1px 7px}
+.info .mt{font-size:13px;color:var(--muted)}
+.info .from{display:block;font-size:12px}
+.who{flex:0 0 auto;font-size:12px;font-weight:700;border-radius:999px;padding:3px 9px;white-space:nowrap;max-width:6.5em;overflow:hidden;text-overflow:ellipsis}
+.who.p1{background:var(--p1-soft);color:var(--p1)} .who.p2{background:var(--p2-soft);color:var(--p2)}
+.more{flex:0 0 auto;width:40px;height:44px;border:0;background:transparent;color:var(--muted);font-size:18px}
+.pk{flex:0 0 auto;width:44px;height:44px;border:0;background:transparent;display:grid;place-items:center;padding:0}
+.pk i{width:24px;height:24px;border-radius:7px;border:2px solid var(--box);display:grid;place-items:center;font-style:normal;font-size:15px;font-weight:900;color:#fff}
+.item.packed{background:var(--surface-2)}
+.item.packed .pk i{background:var(--ok);border-color:var(--ok)}
+.item.packed .nm .t{color:var(--muted);text-decoration:line-through;text-decoration-color:color-mix(in srgb,var(--muted) 45%,transparent)}
+.item.packed .who{opacity:.6}
+.item.isdup{box-shadow:inset 3px 0 0 var(--warn)}
+.info .dup{display:block;font-size:12px;font-weight:600;color:var(--warn)}
 .dupbar{display:flex;align-items:center;justify-content:space-between;gap:10px;background:var(--warn-soft);border:1px solid var(--warn);border-radius:12px;padding:10px 12px;margin-top:14px;font-size:14px}
 .dupbar b{color:var(--warn)}
 .dupbar button{flex:0 0 auto;height:40px;border-radius:9px;border:1px solid var(--warn);background:var(--surface);color:var(--warn);font-weight:700;padding:0 12px}
@@ -242,11 +251,8 @@ dialog::backdrop{background:rgba(10,14,20,.5)}
 .seg button[data-bag="both"].on{background:var(--ink);color:var(--bg)}
 .addbtn.both{background:var(--ink);color:var(--bg)}
 body.single #eCopy,
-body.single .bag.p2, body.single .tabs, body.single .addbag, body.single .l2,
+body.single .tile.p1, body.single .tile.p2, body.single .addbag, body.single .who,
 body.single #eBagField, body.single #kBagField, body.single [data-act="share"]{display:none}
-body.single .bags{grid-template-columns:1fr}
-body.single .item.b-p1, body.single .item.b-p2{border-inline-start:1px solid var(--line)}
-body.single .add{margin-top:0}
 .note{font-size:12px;color:var(--muted);margin-top:12px}
 .btn.dangerfill{background:var(--danger);color:#fff;border-color:var(--danger)}
 .rlist .nb{font-weight:700}
@@ -311,68 +317,69 @@ body.single #pWhoF{display:none}
 <body>
 <div class="wrap">
   <header class="top">
-    <div>
-      <h1>Packing</h1>
-      <button class="owner" id="ownerBtn" type="button"></button>
-    </div>
+    <h1>Packing</h1>
+    <button class="owner" id="ownerBtn" type="button"></button>
     <button class="icon-btn" id="menuBtn" type="button" aria-label="הגדרות">☰</button>
   </header>
-
-  <section class="bags">
-    <button class="bag p1" data-tab="p1" type="button">
-      <div class="bn">🧳 <span data-name="p1"></span></div>
-      <div class="bc" id="cP1"></div>
-      <div class="bar"><i id="pP1"></i></div>
-      <div class="bp" id="sP1"></div>
-    </button>
-    <button class="bag p2" data-tab="p2" type="button">
-      <div class="bn">🧳 <span data-name="p2"></span></div>
-      <div class="bc" id="cP2"></div>
-      <div class="bar"><i id="pP2"></i></div>
-      <div class="bp" id="sP2"></div>
-    </button>
-  </section>
 </div>
 
 <div class="sticky">
   <div class="wrap">
-    <nav class="tabs" role="tablist">
-      <button class="tab" role="tab" data-tab="all" type="button">הכל<span id="tAll"></span></button>
-      <button class="tab" role="tab" data-tab="p1" type="button"><span data-name="p1"></span><span id="tP1"></span></button>
-      <button class="tab" role="tab" data-tab="p2" type="button"><span data-name="p2"></span><span id="tP2"></span></button>
+    <nav class="tiles" role="tablist">
+      <button class="tab tile all" role="tab" data-tab="all" type="button"><span class="tn" id="nAll">הכל</span><span class="tc" id="tAll"></span><span class="bar"><i id="pAll"></i></span></button>
+      <button class="tab tile p1" role="tab" data-tab="p1" type="button"><span class="tn" data-name="p1"></span><span class="tc" id="tP1"></span><span class="bar"><i id="pP1"></i></span></button>
+      <button class="tab tile p2" role="tab" data-tab="p2" type="button"><span class="tn" data-name="p2"></span><span class="tc" id="tP2"></span><span class="bar"><i id="pP2"></i></span></button>
     </nav>
-    <div class="add">
-      <textarea id="addName" class="one" rows="1" wrap="off" autocomplete="off" placeholder="הוספת פריט…" enterkeyhint="done" maxlength="80" dir="auto"></textarea>
-      <button class="addbtn" type="button" id="addBtn">הוסף</button>
+    <div class="addzone" id="addZone">
+      <div class="add">
+        <textarea id="addName" class="one" rows="1" wrap="off" autocomplete="off" placeholder="הוספת פריט…" enterkeyhint="done" maxlength="80" dir="auto"></textarea>
+        <button class="addbtn" type="button" id="addBtn">הוסף</button>
+      </div>
+      <div class="addmore">
+        <div class="addopts">
+          <select id="addCat" class="pill" aria-label="קטגוריה"></select>
+          <div class="stepper pill" aria-label="כמות">
+            <button type="button" data-step="1" aria-label="יותר">+</button>
+            <output id="addQty">1</output>
+            <button type="button" data-step="-1" aria-label="פחות">−</button>
+          </div>
+          <button type="button" id="addPacked" class="addpk pill" aria-pressed="false">כבר ארוז</button>
+        </div>
+        <div class="addbag"><span class="lbl">למזוודה:</span>
+          <div class="seg soft" id="addBag"><button type="button" data-bag="p1"></button><button type="button" data-bag="p2"></button><button type="button" data-bag="both">שניהם</button></div>
+        </div>
+      </div>
     </div>
   </div>
 </div>
 
 <div class="wrap">
-  <div class="addopts">
-    <select id="addCat" aria-label="קטגוריה"></select>
-    <div class="stepper" aria-label="כמות">
-      <button type="button" data-step="1" aria-label="יותר">+</button>
-      <output id="addQty">1</output>
-      <button type="button" data-step="-1" aria-label="פחות">−</button>
-    </div>
-    <button type="button" id="addPacked" class="addpk" aria-pressed="false">כבר ארוז</button>
-  </div>
-  <div class="addbag"><span class="lbl">מוסיפים למזוודה:</span>
-    <div class="seg" id="addBag"><button type="button" data-bag="p1"></button><button type="button" data-bag="p2"></button><button type="button" data-bag="both">שניהם</button></div>
-  </div>
   <div class="tools">
-    <button class="chip" id="searchClear" type="button" aria-label="ניקוי החיפוש" hidden>✕</button>
-    <textarea class="search one" id="search" rows="1" wrap="off" autocomplete="off" placeholder="חיפוש" enterkeyhint="search" dir="auto"></textarea>
-    <button class="chip" id="unpackedBtn" type="button" data-show="done" aria-label="מה להציג — לחיצה מחליפה">הצג: ארוז ✓</button>
+    <div class="seg soft" id="showSeg" role="group" aria-label="מה להציג">
+      <button type="button" data-show-set="todo"></button><button type="button" data-show-set="done"></button><button type="button" data-show-set="all" class="sall">הכל</button>
+    </div>
+    <button class="icon-btn soft" id="searchBtn" type="button" aria-label="חיפוש" aria-pressed="false">🔍</button>
+    <button class="icon-btn soft" id="moreBtn" type="button" aria-label="מיון ועוד">⋯</button>
   </div>
-  <div class="addbag sortrow"><span class="lbl">מיון:</span>
-    <div class="seg" id="sortSeg" role="group" aria-label="מיון"><button type="button" data-sort-set="cat">קטגוריה</button><button type="button" data-sort-set="az">א–ת</button></div>
-    <button class="chip" id="selBtn" type="button" aria-pressed="false">בחירה מרובה</button>
+  <div class="searchrow" id="searchRow" hidden>
+    <textarea class="search one" id="search" rows="1" wrap="off" autocomplete="off" placeholder="חיפוש" enterkeyhint="search" dir="auto"></textarea>
+    <button class="chip" id="searchClear" type="button" aria-label="ניקוי החיפוש" hidden>✕</button>
   </div>
 </div>
 
 <main class="wrap" id="list"></main>
+
+<!-- view options -->
+<dialog id="moreDlg" class="sheetdlg">
+  <div class="dlg">
+    <div class="dhead"><h2>תצוגה</h2><button class="xbtn" type="button" id="moreX" aria-label="סגירה">✕</button></div>
+    <div class="mlbl">מיון</div>
+    <div class="seg soft" id="sortSeg" role="group" aria-label="מיון"><button type="button" data-sort-set="cat">לפי קטגוריה</button><button type="button" data-sort-set="az">א–ת</button></div>
+    <div class="mlbl">להציג</div>
+    <div class="seg soft"><button type="button" data-show-set="todo">מה שנשאר</button><button type="button" data-show-set="done">מה שנארז</button><button type="button" data-show-set="all">הכל</button></div>
+    <button class="mrow" id="selBtn" type="button" aria-pressed="false"><span class="ic">☑️</span><span>בחירה מרובה<span class="ds">לסמן כמה פריטים ולהסתיר אותם מהנסיעה הזו</span></span></button>
+  </div>
+</dialog>
 
 <!-- edit item -->
 <dialog id="editDlg">
@@ -428,6 +435,7 @@ body.single #pWhoF{display:none}
 
       <div class="sect danger-sect">אזור מסוכן</div>
       <button type="button" data-act="clear" class="danger"><span class="ic">🗑</span><span>מחיקת כל הפריטים</span></button>
+      <div class="ver" id="appVer"></div>
     </div>
     <div class="dfoot"><button class="btn" type="button" data-act="close">סגירה</button></div>
   </div>
@@ -568,12 +576,13 @@ const CAT = Object.assign(Object.create(null), Object.fromEntries(CATS.map(c => 
 const BAGS = Object.assign(Object.create(null), {p1: 1, p2: 1});                       // internal suitcase slots: 1 = "p1" (pink), 2 = "p2" (blue)
 const defaultUsers = () => ({count: 2, names: {p1: 'משתמש/ת 1', p2: 'משתמש/ת 2'}, ts: {count: 1, p1: 1, p2: 1}, sid: '', links: {}});   // lists made before names were configurable
 const FIELDS = ['name','cat','qty','bag','packed','deleted','skip'];   // skip = not for this trip (kept for next time)
+const APP_VERSION = '2.0', APP_DATE = '30.10.2026';   // shown at the bottom of settings — bump on every release
 const MAX_FILE = 5e6, MAX_ITEMS = 5000, MAX_FUTURE = 864e5 * 366;
 const ERR = Symbol('read-error');
 
 /* ---------- state ---------- */
 let state = {version:3, owner:null, users:null, items:[], lastExport:null};
-const ui = {tab:'all', q:'', show:'done', qty:1, cat:'auto', addBag:null, addPacked:false, hidOpen:false, sel:null, dupOnly:false, sort:'cat', frozen: new Map()};
+const ui = {tab:'all', q:'', show:'todo', searchOpen:false, qty:1, cat:'auto', addBag:null, addPacked:false, hidOpen:false, sel:null, dupOnly:false, sort:'cat', frozen: new Map()};
 const heSort = new Intl.Collator('he', {numeric: true, sensitivity: 'base'}).compare;
 let pendingImport = null;          // {items, users, from, flip, first} waiting for merge/replace
 const resetOrder = () => ui.frozen.clear();
@@ -835,7 +844,6 @@ function addItem(name) {
 /* ---------- not for this trip ---------- */
 function paintSel() {
   const on = !!ui.sel;
-  $('#selBtn').setAttribute('aria-pressed', on); $('#selBtn').textContent = on ? 'סיום בחירה' : 'בחירה מרובה';
   $('#selBar').hidden = !on;
   if (!on) return;
   const n = ui.sel.size;
@@ -904,16 +912,16 @@ function render() {
   document.querySelectorAll('[data-name]').forEach(e => e.textContent = single() && e.dataset.name === 'p1' ? nm(solo()) : nm(e.dataset.name));
   document.querySelectorAll('#addBag button,#eBag button,#kBag button').forEach(b => { if (b.dataset.bag !== 'both') b.textContent = nm(b.dataset.bag); });
 
+  const tileTxt = (p, n) => !n ? 'ריקה' : p === n ? `הכל ארוז ✓ · ${n}` : `${p}/${n} ארוזים`;
   for (const b of ['p1', 'p2']) {
-    const B = b === 'p1' ? 'P1' : 'P2';
-    const n = s[b], p = s[b + 'Packed'];
-    $('#c' + B).textContent = n ? many(n, 'פריט אחד', 'פריטים') + (s[b + 'Qty'] !== n ? ` · ${s[b + 'Qty']} יחידות` : '') : 'ריקה';
+    const B = b === 'p1' ? 'P1' : 'P2', n = s[b], p = s[b + 'Packed'];
+    $('#t' + B).textContent = tileTxt(p, n);
     $('#p' + B).style.width = n ? (p / n * 100) + '%' : '0';
-    $('#s' + B).textContent = n ? (p === n ? 'הכל ארוז ✓' : (n === 1 ? 'עוד לא נארז' : `${p} מתוך ${n} ארוזים`)) : '—';
   }
-  $('#tAll').textContent = s.all; $('#tP1').textContent = s.p1; $('#tP2').textContent = s.p2;
+  const allP = s.p1Packed + s.p2Packed;
+  $('#nAll').textContent = single() ? nm(solo()) : 'הכל';
+  $('#tAll').textContent = tileTxt(allP, s.all); $('#pAll').style.width = s.all ? (allP / s.all * 100) + '%' : '0';
   document.querySelectorAll('.tab').forEach(t => t.setAttribute('aria-selected', t.dataset.tab === ui.tab));
-  document.querySelectorAll('.bag').forEach(t => t.classList.toggle('active', t.dataset.tab === ui.tab));
 
   const ab = curBag();
   document.querySelectorAll('#addBag button').forEach(b => b.classList.toggle('on', b.dataset.bag === ab));
@@ -923,6 +931,10 @@ function render() {
   $('#addBtn').classList.toggle('both', !single() && ab === 'both');
   $('#addQty').textContent = ui.qty;
   $('#searchClear').hidden = !ui.q;
+  $('#searchRow').hidden = !(ui.searchOpen || ui.q);
+  $('#searchBtn').setAttribute('aria-pressed', !$('#searchRow').hidden);
+  document.querySelectorAll('[data-show-set]').forEach(b => b.classList.toggle('on', b.dataset.showSet === ui.show));
+  $('#showSeg').classList.toggle('all3', ui.show === 'all');
   $('#ownerBtn').innerHTML = !configured() ? '<b>הגדרת משתמשים</b>'
     : single() ? `הרשימה של <b><bdi>${esc(nm(solo()))}</bdi></b>` : `הטלפון של <b><bdi>${esc(nm(state.owner))}</bdi></b>`;
 
@@ -945,9 +957,8 @@ function render() {
   const bar = dupCount ? `<div class="dupbar"><span>⚠️ יש <b>${dupCount}</b> פריטים כפולים ${single() ? 'ברשימה' : 'באותה מזוודה'}</span><button type="button" data-act="dup-toggle">${ui.dupOnly ? 'הצג הכל' : 'הצג כפולים'}</button></div>` : '';
 
   const todoN = inTab.filter(i => !i.packed).length, doneN = inTab.length - todoN;
-  const sb = $('#unpackedBtn');
-  sb.dataset.show = ui.show;
-  sb.textContent = ui.show === 'todo' ? `הצג: לא נארז · ${todoN}` : ui.show === 'done' ? `הצג: ארוז ✓ · ${doneN}` : 'הצג: הכל';
+  $('#showSeg [data-show-set="todo"]').textContent = `נשאר · ${todoN}`;
+  $('#showSeg [data-show-set="done"]').textContent = `ארוז ✓ · ${doneN}`;
   const hid = state.items.filter(i => !i.deleted && i.skip && (ui.tab === 'all' || i.bag === ui.tab) && (!q || normName(i.name).includes(q)))
     .sort((a, b) => heSort(a.name, b.name));
   const hidHtml = !hid.length ? '' : `<section class="group sect-st"><button type="button" class="sh hid" data-act="hid-toggle" aria-expanded="${ui.hidOpen}">🙈 לא בנסיעה הזו <span class="n">· ${hid.length}</span><span class="ar">${ui.hidOpen ? 'הסתר ▴' : 'הצג ▾'}</span></button>`
@@ -965,30 +976,31 @@ function render() {
       : `<div class="empty"><div class="big">🔍</div>אין פריטים כאן</div>`) + hidHtml;
     return;
   }
+  const two = !single() && ui.tab === 'all';
   const row = (i, showCat) => {
-    const isDup = dups.has(dupKey(i));
-    const seg = ['p1', 'p2'].map(b => `<button type="button" data-bag="${b}" class="${i.bag === b ? 'on' : ''}">${esc(nm(b))}</button>`).join('');
-    return `<div class="item b-${i.bag}${i.packed ? ' packed' : ''}${isDup ? ' isdup' : ''}${ui.sel && ui.sel.has(i.id) ? ' chosen' : ''}" data-id="${esc(i.id)}">
-        <div class="l1">
-          <button type="button" class="info" aria-label="עריכת ${esc(i.name)}"><span class="nm">${showCat ? `<span class="ci" title="${CAT[i.cat].name}">${CAT[i.cat].icon}</span>` : ''}<span class="t" dir="auto">${bidi(i.name)}</span><span class="pen">✏️</span></span>${i.qty > 1 ? `<span class="mt">כמות: ${i.qty}</span>` : ''}${single() && i.bag !== solo() ? `<span class="mt from">מהמזוודה של <bdi>${esc(nm(i.bag))}</bdi></span>` : ''}${isDup ? `<span class="dup">⚠️ מופיע פעמיים ${single() ? 'ברשימה' : 'במזוודה של <bdi>' + esc(nm(i.bag)) + '</bdi>'}</span>` : ''}</button>
-          ${!ui.sel ? `<button type="button" class="pk">${i.packed ? '✓ ארוז' : 'סמן כארוז'}</button>`
-            : i.packed ? '' : `<button type="button" class="selbox${ui.sel.has(i.id) ? ' on' : ''}" aria-pressed="${ui.sel.has(i.id)}" aria-label="בחירה">${ui.sel.has(i.id) ? '✓' : ''}</button>`}
+    const isDup = dups.has(dupKey(i)), ch = ui.sel && ui.sel.has(i.id);
+    const ctl = !ui.sel ? `<button type="button" class="pk" aria-label="${i.packed ? 'ארוז — לחיצה מבטלת' : 'סמן כארוז'}" aria-pressed="${i.packed}"><i>${i.packed ? '✓' : ''}</i></button>`
+      : i.packed ? `<span class="pk" aria-hidden="true"><i>✓</i></span>` : `<button type="button" class="selbox${ch ? ' on' : ''}" aria-pressed="${ch}" aria-label="בחירה">${ch ? '✓' : ''}</button>`;
+    return `<div class="item b-${i.bag}${i.packed ? ' packed' : ''}${isDup ? ' isdup' : ''}${ch ? ' chosen' : ''}" data-id="${esc(i.id)}">
+        <div class="l1">${ctl}
+          <button type="button" class="info" aria-label="עריכת ${esc(i.name)}"><span class="nm">${showCat ? `<span class="ci" title="${CAT[i.cat].name}">${CAT[i.cat].icon}</span>` : ''}<span class="t" dir="auto">${bidi(i.name)}</span>${i.qty > 1 ? `<span class="mt q" dir="ltr">×${i.qty}</span>` : ''}</span>${single() && i.bag !== solo() ? `<span class="mt from">מהמזוודה של <bdi>${esc(nm(i.bag))}</bdi></span>` : ''}${isDup ? `<span class="dup">⚠️ מופיע פעמיים ${single() ? 'ברשימה' : 'במזוודה של <bdi>' + esc(nm(i.bag)) + '</bdi>'}</span>` : ''}</button>
+          ${two ? `<span class="who ${i.bag}"><bdi>${esc(nm(i.bag))}</bdi></span>` : ''}
+          <button type="button" class="more" aria-label="עריכה">⋯</button>
         </div>
-        <div class="l2"><span class="lbl">מזוודה:</span><div class="seg">${seg}</div></div>
       </div>`;
   };
   let html = bar;
   if (ui.sort === 'az') {
     /* one alphabetical list; packed items keep their place */
     list.sort((a, b) => heSort(a.name, b.name));
-    html += `<section class="group">${list.map(i => row(i, true)).join('')}</section>`;
+    html += `<section class="group"><div class="gcard">${list.map(i => row(i, true)).join('')}</div></section>`;
   } else {
     const pkd = i => ui.frozen.has(i.id) ? ui.frozen.get(i.id) : i.packed;
     list.sort((a, b) => (pkd(a) - pkd(b)) || heSort(a.name, b.name));
     for (const [key, name, icon] of CATS) {
       const g = list.filter(i => i.cat === key);
       if (!g.length) continue;
-      html += `<section class="group"><div class="gh">${icon} ${name} · ${g.length}</div>${g.map(i => row(i, false)).join('')}</section>`;
+      html += `<section class="group"><div class="gh">${icon} ${name} · ${g.length}</div><div class="gcard">${g.map(i => row(i, false)).join('')}</div></section>`;
     }
   }
   host.innerHTML = html + hidHtml;
@@ -1081,7 +1093,12 @@ function submitEdit() {
   if (!name) { $('#eErr').hidden = false; $('#eName').focus(); return; }
   if (it) {
     const packed = editBag === it.bag ? it.packed : false;
+    const prev = editBag !== it.bag ? {bag: it.bag, packed: it.packed} : null;
     touch(it, {name: cut(name, 80), cat: $('#eCat').value, qty: editQty, bag: editBag, packed});
+    const nb = editBag;
+    if (prev) setTimeout(() => toast(`"${iso(it.name)}" הועבר למזוודה של ${nmI(nb)}${prev.packed ? ' · סימון ״ארוז״ אופס' : ''}`, 'בטל', () => {
+      const x = find(it.id); if (x) { touch(x, prev); commit(); }
+    }), 0);
     const tw = editTwin && find(editTwin);                 // just added to both suitcases: fix both copies
     if (tw) touch(tw, {name: cut(name, 80), cat: $('#eCat').value, qty: editQty});
     commit();
@@ -1298,7 +1315,7 @@ function doKeepImport() {
 /* ---------- events ---------- */
 function bind() {
   document.querySelectorAll('[data-tab]').forEach(b => b.addEventListener('click', () => {
-    ui.tab = (b.classList.contains('bag') && ui.tab === b.dataset.tab) ? 'all' : b.dataset.tab;
+    ui.tab = (b.dataset.tab !== 'all' && ui.tab === b.dataset.tab) ? 'all' : b.dataset.tab;
     if (BAGS[ui.tab]) ui.addBag = ui.tab;
     resetOrder(); render();
   }));
@@ -1335,7 +1352,7 @@ function bind() {
   // keep the phone keyboard open while tapping these
   document.querySelectorAll('#addBtn,#addPacked,.stepper button,#addBag button').forEach(b => b.addEventListener('pointerdown', e => e.preventDefault()));
   document.querySelectorAll('#addBag button').forEach(b => b.addEventListener('click', () => { ui.addBag = b.dataset.bag; render(); }));
-  $('#selBtn').addEventListener('click', () => { ui.sel = ui.sel ? null : new Set(); render(); });
+  $('#selBtn').addEventListener('click', () => { $('#moreDlg').close(); ui.sel = ui.sel ? null : new Set(); render(); });
   $('#selCancel').addEventListener('click', endSel);
   $('#selSkip').addEventListener('click', skipSelected);
   $('#selAll').addEventListener('click', () => {
@@ -1354,9 +1371,22 @@ function bind() {
     ui.qty = Math.min(99, Math.max(1, ui.qty + +b.dataset.step)); $('#addQty').textContent = ui.qty;
   }));
   $('#search').addEventListener('input', e => { ui.q = e.target.value; resetOrder(); render(); });
-  $('#unpackedBtn').addEventListener('click', e => {
-    ui.show = ui.show === 'all' ? 'todo' : ui.show === 'todo' ? 'done' : 'all'; resetOrder(); render();   // הכל → לא נארז → ארוז → הכל
+  document.querySelectorAll('[data-show-set]').forEach(b => b.addEventListener('click', () => {
+    ui.show = b.dataset.showSet; store.set('show', ui.show); resetOrder(); render();
+    if (b.closest('#moreDlg')) $('#moreDlg').close();
+  }));
+  $('#searchBtn').addEventListener('click', () => {
+    if (ui.searchOpen || ui.q) { ui.searchOpen = false; if (ui.q) clearSearch(); else render(); return; }
+    ui.searchOpen = true; render(); $('#search').focus();
   });
+  $('#moreBtn').addEventListener('click', () => $('#moreDlg').showModal());
+  $('#moreX').addEventListener('click', () => $('#moreDlg').close());
+  $('#moreDlg').addEventListener('click', e => { if (e.target === $('#moreDlg')) $('#moreDlg').close(); });
+  // add options show only while adding (focus inside the add area, or text typed)
+  const addingNow = () => { document.body.classList.toggle('adding', $('#addZone').contains(document.activeElement) || !!$('#addName').value.trim()); };
+  $('#addZone').addEventListener('focusin', addingNow);
+  $('#addZone').addEventListener('focusout', () => setTimeout(addingNow, 0));
+  $('#addName').addEventListener('input', addingNow);
 
   $('#list').addEventListener('click', e => {
     if (e.target.closest('[data-act="dup-toggle"]')) { ui.dupOnly = !ui.dupOnly; resetOrder(); render(); return; }
@@ -1371,10 +1401,8 @@ function bind() {
       if (it.packed) { toast('אפשר לבחור רק פריטים שעוד לא נארזו'); return; }
       ui.sel.has(it.id) ? ui.sel.delete(it.id) : ui.sel.add(it.id); render(); return;
     }
-    const bagBtn = e.target.closest('.seg button');
-    if (bagBtn) { moveItem(it, bagBtn.dataset.bag); return; }
     if (e.target.closest('.pk')) { togglePacked(it); return; }
-    if (e.target.closest('.info')) openEdit(it.id);
+    if (e.target.closest('.info') || e.target.closest('.more')) openEdit(it.id);
   });
 
   // edit dialog
@@ -1758,6 +1786,7 @@ function paintTheme() {
 
 /* ---------- init ---------- */
 async function init() {
+  $('#appVer').textContent = `Packing · גרסה ${APP_VERSION} · ${APP_DATE}`;
   const opts = CATS.map(([k, n, i]) => `<option value="${k}">${i} ${n}</option>`).join('');
   $('#addCat').innerHTML = '<option value="auto">✨ אוטומטי</option>' + opts; $('#eCat').innerHTML = opts;
 
@@ -1778,6 +1807,7 @@ async function init() {
   }
   const lc = await store.get('lastCat2'); if (lc !== ERR && (CAT[lc] || lc === 'auto')) ui.cat = lc;
   const so = await store.get('sort'); if (so === 'az' || so === 'cat') ui.sort = so;
+  const sh = await store.get('show'); if (sh === 'todo' || sh === 'done' || sh === 'all') ui.show = sh;
   $('#addCat').value = ui.cat;
 
   bind(); render();
