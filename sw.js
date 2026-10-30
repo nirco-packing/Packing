@@ -1,9 +1,9 @@
 // Offline copy of the app files only. Your packing list is never stored here —
 // it lives in the phone's private app storage.
-// The Japan trip tracker (/Yudale/) shares this website, so this file only ever
-// touches caches whose name starts with "packing-".
+// It only ever touches caches whose name starts with "packing-", so it is safe
+// next to other apps on the same website.
 const PREFIX = 'packing-';
-const CACHE = PREFIX + 'v3';
+const CACHE = PREFIX + 'v4';
 const ASSETS = ['./', './index.html', './packing.webmanifest', './icon-192.png', './icon-512.png', './icon-maskable-512.png'];
 const TIMEOUT_MS = 4000;
 

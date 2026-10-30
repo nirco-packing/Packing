@@ -2,7 +2,7 @@
 <html lang="he" dir="rtl">
 <head>
 <meta charset="utf-8">
-<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover, interactive-widget=resizes-content">
 <meta name="theme-color" content="#f5f2ed">
 <meta name="mobile-web-app-capable" content="yes">
 <link rel="manifest" href="packing.webmanifest">
@@ -61,7 +61,7 @@
 <style>
 :root{
   color-scheme:light;
-  --bg:#f5f2ed; --surface:#ffffff; --surface-2:#faf8f5; --ink:#1d2430; --muted:#646c79; --line:#e3ddd3;
+  --bg:#f5f2ed; --surface:#ffffff; --surface-2:#faf8f5; --ink:#1d2430; --muted:#5a616d; --line:#e3ddd3;
   --noga:#c2405f; --noga-fill:#c2405f; --noga-soft:#fbe6ec;
   --nir:#2b6fc2; --nir-fill:#2b6fc2; --nir-soft:#e2edfb;
   --ok:#23825a; --danger:#c73e3e; --warn:#a85208; --warn-soft:#fdf0e1;
@@ -74,11 +74,12 @@
   --bg:#13161b; --surface:#1d222a; --surface-2:#191d24; --ink:#eef1f5; --muted:#9aa3ae; --line:#2e353f;
   --noga:#ec7391; --noga-fill:#b83d5e; --noga-soft:#3a2129;
   --nir:#6aa6ec; --nir-fill:#2f6bb8; --nir-soft:#1b2b40;
-  --ok:#2a8a5f; --danger:#ef6b6b; --warn:#f0a54a; --warn-soft:#3a2a17;
+  --ok:#23784f; --danger:#ef6b6b; --warn:#f0a54a; --warn-soft:#3a2a17;
   --toast:#2c3440; --toast-line:#3d4652;
   --shadow:0 1px 2px rgba(0,0,0,.3);
 }
 *{box-sizing:border-box;-webkit-tap-highlight-color:transparent}
+[hidden]{display:none!important}
 html,body{margin:0;background:var(--bg);color:var(--ink)}
 body{font-family:system-ui,"Segoe UI",Roboto,"Noto Sans Hebrew",Arial,sans-serif;font-size:16px;line-height:1.4;
   padding:env(safe-area-inset-top) 0 calc(env(safe-area-inset-bottom) + 96px);transition:background .3s}
@@ -117,9 +118,10 @@ button{cursor:pointer}
 .tab[data-tab="nir"][aria-selected="true"]{background:var(--nir-fill);border-color:var(--nir-fill);color:#fff}
 
 .add{display:flex;gap:8px;margin-top:10px}
-.add input{flex:1;min-width:0;height:48px;border-radius:12px;border:1px solid var(--line);background:var(--surface);padding:0 12px}
+textarea.one{display:block;resize:none;overflow:hidden;white-space:pre;line-height:22px;font-size:16px}
+.add textarea{flex:1;min-width:0;height:48px;border-radius:12px;border:1px solid var(--line);background:var(--surface);padding:12px}
 input:focus-visible,select:focus-visible,textarea:focus-visible,.search:focus{outline:2px solid var(--nir);outline-offset:-1px}
-.addbtn{height:48px;border:0;border-radius:12px;color:#fff;font-weight:700;padding:0 14px;white-space:nowrap;background:var(--nir-fill)}
+.addbtn{height:48px;max-width:45%;overflow:hidden;text-overflow:ellipsis;border:0;border-radius:12px;color:#fff;font-weight:700;padding:0 14px;white-space:nowrap;background:var(--nir-fill)}
 .addbtn.noga{background:var(--noga-fill)}
 
 /* add options (scroll with page) */
@@ -132,7 +134,7 @@ input:focus-visible,select:focus-visible,textarea:focus-visible,.search:focus{ou
 .lbl{flex:0 0 auto;font-size:13px;color:var(--muted)}
 
 .tools{display:flex;gap:8px;margin-top:12px}
-.search{flex:1;min-width:0;height:42px;border-radius:10px;border:1px solid var(--line);background:var(--surface);padding:0 10px;font-size:15px}
+.search{flex:1;min-width:0;height:42px;border-radius:10px;border:1px solid var(--line);background:var(--surface);padding:9px 10px;font-size:15px!important}
 .chip{height:42px;border-radius:10px;border:1px solid var(--line);background:var(--surface);padding:0 12px;font-size:14px;white-space:nowrap}
 .chip[aria-pressed="true"]{background:var(--ink);color:var(--bg);border-color:var(--ink)}
 
@@ -151,7 +153,7 @@ input:focus-visible,select:focus-visible,textarea:focus-visible,.search:focus{ou
 .item.b-noga{border-inline-start:5px solid var(--noga)}
 .item.b-nir{border-inline-start:5px solid var(--nir)}
 .l1{display:flex;align-items:center;gap:10px}
-.info{flex:1;min-width:0;border:0;background:transparent;text-align:right;padding:2px 0}
+.info{flex:1;min-width:0;min-height:44px;align-self:stretch;border:0;background:transparent;text-align:right;padding:2px 0}
 .info .nm{display:flex;align-items:flex-start;gap:6px;font-weight:700;font-size:17px}
 .nm .t{display:-webkit-box;-webkit-line-clamp:2;-webkit-box-orient:vertical;overflow:hidden;overflow-wrap:anywhere;text-align:start}
 .nm .ci{flex:0 0 auto;font-size:15px;margin-top:2px}
@@ -179,6 +181,7 @@ dialog::backdrop{background:rgba(10,14,20,.5)}
 .f{display:block;margin-bottom:12px}
 .f>span{display:block;font-size:13px;color:var(--muted);margin-bottom:4px}
 .f input,.f select{width:100%;height:46px;border-radius:10px;border:1px solid var(--line);background:var(--surface-2);padding:0 10px}
+.f textarea{width:100%;height:46px;border-radius:10px;border:1px solid var(--line);background:var(--surface-2);padding:11px 10px}
 .hint{font-size:13px;color:var(--warn);margin-top:6px}
 .row{display:flex;gap:8px;margin-top:6px}
 .row>*{flex:1}
@@ -207,6 +210,17 @@ body.single .bags{grid-template-columns:1fr}
 body.single .item.b-noga, body.single .item.b-nir{border-inline-start:1px solid var(--line)}
 body.single .add{margin-top:0}
 .note{font-size:12px;color:var(--muted);margin-top:12px}
+.dhead{position:sticky;top:0;z-index:2;display:flex;align-items:center;justify-content:space-between;gap:8px;background:var(--surface);margin:-18px -18px 0;padding:12px 18px 4px 8px}
+.dhead h2{margin:0!important}
+.xbtn{flex:0 0 auto;width:44px;height:44px;border-radius:12px;border:0;background:transparent;font-size:20px;color:var(--muted)}
+.dfoot{position:sticky;bottom:0;z-index:2;background:var(--surface);margin:14px -18px -18px;padding:10px 18px 14px;border-top:1px solid var(--line)}
+.dfoot>.btn{width:100%}
+.dfoot .row{margin-top:0}
+.menu .sect.danger-sect{margin-top:16px;color:var(--danger)}
+.okbox{background:var(--surface-2);border:1.5px solid var(--ok);border-radius:10px;padding:10px 12px;margin:8px 0 12px;font-size:14px;font-weight:700}
+.bigimport{display:flex;align-items:center;gap:12px;width:100%;text-align:right;min-height:64px;margin:10px 0 14px;border-radius:14px;border:1.5px solid var(--nir);background:var(--nir-soft);color:var(--ink);font-size:16px;font-weight:700;padding:10px 14px}
+.bigimport .ds{display:block;font-size:13px;font-weight:500;color:var(--muted)}
+.focusrow{outline:2px solid var(--warn);outline-offset:6px;border-radius:10px}
 
 /* keep import */
 #kText{width:100%;min-height:120px;border-radius:10px;border:1px solid var(--line);background:var(--surface-2);padding:10px;resize:vertical;font-size:15px}
@@ -223,7 +237,8 @@ body.single .add{margin-top:0}
 .toast{position:fixed;left:12px;right:12px;bottom:calc(env(safe-area-inset-bottom) + 16px);max-width:616px;margin:0 auto;
   transform:translateY(20px);opacity:0;pointer-events:none;background:var(--toast);border:1px solid var(--toast-line);color:#fff;
   border-radius:14px;padding:6px 8px 6px 14px;min-height:52px;font-size:14px;display:flex;gap:12px;align-items:center;justify-content:space-between;
-  transition:.2s;z-index:50;box-shadow:0 8px 24px rgba(0,0,0,.25)}
+  transition:.2s;z-index:50;box-shadow:0 8px 24px rgba(0,0,0,.25);top:auto;width:auto;height:auto;overflow:visible}
+.toast:not(:popover-open){display:none}
 .toast.show{opacity:1;transform:none;pointer-events:auto}
 .toast span{padding:8px 0}
 .toast button{flex:0 0 auto;min-height:40px;border:0;border-radius:10px;background:rgba(255,255,255,.12);color:#9cc8ff;font-weight:700;padding:0 14px}
@@ -263,7 +278,7 @@ body.single .add{margin-top:0}
       <button class="tab" role="tab" data-tab="nir" type="button"><span data-name="nir"></span><span id="tNir"></span></button>
     </nav>
     <div class="add">
-      <input id="addName" placeholder="הוספת פריט…" enterkeyhint="done" maxlength="80" autocomplete="off" dir="auto">
+      <textarea id="addName" class="one" rows="1" wrap="off" autocomplete="off" placeholder="הוספת פריט…" enterkeyhint="done" maxlength="80" dir="auto"></textarea>
       <button class="addbtn" type="button" id="addBtn">הוסף</button>
     </div>
   </div>
@@ -282,8 +297,8 @@ body.single .add{margin-top:0}
     <div class="seg" id="addBag"><button type="button" data-bag="noga"></button><button type="button" data-bag="nir"></button></div>
   </div>
   <div class="tools">
-    <input class="search" id="search" type="search" placeholder="חיפוש" dir="auto">
-    <button class="chip" id="unpackedBtn" type="button" aria-pressed="false">רק לא ארוז</button>
+    <textarea class="search one" id="search" rows="1" wrap="off" autocomplete="off" placeholder="חיפוש" enterkeyhint="search" dir="auto"></textarea>
+    <button class="chip" id="unpackedBtn" type="button" aria-pressed="false">רק מה שלא נארז</button>
   </div>
 </div>
 
@@ -293,7 +308,7 @@ body.single .add{margin-top:0}
 <dialog id="editDlg">
   <div class="dlg">
     <h2>עריכת פריט</h2>
-    <label class="f"><span>שם</span><input id="eName" maxlength="80" dir="auto"></label>
+    <label class="f"><span>שם</span><textarea id="eName" class="one" rows="1" wrap="off" autocomplete="off" maxlength="80" enterkeyhint="done" dir="auto"></textarea></label>
     <label class="f"><span>קטגוריה</span><select id="eCat"></select></label>
     <div class="f"><span>כמות</span>
       <div class="stepper" style="width:max-content">
@@ -315,19 +330,20 @@ body.single .add{margin-top:0}
 <!-- settings -->
 <dialog id="menuDlg">
   <div class="dlg">
-    <h2>הגדרות</h2>
+    <div class="dhead"><h2>הגדרות</h2><button class="xbtn" type="button" data-act="close" aria-label="סגירה">✕</button></div>
     <p class="sub" id="menuSub"></p>
     <div class="menu">
       <div class="sect" id="syncSect">סנכרון עם הטלפון השני</div>
-      <button type="button" data-act="share"><span class="ic">📤</span><span>שליחת הרשימה<span class="ds">בוואטסאפ לטלפון השני — שם בוחרים ״טעינת קובץ״ ← מיזוג</span></span></button>
-      <button type="button" data-act="import"><span class="ic">📥</span><span>טעינת קובץ<span class="ds" id="importDs">קובץ שהגיע מהטלפון השני, או שחזור מגיבוי</span></span></button>
-      <button type="button" data-act="download"><span class="ic">💾</span><span>שמירת גיבוי בהורדות<span class="ds">עותק של הרשימה בתיקיית ההורדות</span></span></button>
+      <button type="button" data-act="share"><span class="ic">📤</span><span>שליחת הרשימה לטלפון השני<span class="ds">בוואטסאפ. בטלפון השני: הגדרות ← קבלת קובץ ← מיזוג</span></span></button>
+      <button type="button" data-act="import"><span class="ic">📥</span><span><span id="importLbl">קבלת קובץ</span><span class="ds" id="importDs">מהטלפון השני, או שחזור מגיבוי</span></span></button>
+      <button type="button" data-act="download"><span class="ic">💾</span><span>שמירת גיבוי<span class="ds">עותק של הרשימה בתיקיית ההורדות</span></span></button>
 
-      <div class="sect">פעולות חד-פעמיות</div>
-      <button type="button" data-act="keep"><span class="ic">📝</span><span>ייבוא רשימה מ-Google Keep<span class="ds">הדבקה או קובץ txt — הפריטים נוספים פעם אחת</span></span></button>
-      <button type="button" data-act="unpack"><span class="ic">↺</span><span>איפוס סימוני ״ארוז״<span class="ds">הפריטים נשארים, רק הסימונים מתאפסים</span></span></button>
+      <div class="sect">כלים</div>
+      <button type="button" data-act="keep"><span class="ic">📝</span><span>ייבוא רשימה מ-Google Keep<span class="ds">הדבקה או קובץ txt</span></span></button>
+      <button type="button" data-act="unpack"><span class="ic">↺</span><span>איפוס סימוני ״ארוז״<span class="ds">לנסיעה הבאה — הפריטים נשארים</span></span></button>
 
-      <div class="sect">תצוגה</div>
+      <div class="sect">משתמשים ותצוגה</div>
+      <button type="button" data-act="users"><span class="ic">👥</span><span>משתמשים<span class="ds" id="usersInfo"></span></span></button>
       <div class="setrow">
         <div class="top2"><span class="ic">🌗</span><span>ערכת צבעים<span class="ds" id="themeInfo"></span></span></div>
         <div class="seg" id="themeSeg">
@@ -343,17 +359,18 @@ body.single .add{margin-top:0}
           <button type="button" data-sort-set="az">א–ת</button>
         </div>
       </div>
-      <button type="button" data-act="users"><span class="ic">👥</span><span>משתמשים<span class="ds" id="usersInfo"></span></span></button>
+
+      <div class="sect danger-sect">אזור מסוכן</div>
       <button type="button" data-act="clear" class="danger"><span class="ic">🗑</span><span>מחיקת כל הפריטים</span></button>
     </div>
-    <div class="row"><button class="btn" type="button" data-act="close">סגירה</button></div>
+    <div class="dfoot"><button class="btn" type="button" data-act="close">סגירה</button></div>
   </div>
 </dialog>
 
 <!-- import choice -->
 <dialog id="importDlg">
   <div class="dlg">
-    <h2>טעינת קובץ</h2>
+    <h2>קבלת קובץ</h2>
     <p class="sub" id="importSub"></p>
     <div class="row"><button class="btn main" type="button" id="iMerge">מיזוג (מומלץ)</button></div>
     <p class="note" style="margin:4px 0 12px">מיזוג: פריטים חדשים נוספים, ושינויים מהטלפון השני עוברים לכאן. זו הדרך הנכונה לסנכרן — היא לא מוחקת את הרשימה שבטלפון הזה.</p>
@@ -394,10 +411,10 @@ body.single .add{margin-top:0}
     <div class="kcount" id="kCount"></div>
     <div class="kprev" id="kPrev"></div>
     <p class="note">הקטגוריה נקבעת אוטומטית לפי השם, ואפשר לתקן אחר כך בעריכה.</p>
-    <div class="row">
+    <div class="dfoot"><div class="row">
       <button class="btn main" type="button" id="kGo" disabled>ייבוא</button>
       <button class="btn" type="button" id="kCancel">ביטול</button>
-    </div>
+    </div></div>
   </div>
 </dialog>
 
@@ -405,17 +422,20 @@ body.single .add{margin-top:0}
 <dialog id="setupDlg">
   <div class="dlg">
     <h2 id="suTitle">ברוכים הבאים ל-Packing</h2>
-    <p class="sub">כמה אנשים אורזים עם הרשימה הזו?</p>
-    <div class="seg" id="suCount"><button type="button" data-count="1">משתמש אחד</button><button type="button" data-count="2">שני משתמשים</button></div>
-    <label class="f" style="margin-top:14px"><span id="suL1">השם שלך</span><input id="suName1" maxlength="20" dir="auto" autocomplete="off"></label>
-    <label class="f" id="suF2"><span>משתמש/ת 2</span><input id="suName2" maxlength="20" dir="auto" autocomplete="off"></label>
+    <button class="bigimport" type="button" id="suImport"><span style="font-size:24px">📥</span><span>יש כבר רשימה בטלפון השני?<span class="ds">טענו את הקובץ שקיבלתם ממנו בוואטסאפ</span></span></button>
+    <div class="okbox" id="suLoaded" hidden></div>
+    <div id="suNew">
+      <p class="sub" id="suLead">כמה אנשים אורזים עם הרשימה?</p>
+      <div class="seg" id="suCount"><button type="button" data-count="1">משתמש אחד</button><button type="button" data-count="2">שני משתמשים</button></div>
+    </div>
+    <label class="f" style="margin-top:14px"><span id="suL1">השם שלך</span><textarea id="suName1" class="one" rows="1" wrap="off" autocomplete="off" maxlength="20" enterkeyhint="next" dir="auto"></textarea></label>
+    <label class="f" id="suF2"><span id="suL2">השם של מי שאורז/ת איתך</span><textarea id="suName2" class="one" rows="1" wrap="off" autocomplete="off" maxlength="20" enterkeyhint="done" dir="auto"></textarea></label>
     <div class="f" id="suOwnerF"><span>הטלפון הזה של:</span>
       <div class="seg" id="suOwner"><button type="button" data-owner="noga" data-bag="noga"></button><button type="button" data-owner="nir" data-bag="nir"></button></div>
     </div>
     <p class="note" id="suNote"></p>
     <div class="hint" id="suErr" hidden></div>
-    <div class="row"><button class="btn main" type="button" id="suSave">שמירה</button><button class="btn" type="button" id="suCancel">ביטול</button></div>
-    <button class="linkbtn" type="button" id="suImport">קיבלת קובץ מהטלפון השני? לטעון אותו כאן</button>
+    <div class="dfoot"><div class="row"><button class="btn main" type="button" id="suSave">שמירה</button><button class="btn" type="button" id="suCancel">ביטול</button></div></div>
   </div>
 </dialog>
 
@@ -433,7 +453,7 @@ body.single .add{margin-top:0}
 
 <input type="file" id="fileIn" hidden>
 <input type="file" id="kFile" hidden>
-<div class="toast" id="toast" role="status"><span id="toastText"></span><button type="button" id="toastAct" hidden></button></div>
+<div class="toast" id="toast" role="status" popover="manual"><span id="toastText"></span><button type="button" id="toastAct" hidden></button></div>
 
 <script>
 (() => {
@@ -446,43 +466,69 @@ const CATS = [
 ];
 const CAT = Object.fromEntries(CATS.map(c => [c[0], {name:c[1], icon:c[2]}]));
 const BAGS = {noga: 1, nir: 1};                       // internal suitcase slots: 1 = "noga" (pink), 2 = "nir" (blue)
-const DEFAULT_USERS = {count: 2, names: {noga: 'נגה', nir: 'ניר'}, ts: 1};   // for lists made before names were configurable
+const defaultUsers = () => ({count: 2, names: {noga: 'נגה', nir: 'ניר'}, ts: {count: 1, noga: 1, nir: 1}});   // lists made before names were configurable
 const FIELDS = ['name','cat','qty','bag','packed','deleted'];
-const MAX_FILE = 5e6, MAX_ITEMS = 5000;
+const MAX_FILE = 5e6, MAX_ITEMS = 5000, MAX_FUTURE = 864e5 * 366;
 const ERR = Symbol('read-error');
 
 /* ---------- state ---------- */
 let state = {version:3, owner:null, users:null, items:[], lastExport:null};
-const ui = {tab:'all', q:'', unpacked:false, qty:1, cat:'clothes', addBag:null, dupOnly:false, sort:'cat'};
+const ui = {tab:'all', q:'', unpacked:false, qty:1, cat:'auto', addBag:null, dupOnly:false, sort:'cat', frozen: new Map()};
 const heSort = new Intl.Collator('he', {numeric: true, sensitivity: 'base'}).compare;
 let pendingImport = null, pendingFrom = null, pendingUsers = null;
+const resetOrder = () => ui.frozen.clear();
 
 const $ = s => document.querySelector(s);
 const uid = () => Date.now().toString(36) + Math.random().toString(36).slice(2, 8);
 const now = () => Date.now();
+const cut = (s, n) => { s = String(s).slice(0, n); return /[\uD800-\uDBFF]$/.test(s) ? s.slice(0, -1) : s; };   // never split an emoji
+const clampTs = x => { x = Number(x); return Number.isFinite(x) && x > 0 ? Math.min(x, now() + MAX_FUTURE) : 0; };
+const many = (n, one, pl) => n === 1 ? one : `${n} ${pl}`;
+const iso = s => '\u2068' + s + '\u2069';              // keep a Latin/Hebrew name from scrambling the sentence around it
 const live = () => state.items.filter(i => !i.deleted);
 const byId = id => state.items.find(i => i.id === id);
 const find = id => { const i = byId(id); return i && !i.deleted ? i : null; };
 const single = () => !!state.users && state.users.count === 1;
 const configured = () => !!state.users && (single() || !!state.owner);
 const nm = slot => (state.users && state.users.names[slot]) || (slot === 'noga' ? 'משתמש/ת 1' : 'משתמש/ת 2');
+const nmI = slot => iso(nm(slot));
+const flip = b => b === 'noga' ? 'nir' : 'noga';
 const defaultBag = () => single() ? 'noga' : (state.owner || 'noga');
 const curBag = () => single() ? 'noga' : (ui.addBag || defaultBag());
 function cleanUsers(u) {
   if (!u || typeof u !== 'object') return null;
   const count = u.count === 1 ? 1 : 2;
   const names = {};
-  for (const k of ['noga', 'nir']) names[k] = String((u.names && u.names[k]) || '').trim().slice(0, 20);
+  for (const k of ['noga', 'nir']) names[k] = cut(String((u.names && u.names[k]) || '').trim(), 20);
   if (!names.noga || (count === 2 && !names.nir)) return null;
-  return {count, names, ts: Number(u.ts) || 0};
+  const t = u.ts && typeof u.ts === 'object' ? u.ts : {count: u.ts, noga: u.ts, nir: u.ts};
+  return {count, names, ts: {count: clampTs(t.count), noga: clampTs(t.noga), nir: names.nir ? clampTs(t.nir) : 0}};
 }
-/* names/count sync between phones: the newer setting wins */
+/* number of users and each name sync between phones separately: the newer change of each wins */
 function adoptUsers(u, force) {
-  if (!u || (!force && state.users && u.ts <= state.users.ts)) return false;
-  const same = state.users && JSON.stringify(state.users.names) === JSON.stringify(u.names) && state.users.count === u.count;
-  state.users = {...u, names: {...u.names}};          // "whose phone" stays as it was
-  return !same;
+  if (!u) return null;
+  const L = state.users;
+  if (!L) { state.users = {count: u.count, names: {...u.names}, ts: {...u.ts}}; return {changed: true, countChanged: false}; }
+  const n = {count: L.count, names: {...L.names}, ts: {...L.ts}};
+  const val = (x, f) => f === 'count' ? x.count : x.names[f];
+  const wins = f => force || u.ts[f] > n.ts[f] || (u.ts[f] === n.ts[f] && String(val(u, f)) > String(val(n, f)));
+  if (wins('count')) { n.count = u.count; n.ts.count = u.ts.count; }
+  for (const k of ['noga', 'nir']) if (u.names[k] && wins(k)) { n.names[k] = u.names[k]; n.ts[k] = u.ts[k]; }
+  if (n.count === 2 && !n.names.nir && u.names.nir) { n.names.nir = u.names.nir; n.ts.nir = u.ts.nir; }
+  if (n.count === 2 && !n.names.nir) n.count = 1;
+  state.users = n;
+  return {changed: n.count !== L.count || n.names.noga !== L.names.noga || n.names.nir !== L.names.nir, countChanged: n.count !== L.count};
 }
+/* two phones set up separately may have the two people in opposite slots: detect by names */
+const eqN = (a, b) => !!a && !!b && normName(a) === normName(b);
+function isSwapped(u) {
+  const L = state.users;
+  if (!u || !L || u.count !== 2 || !L.names.nir) return false;
+  const straight = eqN(u.names.noga, L.names.noga) || eqN(u.names.nir, L.names.nir);
+  const cross = eqN(u.names.noga, L.names.nir) || eqN(u.names.nir, L.names.noga);
+  return cross && !straight;
+}
+const flipUsers = u => ({count: u.count, names: {noga: u.names.nir, nir: u.names.noga}, ts: {count: u.ts.count, noga: u.ts.nir, nir: u.ts.noga}});
 const normName = n => String(n).trim().replace(/\s+/g, ' ').toLowerCase();
 const dupKey = i => (single() ? '' : i.bag + '|') + normName(i.name);
 const esc = s => String(s).replace(/[&<>"']/g, c => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
@@ -490,7 +536,7 @@ const anyDialogOpen = () => !!document.querySelector('dialog[open]');
 
 /* ---------- storage (IndexedDB, localStorage fallback) ---------- */
 const store = {
-  db: null, readOnly: false, warned: false,
+  db: null, readOnly: false, warned: false, failed: false,
   async open() {
     if (!('indexedDB' in window)) return null;
     return new Promise(res => {
@@ -534,6 +580,7 @@ const store = {
       } catch {}
     }
     if (!ok) { try { localStorage.setItem('mizvadot:' + key, JSON.stringify(val)); ok = true; } catch {} }
+    this.failed = !ok;
     if (!ok && !this.warned) { this.warned = true; toast('הדפדפן הזה לא מאפשר שמירה — הרשימה תימחק בסגירה'); }
   }
 };
@@ -544,12 +591,12 @@ function cleanItem(it) {
   if (!it || typeof it !== 'object' || it.id == null) return null;
   const id = String(it.id);
   if (!/^[A-Za-z0-9_-]{1,64}$/.test(id)) return null;
-  const base = Number(it.updatedAt) || 0;
+  const base = clampTs(it.updatedAt);
   const ts = {};
-  for (const f of FIELDS) ts[f] = Number(it.ts && it.ts[f]) || base;
+  for (const f of FIELDS) ts[f] = clampTs(it.ts && it.ts[f]) || base;
   const out = {
     id,
-    name: String(it.name ?? '').trim().slice(0, 80) || 'פריט',
+    name: cut(String(it.name ?? '').trim(), 80) || 'פריט',
     cat: CAT[it.cat] ? it.cat : 'other',
     qty: Math.min(99, Math.max(1, parseInt(it.qty, 10) || 1)),
     bag: BAGS[it.bag] ? it.bag : defaultBag(),
@@ -576,36 +623,37 @@ function touch(it, patch) {
   if (changed) it.updatedAt = t;
   return changed;
 }
-function commit() { save(); render(); }
+function commit() { if (store.readOnly) return; save(); render(); }
 
 function addItem(name) {
   const bag = curBag();
   const exists = live().some(i => dupKey(i) === dupKey({bag, name}));
-  const it = newItem({name, cat: ui.cat, qty: ui.qty, bag});
+  const it = newItem({name, cat: ui.cat === 'auto' ? guessCat(name) : ui.cat, qty: ui.qty, bag});
   state.items.push(it);
   commit();
   if (exists) {
-    toast(`⚠️ "${name}" כבר קיים ${single() ? 'ברשימה' : 'במזוודה של ' + nm(bag)}`, 'הסר', () => { const x = byId(it.id); if (x) touch(x, {deleted: true}); commit(); });
+    toast(`⚠️ "${iso(name)}" כבר קיים ${single() ? 'ברשימה' : 'במזוודה של ' + nmI(bag)}`, 'הסר', () => { const x = byId(it.id); if (x) touch(x, {deleted: true}); commit(); });
   } else if (!single() && ui.tab !== 'all' && ui.tab !== bag) {
-    toast(`נוסף למזוודה של ${nm(bag)}`, 'הצג', () => { ui.tab = bag; render(); });
+    toast(`נוסף למזוודה של ${nmI(bag)}`, 'הצג', () => { ui.tab = bag; render(); });
   }
 }
 function removeItem(id) {
   const it = find(id); if (!it) return;
   touch(it, {deleted: true}); commit();
-  toast(`"${it.name}" נמחק`, 'בטל', () => { const x = byId(id); if (x && x.deleted) { touch(x, {deleted: false}); commit(); } });
+  toast(`"${iso(it.name)}" נמחק`, 'בטל', () => { const x = byId(id); if (x && x.deleted) { touch(x, {deleted: false}); commit(); } });
 }
 function moveItem(it, bag) {
   if (it.bag === bag) return;
   const prev = {bag: it.bag, packed: it.packed};
   touch(it, {bag, packed: false}); commit();
-  if (prev.packed) toast(`הועבר למזוודה של ${nm(bag)} · סימון ״ארוז״ אופס`, 'בטל', () => {
+  if (prev.packed) toast(`הועבר למזוודה של ${nmI(bag)} · סימון ״ארוז״ אופס`, 'בטל', () => {
     const x = find(it.id); if (x) { touch(x, prev); commit(); }
   });
 }
 function togglePacked(it) {
+  if (!ui.frozen.has(it.id)) ui.frozen.set(it.id, it.packed);   // keep the row where it is until the view changes
   touch(it, {packed: !it.packed}); commit();
-  if (ui.unpacked && it.packed) toast(`"${it.name}" סומן כארוז`, 'בטל', () => { const x = find(it.id); if (x) { touch(x, {packed: false}); commit(); } });
+  if (ui.unpacked && it.packed) toast(`"${iso(it.name)}" סומן כארוז`, 'בטל', () => { const x = find(it.id); if (x) { touch(x, {packed: false}); commit(); } });
 }
 
 /* ---------- duplicates ---------- */
@@ -633,7 +681,7 @@ function render() {
   for (const b of ['noga', 'nir']) {
     const B = b === 'noga' ? 'Noga' : 'Nir';
     const n = s[b], p = s[b + 'Packed'];
-    $('#c' + B).textContent = n ? `${n} פריטים · ${s[b + 'Qty']} יח׳` : 'ריקה';
+    $('#c' + B).textContent = n ? many(n, 'פריט אחד', 'פריטים') + (s[b + 'Qty'] !== n ? ` · ${s[b + 'Qty']} יח׳` : '') : 'ריקה';
     $('#p' + B).style.width = n ? (p / n * 100) + '%' : '0';
     $('#s' + B).textContent = n ? (p === n ? 'הכל ארוז ✓' : `${p} מתוך ${n} ארוזים`) : '—';
   }
@@ -643,12 +691,12 @@ function render() {
 
   const ab = curBag();
   document.querySelectorAll('#addBag button').forEach(b => b.classList.toggle('on', b.dataset.bag === ab));
-  $('#addBtn').textContent = single() ? 'הוסף' : `הוסף ל${nm(ab)}`;
+  $('#addBtn').textContent = single() ? 'הוסף' : `הוסף ל${nmI(ab)}`;
   $('#addBtn').classList.toggle('noga', !single() && ab === 'noga');
   $('#addBtn').classList.toggle('one', single());
   $('#addQty').textContent = ui.qty;
   $('#ownerBtn').innerHTML = !configured() ? '<b>הגדרת משתמשים</b>'
-    : single() ? `הרשימה של <b>${esc(nm('noga'))}</b>` : `הטלפון של <b>${esc(nm(state.owner))}</b>`;
+    : single() ? `הרשימה של <b><bdi>${esc(nm('noga'))}</bdi></b>` : `הטלפון של <b><bdi>${esc(nm(state.owner))}</bdi></b>`;
 
   const host = $('#list');
   if (store.readOnly) {
@@ -681,7 +729,7 @@ function render() {
     const seg = ['noga', 'nir'].map(b => `<button type="button" data-bag="${b}" class="${i.bag === b ? 'on' : ''}">${esc(nm(b))}</button>`).join('');
     return `<div class="item b-${i.bag}${i.packed ? ' packed' : ''}${isDup ? ' isdup' : ''}" data-id="${esc(i.id)}">
         <div class="l1">
-          <button type="button" class="info" aria-label="עריכת ${esc(i.name)}"><span class="nm">${showCat ? `<span class="ci" title="${CAT[i.cat].name}">${CAT[i.cat].icon}</span>` : ''}<span class="t" dir="auto">${esc(i.name)}</span><span class="pen">✏️</span></span>${i.qty > 1 ? `<span class="mt">כמות: ${i.qty}</span>` : ''}${isDup ? `<span class="dup">⚠️ מופיע פעמיים ${single() ? 'ברשימה' : 'במזוודה של ' + esc(nm(i.bag))}</span>` : ''}</button>
+          <button type="button" class="info" aria-label="עריכת ${esc(i.name)}"><span class="nm">${showCat ? `<span class="ci" title="${CAT[i.cat].name}">${CAT[i.cat].icon}</span>` : ''}<span class="t" dir="auto">${esc(i.name)}</span><span class="pen">✏️</span></span>${i.qty > 1 ? `<span class="mt">כמות: ${i.qty}</span>` : ''}${isDup ? `<span class="dup">⚠️ מופיע פעמיים ${single() ? 'ברשימה' : 'במזוודה של <bdi>' + esc(nm(i.bag)) + '</bdi>'}</span>` : ''}</button>
           <button type="button" class="pk">${i.packed ? '✓ ארוז' : 'סמן כארוז'}</button>
         </div>
         <div class="l2"><span class="lbl">מזוודה:</span><div class="seg">${seg}</div></div>
@@ -693,7 +741,8 @@ function render() {
     list.sort((a, b) => heSort(a.name, b.name));
     html += `<section class="group">${list.map(i => row(i, true)).join('')}</section>`;
   } else {
-    list.sort((a, b) => (a.packed - b.packed) || heSort(a.name, b.name));
+    const pkd = i => ui.frozen.has(i.id) ? ui.frozen.get(i.id) : i.packed;
+    list.sort((a, b) => (pkd(a) - pkd(b)) || heSort(a.name, b.name));
     for (const [key, name, icon] of CATS) {
       const g = list.filter(i => i.cat === key);
       if (!g.length) continue;
@@ -704,16 +753,24 @@ function render() {
 }
 
 /* ---------- toast ---------- */
-let toastTimer;
+let toastTimer, toastHide;
 function toast(text, actLabel, actFn) {
+  const el = $('#toast'), b = $('#toastAct');
   $('#toastText').textContent = text;
-  const b = $('#toastAct');
   b.hidden = !actLabel;
   b.textContent = actLabel || '';
-  b.onclick = () => { $('#toast').classList.remove('show'); b.onclick = null; actFn && actFn(); };
-  $('#toast').classList.add('show');
+  b.onclick = () => { hideToast(); actFn && actFn(); };
+  clearTimeout(toastHide);
+  try { if (el.showPopover) { if (el.matches(':popover-open')) el.hidePopover(); el.showPopover(); } } catch {}
+  el.classList.add('show');
   clearTimeout(toastTimer);
-  toastTimer = setTimeout(() => { $('#toast').classList.remove('show'); b.onclick = null; }, actLabel ? 6000 : 3000);
+  toastTimer = setTimeout(hideToast, actLabel ? 6000 : 3500);
+}
+function hideToast() {
+  const el = $('#toast');
+  el.classList.remove('show'); $('#toastAct').onclick = null;
+  clearTimeout(toastTimer); clearTimeout(toastHide);
+  toastHide = setTimeout(() => { try { if (el.matches(':popover-open')) el.hidePopover(); } catch {} }, 220);
 }
 
 /* ---------- confirm ---------- */
@@ -748,7 +805,7 @@ function submitEdit() {
   if (!name) { $('#eName').focus(); return; }
   if (it) {
     const packed = editBag === it.bag ? it.packed : false;
-    touch(it, {name: name.slice(0, 80), cat: $('#eCat').value, qty: editQty, bag: editBag, packed});
+    touch(it, {name: cut(name, 80), cat: $('#eCat').value, qty: editQty, bag: editBag, packed});
     commit();
   }
   $('#editDlg').close();
@@ -759,7 +816,9 @@ function exportData() {
   const data = {app: 'packing', version: 3, owner: state.owner, users: state.users, exportedAt: new Date().toISOString(), items: state.items};
   const d = new Date();
   const stamp = `${d.getFullYear()}-${String(d.getMonth() + 1).padStart(2, '0')}-${String(d.getDate()).padStart(2, '0')}`;
-  return {base: `packing-${stamp}`, text: JSON.stringify(data)};
+  const who = single() ? nm('noga') : state.owner ? nm(state.owner) : '';
+  const safe = cut(who.replace(/[\\/:*?"<>|\u0000-\u001f]+/g, '').trim().replace(/\s+/g, '_'), 20);
+  return {base: `packing-${safe ? safe + '-' : ''}${stamp}`, text: JSON.stringify(data)};
 }
 function markExported() { state.lastExport = now(); save(); }
 
@@ -790,15 +849,40 @@ async function readImport(file) {
   catch { toast('זה לא קובץ של Packing. לרשימה מ-Keep: הגדרות ← ייבוא מ-Google Keep'); return; }
   const arr = Array.isArray(data) ? data : data && Array.isArray(data.items) ? data.items : null;
   if (!arr) { toast('לא נמצאו פריטים בקובץ'); return; }
-  const items = arr.slice(0, MAX_ITEMS).map(cleanItem).filter(Boolean);
+  const map = new Map();                                // the same item twice in one file → keep the newest of each field
+  for (const it of arr.slice(0, MAX_ITEMS).map(cleanItem).filter(Boolean)) {
+    const cur = map.get(it.id);
+    if (cur) mergeFields(cur, it); else map.set(it.id, it);
+  }
+  const items = [...map.values()];
+  const obj = data && !Array.isArray(data) ? data : {};
+  let users = cleanUsers(obj.users);
+  if (!users && !obj.users && BAGS[obj.owner]) users = defaultUsers();     // file from before names were configurable
+  let from = BAGS[obj.owner] ? obj.owner : null;
+  if (isSwapped(users)) {                               // the other phone has the two people the other way round
+    items.forEach(i => { i.bag = flip(i.bag); });
+    users = flipUsers(users);
+    if (from) from = flip(from);
+  }
+  pendingImport = items; pendingFrom = from; pendingUsers = users;
   const liveCount = items.filter(i => !i.deleted).length;
-  pendingUsers = data && !Array.isArray(data) ? cleanUsers(data.users) : null;
-  pendingImport = items; pendingFrom = data && BAGS[data.owner] ? data.owner : null;
-  const fu = pendingUsers || state.users;
-  const fromName = pendingFrom && fu && fu.count === 2 ? fu.names[pendingFrom] : '';
-  const from = fromName ? ` מהטלפון של ${fromName}` : '';
-  $('#importSub').textContent = `בקובץ${from}: ${liveCount} פריטים. בטלפון הזה: ${live().length}.`;
+  const fu = users || state.users;
+  const fromName = from && fu && fu.count === 2 ? fu.names[from] : '';
+  $('#importSub').textContent = `בקובץ${fromName ? ' מהטלפון של ' + iso(fromName) : ''}: ${many(liveCount, 'פריט אחד', 'פריטים')}. בטלפון הזה: ${many(live().length, 'פריט אחד', 'פריטים')}.`;
   $('#importDlg').showModal();
+}
+/* per-field merge: the newer change of each field wins */
+function mergeFields(cur, it) {
+  let changed = false;
+  for (const f of FIELDS) {
+    const a = cur.ts[f] || 0, b = it.ts[f] || 0;
+    if (b > a || (b === a && String(it[f]) > String(cur[f]))) {
+      if (cur[f] !== it[f]) changed = true;
+      cur[f] = it[f]; cur.ts[f] = b;
+    }
+  }
+  cur.updatedAt = Math.max(...FIELDS.map(f => cur.ts[f]));
+  return changed;
 }
 function mergeItems(incoming) {
   const map = new Map(state.items.map(i => [i.id, i]));
@@ -807,15 +891,7 @@ function mergeItems(incoming) {
     const cur = map.get(it.id);
     if (!cur) { state.items.push(it); map.set(it.id, it); if (!it.deleted) added++; continue; }
     const wasDeleted = cur.deleted;
-    let changed = false;
-    for (const f of FIELDS) {
-      const a = cur.ts[f] || 0, b = it.ts[f] || 0;
-      if (b > a || (b === a && String(it[f]) > String(cur[f]))) {
-        if (cur[f] !== it[f]) changed = true;
-        cur[f] = it[f]; cur.ts[f] = b;
-      }
-    }
-    cur.updatedAt = Math.max(...FIELDS.map(f => cur.ts[f]));
+    const changed = mergeFields(cur, it);
     if (!wasDeleted && cur.deleted) removed++;
     else if (wasDeleted && !cur.deleted) restored++;
     else if (changed && !cur.deleted) updated++;
@@ -851,12 +927,12 @@ function parseKeep(text, skipTitle) {
     if (m) { checked = !!(m[1] || m[3]); line = line.slice(m[0].length).trim(); }
     line = line.replace(/^\d{1,2}[.)]\s+/, '');                       // "1. item"
     let qty = 1, mm;
-    if ((mm = line.match(/^(.+?)\s*[x×*]\s*(\d{1,2})$/i)) || (mm = line.match(/^(.+?)\s*\((\d{1,2})\)$/))) { line = mm[1]; qty = +mm[2]; }
+    if ((mm = line.match(/^(.+?)\s*(?:(?<!\p{L})[xX]|[×*])\s*(\d{1,2})$/u)) || (mm = line.match(/^(.+?)\s*\((\d{1,2})\)$/))) { line = mm[1]; qty = +mm[2]; }
     else if ((mm = line.match(/^(\d{1,2})\s*[x×*]?\s+(.+)$/i))) { qty = +mm[1]; line = mm[2]; }
-    line = line.replace(/\s+/g, ' ').trim().slice(0, 80);
+    line = cut(line.replace(/\s+/g, ' ').trim(), 80);
     if (!line || !/[\p{L}\p{N}]/u.test(line)) continue;
     const key = normName(line);
-    if (seen.has(key)) continue;
+    if (seen.has(key)) { out.dupLines = (out.dupLines || 0) + 1; continue; }
     seen.add(key);
     out.push({name: line, qty: Math.min(99, Math.max(1, qty)), checked, cat: guessCat(line)});
   }
@@ -886,14 +962,17 @@ function paintKeep() {
   rows.forEach(r => r.skip = skipOn && existing.has(dupKey({bag: keep.bag, name: r.name})));
   keep.rows = rows;
   const n = rows.filter(r => !r.skip).length, sk = rows.length - n;
+  const d = rows.dupLines || 0;
   $('#kCount').textContent = rows.length
-    ? `נמצאו ${rows.length} פריטים${sk ? ` · ${sk} כבר קיימים ויידלגו` : ''}`
+    ? (rows.length === 1 ? 'נמצא פריט אחד' : `נמצאו ${rows.length} פריטים`)
+      + (sk ? ' · ' + (sk === 1 ? 'אחד כבר קיים וידולג' : `${sk} כבר קיימים וידולגו`) : '')
+      + (d ? ' · ' + (d === 1 ? 'שורה כפולה אחת בפתק' : `${d} שורות כפולות בפתק`) : '')
     : ($('#kText').value.trim() ? 'לא נמצאו פריטים' : '');
   $('#kPrev').hidden = !rows.length;
   $('#kPrev').innerHTML = rows.map(r =>
     `<div class="${r.skip ? 'skip' : ''}"><span>${CAT[r.cat].icon}</span><span dir="auto">${esc(r.name)}${r.qty > 1 ? ` ×${r.qty}` : ''}${r.checked ? ' ✓' : ''}</span></div>`).join('');
   $('#kGo').disabled = !n;
-  $('#kGo').textContent = n ? `ייבוא ${n} פריטים${single() ? '' : ' ל' + nm(keep.bag)}` : 'ייבוא';
+  $('#kGo').textContent = !n ? 'ייבוא' : n === 1 ? 'ייבוא פריט אחד' : `ייבוא ${n} פריטים`;
 }
 function doKeepImport() {
   const markPacked = $('#kChecked').checked;
@@ -904,8 +983,8 @@ function doKeepImport() {
     state.items.push(it); ids.push(it.id);
   }
   $('#keepDlg').close();
-  ui.tab = 'all'; commit();
-  toast(`נוספו ${ids.length} פריטים ${single() ? 'לרשימה' : 'למזוודה של ' + nm(keep.bag)}`, 'בטל', () => {
+  ui.tab = 'all'; resetOrder(); commit();
+  toast(`${ids.length === 1 ? 'נוסף פריט אחד' : `נוספו ${ids.length} פריטים`} ${single() ? 'לרשימה' : 'למזוודה של ' + nmI(keep.bag)}`, 'בטל', () => {
     ids.forEach(id => { const x = byId(id); if (x && !x.deleted) touch(x, {deleted: true}); }); commit();
   });
 }
@@ -915,30 +994,38 @@ function bind() {
   document.querySelectorAll('[data-tab]').forEach(b => b.addEventListener('click', () => {
     ui.tab = (b.classList.contains('bag') && ui.tab === b.dataset.tab) ? 'all' : b.dataset.tab;
     if (BAGS[ui.tab]) ui.addBag = ui.tab;
-    render();
+    resetOrder(); render();
   }));
 
   const submitAdd = () => {
     const inp = $('#addName'); const name = inp.value.trim();
     if (!name) { inp.focus(); return; }
-    addItem(name.slice(0, 80)); inp.value = ''; ui.qty = 1; $('#addQty').textContent = 1; inp.focus();
+    addItem(cut(name, 80)); inp.value = ''; ui.qty = 1; $('#addQty').textContent = 1; inp.focus();
   };
   $('#addBtn').addEventListener('click', submitAdd);
-  $('#addName').addEventListener('keydown', e => { if (e.key === 'Enter' && !e.isComposing) { e.preventDefault(); submitAdd(); } });
+  // one-line text boxes: Enter (or the keyboard's ✓) acts, line breaks never get in
+  document.querySelectorAll('textarea.one').forEach(el => {
+    const enter = () => el.dispatchEvent(new CustomEvent('enter'));
+    el.addEventListener('keydown', e => { if (e.key === 'Enter' && !e.isComposing) { e.preventDefault(); enter(); } });
+    el.addEventListener('beforeinput', e => { if (e.inputType === 'insertLineBreak' || e.inputType === 'insertParagraph') { e.preventDefault(); enter(); } });
+    el.addEventListener('input', () => { if (/[\r\n]/.test(el.value)) el.value = el.value.replace(/[\r\n]+/g, ' '); });
+  });
+  $('#addName').addEventListener('enter', submitAdd);
+  $('#search').addEventListener('enter', () => $('#search').blur());
   // keep the phone keyboard open while tapping these
   document.querySelectorAll('#addBtn,.stepper button,#addBag button').forEach(b => b.addEventListener('pointerdown', e => e.preventDefault()));
   document.querySelectorAll('#addBag button').forEach(b => b.addEventListener('click', () => { ui.addBag = b.dataset.bag; render(); }));
-  $('#addCat').addEventListener('change', e => { ui.cat = e.target.value; store.set('lastCat', ui.cat); });
+  $('#addCat').addEventListener('change', e => { ui.cat = e.target.value; store.set('lastCat2', ui.cat); });
   document.querySelectorAll('[data-step]').forEach(b => b.addEventListener('click', () => {
     ui.qty = Math.min(99, Math.max(1, ui.qty + +b.dataset.step)); $('#addQty').textContent = ui.qty;
   }));
-  $('#search').addEventListener('input', e => { ui.q = e.target.value; render(); });
+  $('#search').addEventListener('input', e => { ui.q = e.target.value; resetOrder(); render(); });
   $('#unpackedBtn').addEventListener('click', e => {
-    ui.unpacked = !ui.unpacked; e.currentTarget.setAttribute('aria-pressed', ui.unpacked); render();
+    ui.unpacked = !ui.unpacked; e.currentTarget.setAttribute('aria-pressed', ui.unpacked); resetOrder(); render();
   });
 
   $('#list').addEventListener('click', e => {
-    if (e.target.closest('[data-act="dup-toggle"]')) { ui.dupOnly = !ui.dupOnly; render(); return; }
+    if (e.target.closest('[data-act="dup-toggle"]')) { ui.dupOnly = !ui.dupOnly; resetOrder(); render(); return; }
     const row = e.target.closest('.item'); if (!row) return;
     const it = find(row.dataset.id); if (!it) return;
     const bagBtn = e.target.closest('.seg button');
@@ -953,22 +1040,23 @@ function bind() {
   }));
   document.querySelectorAll('#eBag button').forEach(b => b.addEventListener('click', () => { editBag = b.dataset.bag; paintEdit(); }));
   $('#eSave').addEventListener('click', submitEdit);
-  $('#eName').addEventListener('keydown', e => { if (e.key === 'Enter' && !e.isComposing) { e.preventDefault(); submitEdit(); } });
+  $('#eName').addEventListener('enter', submitEdit);
   $('#eCancel').addEventListener('click', () => $('#editDlg').close());
   $('#eDelete').addEventListener('click', () => { $('#editDlg').close(); removeItem(editId); });
 
   // settings
   $('#menuBtn').addEventListener('click', () => {
-    $('#menuSub').textContent = `${live().length} פריטים בטלפון הזה · ` +
+    $('#menuSub').textContent = `${many(live().length, 'פריט אחד', 'פריטים')} בטלפון הזה · ` +
       (state.lastExport ? 'נשלח/נשמר לאחרונה: ' + new Date(state.lastExport).toLocaleString('he-IL', {dateStyle: 'short', timeStyle: 'short'}) : 'עדיין לא נשלח ולא נשמר גיבוי');
     $('#syncSect').textContent = single() ? 'גיבוי' : 'סנכרון עם הטלפון השני';
-    $('#importDs').textContent = single() ? 'שחזור הרשימה מקובץ גיבוי' : 'קובץ שהגיע מהטלפון השני, או שחזור מגיבוי';
-    $('#usersInfo').textContent = !state.users ? '' : single() ? `משתמש אחד: ${nm('noga')} · אפשר לעבור לשניים` : `${nm('noga')} ו${nm('nir')} · הטלפון הזה של ${nm(state.owner)}`;
+    $('#importLbl').textContent = single() ? 'שחזור מגיבוי' : 'קבלת קובץ';
+    $('#importDs').textContent = single() ? 'פתיחת קובץ גיבוי ששמרת' : 'מהטלפון השני, או שחזור מגיבוי';
+    $('#usersInfo').textContent = !state.users ? '' : single() ? `משתמש אחד: ${nmI('noga')} · אפשר לעבור לשניים` : `${nmI('noga')} ו${nmI('nir')} · הטלפון הזה של ${nmI(state.owner)}`;
     paintTheme();
     $('#menuDlg').showModal();
   });
   document.querySelectorAll('[data-theme-set]').forEach(b => b.addEventListener('click', () => { PackingTheme.set(b.dataset.themeSet); paintTheme(); }));
-  document.querySelectorAll('[data-sort-set]').forEach(b => b.addEventListener('click', () => { ui.sort = b.dataset.sortSet; store.set('sort', ui.sort); paintTheme(); render(); }));
+  document.querySelectorAll('[data-sort-set]').forEach(b => b.addEventListener('click', () => { ui.sort = b.dataset.sortSet; store.set('sort', ui.sort); resetOrder(); paintTheme(); render(); }));
   $('#menuDlg').addEventListener('click', async e => {
     const b = e.target.closest('[data-act]'); if (!b) return;
     const act = b.dataset.act;
@@ -980,8 +1068,8 @@ function bind() {
     else if (act === 'unpack') {
       const packed = live().filter(i => i.packed);
       if (!packed.length) { toast('אין פריטים מסומנים כארוזים'); return; }
-      if (await confirmBox('איפוס סימוני ״ארוז״', `${packed.length} פריטים יסומנו כלא ארוזים. השיוך למזוודות נשאר.`, 'איפוס')) {
-        packed.forEach(i => touch(i, {packed: false})); commit();
+      if (await confirmBox('איפוס סימוני ״ארוז״', `${many(packed.length, 'פריט אחד יסומן כלא ארוז', 'פריטים יסומנו כלא ארוזים')}.${single() ? '' : ' השיוך למזוודות נשאר.'}`, 'איפוס')) {
+        packed.forEach(i => touch(i, {packed: false})); resetOrder(); commit();
         toast('הסימונים אופסו', 'בטל', () => { packed.forEach(i => { const x = find(i.id); if (x) touch(x, {packed: true}); }); commit(); });
       }
     }
@@ -989,7 +1077,7 @@ function bind() {
     else if (act === 'clear') {
       const all = live();
       if (!all.length) return;
-      if (await confirmBox('מחיקת כל הפריטים', `${all.length} פריטים יימחקו מהטלפון הזה — ובסנכרון הבא גם מהטלפון השני.`, 'מחיקה')) {
+      if (await confirmBox('מחיקת כל הפריטים', `${many(all.length, 'פריט אחד יימחק', 'פריטים יימחקו')} מהטלפון הזה${single() ? '.' : ' — ובסנכרון הבא גם מהטלפון השני.'}`, 'מחיקה')) {
         all.forEach(i => touch(i, {deleted: true})); commit();
         toast('כל הפריטים נמחקו', 'בטל', () => { all.forEach(i => { const x = byId(i.id); if (x && x.deleted) touch(x, {deleted: false}); }); commit(); });
       }
@@ -1000,6 +1088,8 @@ function bind() {
   document.querySelectorAll('#suCount button').forEach(b => b.addEventListener('click', () => { su.count = +b.dataset.count; paintSetup(); }));
   document.querySelectorAll('#suOwner button').forEach(b => b.addEventListener('click', () => { su.owner = b.dataset.owner; paintSetup(); }));
   ['#suName1', '#suName2'].forEach(id => $(id).addEventListener('input', paintSetup));
+  $('#suName1').addEventListener('enter', () => { if (!$('#suF2').hidden) $('#suName2').focus(); else saveSetup(); });
+  $('#suName2').addEventListener('enter', saveSetup);
   $('#suSave').addEventListener('click', saveSetup);
   $('#suCancel').addEventListener('click', () => $('#setupDlg').close());
   $('#suImport').addEventListener('click', () => { $('#fileIn').value = ''; $('#fileIn').click(); });
@@ -1008,29 +1098,36 @@ function bind() {
 
   // file import
   $('#fileIn').addEventListener('change', e => { const f = e.target.files[0]; if (f) readImport(f); });
-  const runMerge = (items, users) => {
+  const runMerge = (items, users, from) => {
     const r = mergeItems(items);
-    const namesChanged = adoptUsers(users);
-    commit();
-    if ($('#setupDlg').open) refreshSetupFromState();
-    else if (!configured()) openSetup(true);          // switched to two users elsewhere: ask whose phone this is
+    const u = adoptUsers(users);
+    resetOrder(); commit();
     const parts = [];
-    if (r.added) parts.push(`נוספו ${r.added}`);
-    if (r.updated) parts.push(`עודכנו ${r.updated}`);
-    if (r.removed) parts.push(`נמחקו ${r.removed}`);
-    if (r.restored) parts.push(`שוחזרו ${r.restored}`);
+    if (r.added) parts.push(r.added === 1 ? 'נוסף 1' : `נוספו ${r.added}`);
+    if (r.updated) parts.push(r.updated === 1 ? 'עודכן 1' : `עודכנו ${r.updated}`);
+    if (r.removed) parts.push(r.removed === 1 ? 'נמחק 1' : `נמחקו ${r.removed}`);
+    if (r.restored) parts.push(r.restored === 1 ? 'שוחזר 1' : `שוחזרו ${r.restored}`);
     let msg = parts.length ? 'מוזג: ' + parts.join(' · ') : 'אין שינויים חדשים בקובץ';
-    if (r.skipped) msg += ` · ${r.skipped} פריטים מהקובץ נמחקו כאן קודם ולא הוחזרו`;
-    if (namesChanged) msg += ' · שמות המשתמשים עודכנו';
+    if (r.skipped) msg += ' · ' + many(r.skipped, 'פריט אחד מהקובץ נמחק כאן קודם ולא הוחזר', 'פריטים מהקובץ נמחקו כאן קודם ולא הוחזרו');
+    if (u && u.countChanged) msg += single() ? ' · עברנו לרשימה אחת, כמו בטלפון השני' : ' · עברנו לשני משתמשים, כמו בטלפון השני';
+    else if (u && u.changed && state.owner) msg += ' · שמות המשתמשים עודכנו';
     if (dupKeys(live()).size) msg += ' · ⚠️ נמצאו כפילויות';
-    toast(msg);
+    afterImport(msg, from);
+  };
+  /* after loading a file: if this phone still needs setup, show it there; otherwise a toast */
+  const afterImport = (msg, from, undo) => {
+    const open = $('#setupDlg').open;
+    if (!open && configured()) { undo ? toast(msg, 'בטל', undo) : toast(msg); return; }
+    if (!open) openSetup(true);
+    su.loaded = {n: live().length, from};
+    refreshSetupFromState();
   };
   $('#iMerge').addEventListener('click', () => {
-    const items = pendingImport, users = pendingUsers; $('#importDlg').close();
-    if (items) runMerge(items, users);
+    const items = pendingImport, users = pendingUsers, from = pendingFrom; $('#importDlg').close();
+    if (items) runMerge(items, users, from);
   });
 
-  let replaceItems = null, replaceUsers = null;
+  let replaceItems = null, replaceUsers = null, replaceFrom = null;
   $('#iReplace').addEventListener('click', () => {
     const items = pendingImport, from = pendingFrom, users = pendingUsers;
     $('#importDlg').close();
@@ -1041,30 +1138,36 @@ function bind() {
     const here = live();
     const onlyHere = here.filter(i => { const f = fileById.get(i.id); return !f || f.deleted; }).length;
     const newerHere = here.filter(i => { const f = fileById.get(i.id); return f && !f.deleted && i.updatedAt > f.updatedAt; }).length;
-    const lines = [`הרשימה עכשיו: <b>${here.length}</b> פריטים · בקובץ: ${fileLive.length} פריטים`];
-    if (onlyHere) lines.push(`<b>${onlyHere} פריטים שנמצאים רק בטלפון הזה יימחקו</b>`);
-    if (newerHere) lines.push(`<b>${newerHere} פריטים ששינית כאן אחרי שהקובץ נשמר יחזרו לגרסה הישנה</b> (מזוודה, ״ארוז״, שם)`);
+    const lines = [`הרשימה עכשיו: <b>${many(here.length, 'פריט אחד', 'פריטים')}</b> · בקובץ: ${many(fileLive.length, 'פריט אחד', 'פריטים')}`];
+    if (onlyHere) lines.push(`<b>${many(onlyHere, 'פריט אחד שנמצא רק בטלפון הזה יימחק', 'פריטים שנמצאים רק בטלפון הזה יימחקו')}</b>`);
+    if (newerHere) lines.push(`<b>${many(newerHere, 'פריט אחד ששינית כאן אחרי שהקובץ נשמר יחזור לגרסה הישנה', 'פריטים ששינית כאן אחרי שהקובץ נשמר יחזרו לגרסה הישנה')}</b> (מזוודה, ״ארוז״, שם)`);
     if (!onlyHere && !newerHere) lines.push('לפי הבדיקה לא יאבד שום פריט — אבל מיזוג עדיין בטוח יותר');
     $('#rList').innerHTML = lines.map(l => `<li>${l}</li>`).join('');
     const fu = users || state.users;
     const other = from && from !== state.owner && fu && fu.count === 2;
     $('#rFrom').hidden = !other;
-    if (other) $('#rFrom').textContent = `הקובץ הזה הגיע מהטלפון של ${fu.names[from]} — כנראה התכוונת למיזוג.`;
-    replaceItems = items; replaceUsers = users;
+    if (other) $('#rFrom').textContent = `הקובץ הזה הגיע מהטלפון של ${iso(fu.names[from])} — כנראה התכוונת למיזוג.`;
+    replaceItems = items; replaceUsers = users; replaceFrom = from;
     $('#replaceDlg').showModal();
   });
-  $('#rMerge').addEventListener('click', () => { const items = replaceItems, users = replaceUsers; $('#replaceDlg').close(); if (items) runMerge(items, users); });
+  $('#rMerge').addEventListener('click', () => { const items = replaceItems, users = replaceUsers, from = replaceFrom; $('#replaceDlg').close(); if (items) runMerge(items, users, from); });
   $('#rReplace').addEventListener('click', () => {
-    const items = replaceItems; $('#replaceDlg').close();
+    const items = replaceItems, users = replaceUsers, from = replaceFrom;   // captured before close() clears them
+    $('#replaceDlg').close();
     if (!items) return;
     const before = state.items, beforeUsers = state.users, beforeOwner = state.owner;
-    state.items = items;
-    if (users) adoptUsers({...users, ts: Math.max(users.ts, (state.users && state.users.ts || 0) + 1)}, true);
-    commit();
-    toast('הרשימה הוחלפה בקובץ', 'בטל', () => { state.items = before; state.users = beforeUsers; state.owner = beforeOwner; commit(); toast('ההחלפה בוטלה — הרשימה הקודמת חזרה'); });
+    try {
+      if (users) adoptUsers(users, true);
+      state.items = items;
+    } catch (e) {
+      state.items = before; state.users = beforeUsers; state.owner = beforeOwner;
+      toast('ההחלפה נכשלה — הרשימה לא השתנתה'); return;
+    }
+    resetOrder(); commit();
+    afterImport('הרשימה הוחלפה בקובץ', from, () => { state.items = before; state.users = beforeUsers; state.owner = beforeOwner; resetOrder(); commit(); toast('ההחלפה בוטלה — הרשימה הקודמת חזרה'); });
   });
   $('#rCancel').addEventListener('click', () => $('#replaceDlg').close());
-  $('#replaceDlg').addEventListener('close', () => { replaceItems = null; replaceUsers = null; });
+  $('#replaceDlg').addEventListener('close', () => { replaceItems = null; replaceUsers = null; replaceFrom = null; });
   $('#iCancel').addEventListener('click', () => $('#importDlg').close());
   $('#importDlg').addEventListener('close', () => { pendingImport = null; pendingFrom = null; pendingUsers = null; });
 
@@ -1081,7 +1184,7 @@ function bind() {
     const f = e.target.files[0]; if (!f) return;
     if (f.size > MAX_FILE) { toast('הקובץ גדול מדי'); return; }
     const t = await f.text();
-    if (/^\s*[{[]/.test(t) && /"items"\s*:/.test(t)) { toast('זה קובץ סנכרון של Packing — טוענים אותו ב״טעינת קובץ״'); return; }
+    if (/^\s*[{[]/.test(t) && /"items"\s*:/.test(t)) { toast('זה קובץ של Packing — פותחים אותו בהגדרות ← ״קבלת קובץ״'); return; }
     $('#kText').value = t; delete $('#kTitle').dataset.touched;
     $('#kTitle').checked = titleLooksLikeHeader(t); paintKeep();
   });
@@ -1091,7 +1194,8 @@ function bind() {
 
   // another window (installed app + browser tab) may have saved: reload when we come back
   document.addEventListener('visibilitychange', async () => {
-    if (document.hidden || store.readOnly || anyDialogOpen()) return;
+    if (document.hidden || store.readOnly || store.failed || anyDialogOpen()) return;
+    resetOrder();
     const saved = await store.get('state');
     if (saved && saved !== ERR && Array.isArray(saved.items)) {
       state.items = saved.items.map(cleanItem).filter(Boolean);
@@ -1101,43 +1205,70 @@ function bind() {
       render();
     }
   });
+
+  // the list couldn't be read: block every action so nothing looks saved when it isn't
+  document.addEventListener('click', e => {
+    if (!store.readOnly || !e.target.closest('button, input, select, textarea, label')) return;
+    e.preventDefault(); e.stopPropagation();
+    toast('הרשימה לא נטענה — סגרו את האפליקציה ופתחו שוב. שום דבר לא נמחק.');
+  }, true);
+
+  // keep the field being typed in visible above the phone keyboard
+  document.addEventListener('focusin', e => {
+    const el = e.target;
+    if (!el.matches || !el.matches('dialog input, dialog textarea')) return;
+    setTimeout(() => { try { el.scrollIntoView({block: 'center', behavior: 'smooth'}); } catch {} }, 350);
+  });
 }
 
 /* ---------- users setup ---------- */
-const su = {count: 2, owner: null};
+const su = {count: 2, owner: null, first: false, fresh: true, loaded: null};
 function openSetup(first) {
+  if (!$('#setupDlg').open) su.loaded = null;
+  su.first = first;
   refreshSetupFromState();
-  $('#suTitle').textContent = first ? 'ברוכים הבאים ל-Packing' : 'משתמשים';
-  $('#suCancel').hidden = first;
-  $('#suImport').hidden = !first;
   if (!$('#setupDlg').open) $('#setupDlg').showModal();
 }
 function refreshSetupFromState() {
   const u = state.users;
+  su.fresh = !u;
   su.count = u ? u.count : (su.count || 2);
-  su.owner = state.owner || su.owner;
-  $('#suName1').value = u ? u.names.noga : $('#suName1').value;
-  $('#suName2').value = u ? (u.names.nir || '') : $('#suName2').value;
+  if (state.owner) su.owner = state.owner;
+  else if (su.loaded && su.loaded.from && u && u.count === 2) su.owner = flip(su.loaded.from);   // the other phone's person isn't you
+  if (u) { $('#suName1').value = u.names.noga; $('#suName2').value = u.names.nir || ''; }
   paintSetup();
 }
 function paintSetup() {
+  const two = su.count === 2, L = su.loaded, prev = state.users;
+  $('#suTitle').textContent = L ? 'כמעט סיימנו' : su.first ? 'ברוכים הבאים ל-Packing' : 'משתמשים';
+  $('#suImport').hidden = !(su.first && su.fresh && !L);
+  $('#suLoaded').hidden = !L;
+  if (L) $('#suLoaded').textContent = `✓ הרשימה נטענה — ${many(L.n, 'פריט אחד', 'פריטים')}.` + (two ? ' נשאר רק לבחור מי את/ה:' : ' אפשר לשמור.');
+  $('#suNew').hidden = !!L;
+  $('#suLead').textContent = su.first && su.fresh ? 'או התחילו רשימה חדשה. כמה אנשים אורזים איתה?' : 'כמה אנשים אורזים עם הרשימה?';
   document.querySelectorAll('#suCount button').forEach(b => b.classList.toggle('on', +b.dataset.count === su.count));
-  const two = su.count === 2;
-  $('#suF2').hidden = !two; $('#suOwnerF').hidden = !two;
-  $('#suL1').textContent = two ? 'משתמש/ת 1' : 'השם שלך';
+  $('#suF2').hidden = !two;
+  $('#suOwnerF').hidden = !(two && !su.fresh);
+  $('#suOwnerF').classList.toggle('focusrow', !!L && two && !state.owner);
+  $('#suL1').textContent = !two || su.fresh ? 'השם שלך' : 'משתמש/ת 1';
+  $('#suL2').textContent = su.fresh ? 'השם של מי שאורז/ת איתך' : 'משתמש/ת 2';
   const n1 = $('#suName1').value.trim() || 'משתמש/ת 1', n2 = $('#suName2').value.trim() || 'משתמש/ת 2';
   document.querySelectorAll('#suOwner button').forEach(b => {
     b.textContent = b.dataset.owner === 'noga' ? n1 : n2;
     b.classList.toggle('on', b.dataset.owner === su.owner);
   });
-  $('#suNote').textContent = two
-    ? 'השמות משותפים לשני הטלפונים ועוברים בסנכרון. ״הטלפון הזה של״ נשמר רק כאן.'
-    : 'רשימה אחת, בלי חלוקה למזוודות. אפשר לעבור לשני משתמשים בכל זמן.';
+  const note = L ? ''
+    : two ? 'השמות יופיעו גם בטלפון השני אחרי הסנכרון.'
+    : prev && prev.count === 2 ? `כל הפריטים יוצגו ברשימה אחת. החלוקה בין ${iso(prev.names.noga)} ל${iso(prev.names.nir)} נשמרת, ותחזור אם תעברו שוב לשני משתמשים.`
+    : 'רשימה אחת, בלי חלוקה למזוודות. אפשר לעבור לשני משתמשים בכל זמן בהגדרות.';
+  $('#suNote').textContent = note; $('#suNote').hidden = !note;
+  $('#suCancel').hidden = !configured();
   $('#suErr').hidden = true;
 }
-async function saveSetup() {
+function saveSetup() {
   const two = su.count === 2;
-  const n1 = $('#suName1').value.trim().slice(0, 20), n2 = $('#suName2').value.trim().slice(0, 20);
+  const n1 = cut($('#suName1').value.trim(), 20), n2 = cut($('#suName2').value.trim(), 20);
+  if (two && su.fresh) su.owner = 'noga';               // new list: the first name is the person holding this phone
   const err = !n1 ? (two ? 'נא להזין את השם הראשון' : 'נא להזין שם')
     : two && !n2 ? 'נא להזין את השם השני'
     : two && normName(n1) === normName(n2) ? 'השמות צריכים להיות שונים'
@@ -1145,18 +1276,19 @@ async function saveSetup() {
     : '';
   if (err) { $('#suErr').textContent = '⚠️ ' + err; $('#suErr').hidden = false; return; }
   const prev = state.users;
-  if (prev && prev.count === 2 && !two) {
-    const moving = live().filter(i => i.bag === 'nir');
-    if (moving.length && !(await confirmBox('מעבר למשתמש אחד', `${moving.length === 1 ? 'פריט אחד' : moving.length + ' פריטים'} מהמזוודה של ${prev.names.nir} יעברו לרשימה של ${n1}.`, 'להעביר'))) return;
-    moving.forEach(i => touch(i, {bag: 'noga'}));
-  }
-  const names = {noga: n1, nir: two ? n2 : ((prev && prev.names.nir) || '')};
-  const changed = !prev || prev.count !== su.count || prev.names.noga !== names.noga || prev.names.nir !== names.nir;
-  state.users = {count: su.count, names, ts: changed ? Math.max(now(), (prev ? prev.ts : 0) + 1) : prev.ts};
-  if (two) state.owner = su.owner;
+  const names = {noga: n1, nir: two ? n2 : (prev ? prev.names.nir : '')};
+  const base = prev ? Math.max(prev.ts.count, prev.ts.noga, prev.ts.nir) : 0;
+  const t = Math.max(now(), base + 1);
+  const ts = prev ? {...prev.ts} : {count: 0, noga: 0, nir: 0};
+  if (!prev || prev.count !== su.count) ts.count = t;
+  if (!prev || prev.names.noga !== names.noga) ts.noga = t;
+  if (names.nir && (!prev || prev.names.nir !== names.nir)) ts.nir = t;
+  state.users = {count: su.count, names, ts};
+  if (two) state.owner = su.owner;                       // items keep their suitcase, so going back to two users restores the split
   ui.addBag = two ? state.owner : 'noga'; ui.tab = 'all';
+  su.loaded = null;
   $('#setupDlg').close();
-  commit();
+  resetOrder(); commit();
 }
 
 function paintTheme() {
@@ -1172,7 +1304,7 @@ function paintTheme() {
 /* ---------- init ---------- */
 async function init() {
   const opts = CATS.map(([k, n, i]) => `<option value="${k}">${i} ${n}</option>`).join('');
-  $('#addCat').innerHTML = opts; $('#eCat').innerHTML = opts;
+  $('#addCat').innerHTML = '<option value="auto">✨ אוטומטי</option>' + opts; $('#eCat').innerHTML = opts;
 
   await store.open();
   const saved = await store.get('state');
@@ -1180,16 +1312,16 @@ async function init() {
     store.readOnly = true;                       // don't overwrite a list we couldn't read
   } else if (saved && Array.isArray(saved.items)) {
     state.owner = BAGS[saved.owner] ? saved.owner : null;
-    state.users = cleanUsers(saved.users) || (state.owner ? {...DEFAULT_USERS, names: {...DEFAULT_USERS.names}} : null);
+    state.users = cleanUsers(saved.users) || (state.owner ? defaultUsers() : null);
     state.items = saved.items.map(cleanItem).filter(Boolean);
     state.lastExport = saved.lastExport || null;
   }
-  const lc = await store.get('lastCat'); if (lc !== ERR && CAT[lc]) ui.cat = lc;
+  const lc = await store.get('lastCat2'); if (lc !== ERR && (CAT[lc] || lc === 'auto')) ui.cat = lc;
   const so = await store.get('sort'); if (so === 'az' || so === 'cat') ui.sort = so;
   $('#addCat').value = ui.cat;
 
   bind(); render();
-  if (store.readOnly) return;
+  if (store.readOnly) { $('#addName').disabled = true; $('#search').disabled = true; return; }
   if (/SamsungBrowser/i.test(navigator.userAgent)) {
     $('#list').insertAdjacentHTML('beforebegin', `<div class="wrap"><div class="fatal" style="color:var(--warn);border-color:var(--warn)">זה דפדפן סמסונג — לרשימה כאן אין קשר לאפליקציה שהותקנה מ-Chrome.<br>פתחו את הקישור ב-Chrome והוסיפו למסך הבית משם.</div></div>`);
   }
