@@ -204,12 +204,18 @@ dialog::backdrop{background:rgba(10,14,20,.5)}
 .rlist{margin:0 0 12px;padding-inline-start:20px;font-size:14px;line-height:1.7}
 .rlist b{color:var(--danger)}
 .addbtn.one{background:var(--ink);color:var(--bg)}
+.seg button[data-bag="both"].on{background:var(--ink);color:var(--bg)}
+.addbtn.both{background:var(--ink);color:var(--bg)}
+body.single #eCopy,
 body.single .bag.nir, body.single .tabs, body.single .addbag, body.single .l2,
 body.single #eBagField, body.single #kBagField, body.single [data-act="share"]{display:none}
 body.single .bags{grid-template-columns:1fr}
 body.single .item.b-noga, body.single .item.b-nir{border-inline-start:1px solid var(--line)}
 body.single .add{margin-top:0}
 .note{font-size:12px;color:var(--muted);margin-top:12px}
+.btn.dangerfill{background:var(--danger);color:#fff;border-color:var(--danger)}
+.rlist .nb{font-weight:700}
+.empty .clr{margin-top:12px;min-height:40px;border-radius:10px;border:1px solid var(--line);background:var(--surface);padding:0 14px;font-weight:600}
 .dhead{position:sticky;top:0;z-index:2;display:flex;align-items:center;justify-content:space-between;gap:8px;background:var(--surface);margin:-18px -18px 0;padding:12px 18px 4px 8px}
 .dhead h2{margin:0!important}
 .xbtn{flex:0 0 auto;width:44px;height:44px;border-radius:12px;border:0;background:transparent;font-size:20px;color:var(--muted)}
@@ -242,6 +248,29 @@ body.single .add{margin-top:0}
 .toast.show{opacity:1;transform:none;pointer-events:auto}
 .toast span{padding:8px 0}
 .toast button{flex:0 0 auto;min-height:40px;border:0;border-radius:10px;background:rgba(255,255,255,.12);color:#9cc8ff;font-weight:700;padding:0 14px}
+.seg button[data-who="both"].on{background:var(--ink);color:var(--bg)}
+body.single #pWhoF{display:none}
+#printArea{display:none}
+@media print{
+  @page{size:A4;margin:14mm 12mm}
+  :root{color-scheme:light!important}
+  html,body{background:#fff!important;color:#000!important;padding:0!important;margin:0!important}
+  body>*:not(#printArea){display:none!important}
+  #printArea{display:block!important;font-family:system-ui,"Segoe UI",Roboto,"Noto Sans Hebrew",Arial,sans-serif;color:#000;direction:rtl}
+  .psheet+.psheet{break-before:page}
+  .psheet header{border-bottom:2px solid #000;padding-bottom:6px;margin-bottom:6px}
+  .ptag{font-size:10pt;color:#444}
+  .psheet h1{font-size:19pt;margin:2px 0 1px;font-weight:800}
+  .pmeta{font-size:10pt;color:#333}
+  .psheet h2{font-size:11pt;font-weight:700;margin:10px 0 3px;padding-bottom:2px;border-bottom:1px solid #999;break-after:avoid}
+  .pbody{column-count:2;column-gap:12mm}
+  .psheet h2:first-child{margin-top:0}
+  .prow{display:flex;align-items:center;gap:8px;font-size:11.5pt;line-height:1.3;padding:2.5px 0;break-inside:avoid}
+  .pbox{flex:0 0 auto;width:12px;height:12px;border:1.5px solid #000;border-radius:2px;display:inline-flex;align-items:center;justify-content:center;font-size:10px;line-height:1;font-weight:700}
+  .pname{flex:0 1 auto}
+  .pqty{color:#333;font-size:10.5pt}
+  .pempty{font-size:12pt;margin-top:14px}
+}
 </style>
 </head>
 <body>
@@ -294,9 +323,10 @@ body.single .add{margin-top:0}
     </div>
   </div>
   <div class="addbag"><span class="lbl">מוסיפים למזוודה:</span>
-    <div class="seg" id="addBag"><button type="button" data-bag="noga"></button><button type="button" data-bag="nir"></button></div>
+    <div class="seg" id="addBag"><button type="button" data-bag="noga"></button><button type="button" data-bag="nir"></button><button type="button" data-bag="both">שניהם</button></div>
   </div>
   <div class="tools">
+    <button class="chip" id="searchClear" type="button" aria-label="ניקוי החיפוש" hidden>✕</button>
     <textarea class="search one" id="search" rows="1" wrap="off" autocomplete="off" placeholder="חיפוש" enterkeyhint="search" dir="auto"></textarea>
     <button class="chip" id="unpackedBtn" type="button" aria-pressed="false">רק מה שלא נארז</button>
   </div>
@@ -307,8 +337,9 @@ body.single .add{margin-top:0}
 <!-- edit item -->
 <dialog id="editDlg">
   <div class="dlg">
-    <h2>עריכת פריט</h2>
-    <label class="f"><span>שם</span><textarea id="eName" class="one" rows="1" wrap="off" autocomplete="off" maxlength="80" enterkeyhint="done" dir="auto"></textarea></label>
+    <div class="dhead"><h2>עריכת פריט</h2><button class="xbtn" type="button" id="eX" aria-label="סגירה">✕</button></div>
+    <label class="f" style="margin-top:8px"><span>שם</span><textarea id="eName" class="one" rows="1" wrap="off" autocomplete="off" maxlength="80" enterkeyhint="done" dir="auto"></textarea></label>
+    <div class="hint" id="eErr" hidden style="margin:-6px 0 10px">⚠️ צריך שם לפריט</div>
     <label class="f"><span>קטגוריה</span><select id="eCat"></select></label>
     <div class="f"><span>כמות</span>
       <div class="stepper" style="width:max-content">
@@ -319,11 +350,12 @@ body.single .add{margin-top:0}
       <div class="seg" id="eBag"><button type="button" data-bag="noga"></button><button type="button" data-bag="nir"></button></div>
       <div class="hint" id="eHint" hidden>⚠️ העברה למזוודה אחרת תאפס את סימון ״ארוז״</div>
     </div>
-    <div class="row">
+    <div class="row"><button class="btn" type="button" id="eCopy"></button></div>
+    <div class="row"><button class="btn danger" type="button" id="eDelete">מחיקת הפריט</button></div>
+    <div class="dfoot"><div class="row">
       <button class="btn main" type="button" id="eSave">שמירה</button>
       <button class="btn" type="button" id="eCancel">ביטול</button>
-    </div>
-    <div class="row"><button class="btn danger" type="button" id="eDelete">מחיקת הפריט</button></div>
+    </div></div>
   </div>
 </dialog>
 
@@ -340,7 +372,8 @@ body.single .add{margin-top:0}
 
       <div class="sect">כלים</div>
       <button type="button" data-act="keep"><span class="ic">📝</span><span>ייבוא רשימה מ-Google Keep<span class="ds">הדבקה או קובץ txt</span></span></button>
-      <button type="button" data-act="unpack"><span class="ic">↺</span><span>איפוס סימוני ״ארוז״<span class="ds">לנסיעה הבאה — הפריטים נשארים</span></span></button>
+      <button type="button" data-act="print"><span class="ic">🖨️</span><span>הדפסת הרשימה<span class="ds">לנייר או לקובץ PDF</span></span></button>
+      <button type="button" data-act="unpack"><span class="ic">🔄</span><span>איפוס סימוני ״ארוז״<span class="ds">לנסיעה הבאה — הפריטים נשארים</span></span></button>
 
       <div class="sect">משתמשים ותצוגה</div>
       <button type="button" data-act="users"><span class="ic">👥</span><span>משתמשים<span class="ds" id="usersInfo"></span></span></button>
@@ -396,12 +429,12 @@ body.single .add{margin-top:0}
 <!-- Google Keep import -->
 <dialog id="keepDlg">
   <div class="dlg">
-    <h2>ייבוא מ-Google Keep</h2>
+    <h2 id="kHead">ייבוא מ-Google Keep</h2>
     <p class="sub" id="kSub">ב-Keep: פותחים את הפתק ← ⋮ ← <b>שליחה</b> ← <b>העתקה ללוח</b>, ומדביקים כאן. או בוחרים קובץ txt.</p>
     <textarea id="kText" placeholder="הדביקו כאן את הרשימה…" dir="auto"></textarea>
     <div class="row"><button class="btn" type="button" id="kFileBtn">📄 בחירת קובץ txt</button></div>
     <div class="f" id="kBagField" style="margin-top:12px"><span>לאיזו מזוודה?</span>
-      <div class="seg" id="kBag"><button type="button" data-bag="noga"></button><button type="button" data-bag="nir"></button></div>
+      <div class="seg" id="kBag"><button type="button" data-bag="noga"></button><button type="button" data-bag="nir"></button><button type="button" data-bag="both">שניהם</button></div>
     </div>
     <div class="kopts">
       <label><input type="checkbox" id="kTitle"> לדלג על השורה הראשונה (כותרת הפתק)</label>
@@ -418,11 +451,29 @@ body.single .add{margin-top:0}
   </div>
 </dialog>
 
+<!-- print -->
+<dialog id="printDlg">
+  <div class="dlg">
+    <h2>הדפסת הרשימה</h2>
+    <div class="f" id="pWhoF" style="margin-top:12px"><span>מה להדפיס</span>
+      <div class="seg" id="pWho"><button type="button" data-who="noga" data-bag="noga"></button><button type="button" data-who="nir" data-bag="nir"></button><button type="button" data-who="both" data-bag="both">שניהם</button></div>
+    </div>
+    <div class="f"><span>פריטים</span>
+      <div class="seg" id="pWhat"><button type="button" data-what="all">כל הפריטים</button><button type="button" data-what="left">רק מה שלא נארז</button></div>
+    </div>
+    <div class="f"><span>סדר</span>
+      <div class="seg" id="pSort"><button type="button" data-psort="cat">לפי קטגוריה</button><button type="button" data-psort="az">א–ת</button></div>
+    </div>
+    <p class="note" id="pSum"></p>
+    <div class="dfoot"><div class="row"><button class="btn main" type="button" id="pGo">הדפסה</button><button class="btn" type="button" id="pCancel">ביטול</button></div></div>
+  </div>
+</dialog>
+
 <!-- users setup -->
 <dialog id="setupDlg">
   <div class="dlg">
     <h2 id="suTitle">ברוכים הבאים ל-Packing</h2>
-    <button class="bigimport" type="button" id="suImport"><span style="font-size:24px">📥</span><span>יש כבר רשימה בטלפון השני?<span class="ds">טענו את הקובץ שקיבלתם ממנו בוואטסאפ</span></span></button>
+    <button class="bigimport" type="button" id="suImport"><span style="font-size:24px">📥</span><span><span id="suImpT">יש כבר רשימה בטלפון השני?</span><span class="ds" id="suImpD">טענו את הקובץ שקיבלתם ממנו בוואטסאפ</span></span></button>
     <div class="okbox" id="suLoaded" hidden></div>
     <div id="suNew">
       <p class="sub" id="suLead">כמה אנשים אורזים עם הרשימה?</p>
@@ -439,18 +490,30 @@ body.single .add{margin-top:0}
   </div>
 </dialog>
 
+<!-- who is who -->
+<dialog id="whoDlg">
+  <div class="dlg">
+    <h2>מי זה מי?</h2>
+    <p class="sub" id="whoText"></p>
+    <div class="row"><button class="btn main" type="button" id="whoA"></button></div>
+    <div class="row"><button class="btn main" type="button" id="whoB"></button></div>
+    <div class="row"><button class="btn" type="button" id="whoCancel">ביטול</button></div>
+  </div>
+</dialog>
+
 <!-- confirm -->
 <dialog id="confirmDlg">
   <div class="dlg">
     <h2 id="cTitle"></h2>
     <p class="sub" id="cText"></p>
     <div class="row">
-      <button class="btn danger" type="button" id="cYes"></button>
-      <button class="btn" type="button" id="cNo">ביטול</button>
+      <button class="btn" type="button" id="cNo" autofocus>ביטול</button>
+      <button class="btn dangerfill" type="button" id="cYes"></button>
     </div>
   </div>
 </dialog>
 
+<div id="printArea" aria-hidden="true"></div>
 <input type="file" id="fileIn" hidden>
 <input type="file" id="kFile" hidden>
 <div class="toast" id="toast" role="status" popover="manual"><span id="toastText"></span><button type="button" id="toastAct" hidden></button></div>
@@ -466,7 +529,7 @@ const CATS = [
 ];
 const CAT = Object.fromEntries(CATS.map(c => [c[0], {name:c[1], icon:c[2]}]));
 const BAGS = {noga: 1, nir: 1};                       // internal suitcase slots: 1 = "noga" (pink), 2 = "nir" (blue)
-const defaultUsers = () => ({count: 2, names: {noga: 'נגה', nir: 'ניר'}, ts: {count: 1, noga: 1, nir: 1}});   // lists made before names were configurable
+const defaultUsers = () => ({count: 2, names: {noga: 'נגה', nir: 'ניר'}, ts: {count: 1, noga: 1, nir: 1}, sid: '', links: {}});   // lists made before names were configurable
 const FIELDS = ['name','cat','qty','bag','packed','deleted'];
 const MAX_FILE = 5e6, MAX_ITEMS = 5000, MAX_FUTURE = 864e5 * 366;
 const ERR = Symbol('read-error');
@@ -475,7 +538,7 @@ const ERR = Symbol('read-error');
 let state = {version:3, owner:null, users:null, items:[], lastExport:null};
 const ui = {tab:'all', q:'', unpacked:false, qty:1, cat:'auto', addBag:null, dupOnly:false, sort:'cat', frozen: new Map()};
 const heSort = new Intl.Collator('he', {numeric: true, sensitivity: 'base'}).compare;
-let pendingImport = null, pendingFrom = null, pendingUsers = null;
+let pendingImport = null;          // {items, users, from, flip, first} waiting for merge/replace
 const resetOrder = () => ui.frozen.clear();
 
 const $ = s => document.querySelector(s);
@@ -484,7 +547,8 @@ const now = () => Date.now();
 const cut = (s, n) => { s = String(s).slice(0, n); return /[\uD800-\uDBFF]$/.test(s) ? s.slice(0, -1) : s; };   // never split an emoji
 const clampTs = x => { x = Number(x); return Number.isFinite(x) && x > 0 ? Math.min(x, now() + MAX_FUTURE) : 0; };
 const many = (n, one, pl) => n === 1 ? one : `${n} ${pl}`;
-const iso = s => '\u2068' + s + '\u2069';              // keep a Latin/Hebrew name from scrambling the sentence around it
+const iso = s => '\u2068' + s + '\u2069';
+const and = s => (/^[A-Za-z0-9]/.test(s) ? 'ו-' : 'ו') + iso(s);   // "ונגה", but "ו-Nir"              // keep a Latin/Hebrew name from scrambling the sentence around it
 const live = () => state.items.filter(i => !i.deleted);
 const byId = id => state.items.find(i => i.id === id);
 const find = id => { const i = byId(id); return i && !i.deleted ? i : null; };
@@ -493,23 +557,34 @@ const configured = () => !!state.users && (single() || !!state.owner);
 const nm = slot => (state.users && state.users.names[slot]) || (slot === 'noga' ? 'משתמש/ת 1' : 'משתמש/ת 2');
 const nmI = slot => iso(nm(slot));
 const flip = b => b === 'noga' ? 'nir' : 'noga';
-const defaultBag = () => single() ? 'noga' : (state.owner || 'noga');
-const curBag = () => single() ? 'noga' : (ui.addBag || defaultBag());
-function cleanUsers(u) {
+/* one-user mode belongs to this phone's owner: shows their name, and new items go to their own suitcase */
+const solo = () => state.owner || 'noga';
+const defaultBag = () => single() ? solo() : (state.owner || 'noga');
+const curBag = () => single() ? solo() : (ui.addBag || defaultBag());
+const targets = bag => single() ? [solo()] : bag === 'both' ? ['noga', 'nir'] : [bag];   // 'both' = one item in each suitcase
+const whereTo = bag => single() ? 'לרשימה' : bag === 'both' ? 'לשתי המזוודות' : 'למזוודה של ' + nmI(bag);
+/* users.sid = this list's identity (shared by phones that set up from each other's file);
+   users.links = other identities met before, and whether their two people come the other way round */
+const SID_RE = /^[A-Za-z0-9_-]{1,40}$/;
+function cleanUsers(u, local) {
   if (!u || typeof u !== 'object') return null;
   const count = u.count === 1 ? 1 : 2;
   const names = {};
   for (const k of ['noga', 'nir']) names[k] = cut(String((u.names && u.names[k]) || '').trim(), 20);
   if (!names.noga || (count === 2 && !names.nir)) return null;
   const t = u.ts && typeof u.ts === 'object' ? u.ts : {count: u.ts, noga: u.ts, nir: u.ts};
-  return {count, names, ts: {count: clampTs(t.count), noga: clampTs(t.noga), nir: names.nir ? clampTs(t.nir) : 0}};
+  const links = {};
+  if (local && u.links && typeof u.links === 'object')
+    for (const [k, v] of Object.entries(u.links).slice(0, 20)) if (SID_RE.test(k)) links[k] = !!v;
+  return {count, names, ts: {count: clampTs(t.count), noga: clampTs(t.noga), nir: names.nir ? clampTs(t.nir) : 0},
+    sid: SID_RE.test(String(u.sid || '')) ? String(u.sid) : '', links};
 }
 /* number of users and each name sync between phones separately: the newer change of each wins */
 function adoptUsers(u, force) {
   if (!u) return null;
   const L = state.users;
-  if (!L) { state.users = {count: u.count, names: {...u.names}, ts: {...u.ts}}; return {changed: true, countChanged: false}; }
-  const n = {count: L.count, names: {...L.names}, ts: {...L.ts}};
+  if (!L) { state.users = {count: u.count, names: {...u.names}, ts: {...u.ts}, sid: u.sid || uid(), links: {}}; return {changed: true, countChanged: false}; }
+  const n = {count: L.count, names: {...L.names}, ts: {...L.ts}, sid: L.sid, links: {...(L.links || {})}};
   const val = (x, f) => f === 'count' ? x.count : x.names[f];
   const wins = f => force || u.ts[f] > n.ts[f] || (u.ts[f] === n.ts[f] && String(val(u, f)) > String(val(n, f)));
   if (wins('count')) { n.count = u.count; n.ts.count = u.ts.count; }
@@ -519,18 +594,54 @@ function adoptUsers(u, force) {
   state.users = n;
   return {changed: n.count !== L.count || n.names.noga !== L.names.noga || n.names.nir !== L.names.nir, countChanged: n.count !== L.count};
 }
-/* two phones set up separately may have the two people in opposite slots: detect by names */
+/* Two phones set up separately can have the two people in opposite slots. The first time their lists meet,
+   work out who is who (by name, or by asking), then remember it — later renames can't confuse it. */
 const eqN = (a, b) => !!a && !!b && normName(a) === normName(b);
-function isSwapped(u) {
+function lineage(u) {
   const L = state.users;
-  if (!u || !L || u.count !== 2 || !L.names.nir) return false;
-  const straight = eqN(u.names.noga, L.names.noga) || eqN(u.names.nir, L.names.nir);
-  const cross = eqN(u.names.noga, L.names.nir) || eqN(u.names.nir, L.names.noga);
-  return cross && !straight;
+  if (!u || !L) return {flip: false};
+  if (u.sid && u.sid === L.sid) return {flip: false};
+  if (u.sid && L.links && Object.prototype.hasOwnProperty.call(L.links, u.sid)) return {flip: L.links[u.sid]};
+  const two = !!(u.names.nir && L.names.nir);
+  const straight = eqN(u.names.noga, L.names.noga) || (two && eqN(u.names.nir, L.names.nir));
+  const cross = two && (eqN(u.names.noga, L.names.nir) || eqN(u.names.nir, L.names.noga));
+  const flip = cross && !straight ? true : straight && !cross ? false : !two ? false : null;   // null → ask
+  return {flip, first: true};
 }
-const flipUsers = u => ({count: u.count, names: {noga: u.names.nir, nir: u.names.noga}, ts: {count: u.ts.count, noga: u.ts.nir, nir: u.ts.noga}});
+const flipUsers = u => ({...u, names: {noga: u.names.nir, nir: u.names.noga}, ts: {count: u.ts.count, noga: u.ts.nir, nir: u.ts.noga}});
+function flipLocal() {                                  // turn this phone's list around once, to match the other phone
+  state.items = state.items.map(i => ({...i, bag: flip(i.bag), ts: {...i.ts}}));
+  state.users = flipUsers(state.users);
+  if (state.owner) state.owner = flip(state.owner);
+  if (ui.addBag && ui.addBag !== 'both') ui.addBag = flip(ui.addBag);
+  if (ui.tab !== 'all') ui.tab = flip(ui.tab);
+}
+/* record what we learned; both phones end up on the identity with the smaller id. Returns the flip for the incoming file. */
+function settle(u, f) {
+  const L = state.users;
+  if (!u || !u.sid || !L) return f;
+  if (u.sid < L.sid) {
+    if (f) flipLocal();
+    const links = {};
+    for (const [k, v] of Object.entries(L.links || {})) links[k] = v !== f;
+    links[L.sid] = f;
+    state.users = {...state.users, sid: u.sid, links};
+    return false;
+  }
+  state.users = {...L, links: {...(L.links || {}), [u.sid]: f}};
+  return f;
+}
+function applyIncoming(p) {
+  let f = !!p.flip;
+  if (p.users && p.first) f = settle(p.users, f);
+  return {
+    items: f ? p.items.map(i => ({...i, bag: flip(i.bag), ts: {...i.ts}})) : p.items,
+    users: p.users && f ? flipUsers(p.users) : p.users,
+    from: p.from && f ? flip(p.from) : p.from
+  };
+}
 const normName = n => String(n).trim().replace(/\s+/g, ' ').toLowerCase();
-const dupKey = i => (single() ? '' : i.bag + '|') + normName(i.name);
+const dupKey = i => i.bag + '|' + normName(i.name);   // duplicates only within the same suitcase
 const esc = s => String(s).replace(/[&<>"']/g, c => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
 const anyDialogOpen = () => !!document.querySelector('dialog[open]');
 
@@ -585,6 +696,8 @@ const store = {
   }
 };
 const save = () => { state.savedAt = now(); return store.set('state', state); };
+/* the phone may close the app right after a tap: keep a synchronous copy too */
+const flushLocal = () => { if (store.readOnly) return; try { state.savedAt = now(); localStorage.setItem('mizvadot:state', JSON.stringify(state)); } catch {} };
 
 /* ---------- items ---------- */
 function cleanItem(it) {
@@ -626,15 +739,22 @@ function touch(it, patch) {
 function commit() { if (store.readOnly) return; save(); render(); }
 
 function addItem(name) {
-  const bag = curBag();
-  const exists = live().some(i => dupKey(i) === dupKey({bag, name}));
-  const it = newItem({name, cat: ui.cat === 'auto' ? guessCat(name) : ui.cat, qty: ui.qty, bag});
-  state.items.push(it);
+  const bag = curBag(), bags = targets(bag);
+  const cat = ui.cat === 'auto' ? guessCat(name) : ui.cat;
+  const dupBags = bags.filter(b => live().some(i => dupKey(i) === dupKey({bag: b, name})));
+  const made = bags.map(b => newItem({name, cat, qty: ui.qty, bag: b}));
+  state.items.push(...made);
   commit();
-  if (exists) {
-    toast(`⚠️ "${iso(name)}" כבר קיים ${single() ? 'ברשימה' : 'במזוודה של ' + nmI(bag)}`, 'הסר', () => { const x = byId(it.id); if (x) touch(x, {deleted: true}); commit(); });
-  } else if (!single() && ui.tab !== 'all' && ui.tab !== bag) {
+  if (dupBags.length) {
+    const where = single() ? 'ברשימה' : dupBags.length === 2 ? 'בשתי המזוודות' : 'במזוודה של ' + nmI(dupBags[0]);
+    const extra = made.filter(it => dupBags.includes(it.bag));
+    toast(`⚠️ "${iso(name)}" כבר קיים ${where}`, 'הסר', () => { extra.forEach(it => { const x = byId(it.id); if (x) touch(x, {deleted: true}); }); commit(); });
+  } else if (!single() && ui.tab !== 'all' && !bags.includes(ui.tab)) {
     toast(`נוסף למזוודה של ${nmI(bag)}`, 'הצג', () => { ui.tab = bag; render(); });
+  } else if (bags.length === 2 && ui.tab !== 'all') {
+    toast('נוסף לשתי המזוודות', 'הצג הכל', () => { ui.tab = 'all'; render(); });
+  } else {
+    toast(`נוסף${bags.length === 2 ? ' לשתי המזוודות' : ''}: "${iso(name)}" · ${CAT[cat].icon} ${CAT[cat].name}`, 'שינוי', () => openEdit(made[0].id));
   }
 }
 function removeItem(id) {
@@ -646,14 +766,13 @@ function moveItem(it, bag) {
   if (it.bag === bag) return;
   const prev = {bag: it.bag, packed: it.packed};
   touch(it, {bag, packed: false}); commit();
-  if (prev.packed) toast(`הועבר למזוודה של ${nmI(bag)} · סימון ״ארוז״ אופס`, 'בטל', () => {
+  toast(`"${iso(it.name)}" הועבר למזוודה של ${nmI(bag)}${prev.packed ? ' · סימון ״ארוז״ אופס' : ''}`, 'בטל', () => {
     const x = find(it.id); if (x) { touch(x, prev); commit(); }
   });
 }
 function togglePacked(it) {
   if (!ui.frozen.has(it.id)) ui.frozen.set(it.id, it.packed);   // keep the row where it is until the view changes
   touch(it, {packed: !it.packed}); commit();
-  if (ui.unpacked && it.packed) toast(`"${iso(it.name)}" סומן כארוז`, 'בטל', () => { const x = find(it.id); if (x) { touch(x, {packed: false}); commit(); } });
 }
 
 /* ---------- duplicates ---------- */
@@ -675,13 +794,13 @@ function render() {
   const s = stats(items);
   document.body.classList.toggle('single', single());
   if (single()) ui.tab = 'all';
-  document.querySelectorAll('[data-name]').forEach(e => e.textContent = nm(e.dataset.name));
-  document.querySelectorAll('#addBag button,#eBag button,#kBag button').forEach(b => b.textContent = nm(b.dataset.bag));
+  document.querySelectorAll('[data-name]').forEach(e => e.textContent = single() && e.dataset.name === 'noga' ? nm(solo()) : nm(e.dataset.name));
+  document.querySelectorAll('#addBag button,#eBag button,#kBag button').forEach(b => { if (b.dataset.bag !== 'both') b.textContent = nm(b.dataset.bag); });
 
   for (const b of ['noga', 'nir']) {
     const B = b === 'noga' ? 'Noga' : 'Nir';
     const n = s[b], p = s[b + 'Packed'];
-    $('#c' + B).textContent = n ? many(n, 'פריט אחד', 'פריטים') + (s[b + 'Qty'] !== n ? ` · ${s[b + 'Qty']} יח׳` : '') : 'ריקה';
+    $('#c' + B).textContent = n ? many(n, 'פריט אחד', 'פריטים') + (s[b + 'Qty'] !== n ? ` · ${s[b + 'Qty']} יחידות` : '') : 'ריקה';
     $('#p' + B).style.width = n ? (p / n * 100) + '%' : '0';
     $('#s' + B).textContent = n ? (p === n ? 'הכל ארוז ✓' : `${p} מתוך ${n} ארוזים`) : '—';
   }
@@ -691,12 +810,14 @@ function render() {
 
   const ab = curBag();
   document.querySelectorAll('#addBag button').forEach(b => b.classList.toggle('on', b.dataset.bag === ab));
-  $('#addBtn').textContent = single() ? 'הוסף' : `הוסף ל${nmI(ab)}`;
+  $('#addBtn').textContent = single() ? 'הוסף' : ab === 'both' ? 'הוסף לשניהם' : `הוסף ל${nmI(ab)}`;
   $('#addBtn').classList.toggle('noga', !single() && ab === 'noga');
   $('#addBtn').classList.toggle('one', single());
+  $('#addBtn').classList.toggle('both', !single() && ab === 'both');
   $('#addQty').textContent = ui.qty;
+  $('#searchClear').hidden = !ui.q;
   $('#ownerBtn').innerHTML = !configured() ? '<b>הגדרת משתמשים</b>'
-    : single() ? `הרשימה של <b><bdi>${esc(nm('noga'))}</bdi></b>` : `הטלפון של <b><bdi>${esc(nm(state.owner))}</bdi></b>`;
+    : single() ? `הרשימה של <b><bdi>${esc(nm(solo()))}</bdi></b>` : `הטלפון של <b><bdi>${esc(nm(state.owner))}</bdi></b>`;
 
   const host = $('#list');
   if (store.readOnly) {
@@ -712,7 +833,7 @@ function render() {
   const list = inTab.filter(i =>
     (!ui.dupOnly || dups.has(dupKey(i))) &&
     (!q || normName(i.name).includes(q)) &&
-    (!ui.unpacked || !i.packed));
+    (!ui.unpacked || !i.packed || ui.frozen.has(i.id)));   // a row just packed stays until the view changes
 
   const bar = dupCount ? `<div class="dupbar"><span>⚠️ יש <b>${dupCount}</b> פריטים כפולים ${single() ? 'ברשימה' : 'באותה מזוודה'}</span><button type="button" data-act="dup-toggle">${ui.dupOnly ? 'הצג הכל' : 'הצג כפולים'}</button></div>` : '';
 
@@ -721,6 +842,7 @@ function render() {
     const allPacked = ui.unpacked && !q && !ui.dupOnly && inTab.length && inTab.every(i => i.packed);
     host.innerHTML = bar + (allPacked
       ? `<div class="empty"><div class="big">✅</div>הכל ארוז!</div>`
+      : q ? `<div class="empty"><div class="big">🔍</div>לא נמצא "<bdi>${esc(ui.q.trim())}</bdi>"<br><button type="button" class="clr" data-act="clear-search">ניקוי החיפוש</button></div>`
       : `<div class="empty"><div class="big">🔍</div>אין פריטים כאן</div>`);
     return;
   }
@@ -791,7 +913,7 @@ let editId = null, editQty = 1, editBag = 'nir';
 function openEdit(id) {
   const it = find(id); if (!it) return;
   editId = id; editQty = it.qty; editBag = it.bag;
-  $('#eName').value = it.name; $('#eCat').value = it.cat;
+  $('#eName').value = it.name; $('#eCat').value = it.cat; $('#eErr').hidden = true;
   paintEdit(); $('#editDlg').showModal();
 }
 function paintEdit() {
@@ -799,10 +921,23 @@ function paintEdit() {
   $('#eQty').textContent = editQty;
   document.querySelectorAll('#eBag button').forEach(b => b.classList.toggle('on', b.dataset.bag === editBag));
   $('#eHint').hidden = !(it && it.packed && editBag !== it.bag);
+  const other = flip(editBag), name = $('#eName').value.trim();
+  const has = live().some(i => i.id !== editId && dupKey(i) === dupKey({bag: other, name}));
+  $('#eCopy').textContent = has ? `✓ קיים גם במזוודה של ${nmI(other)}` : `➕ להוסיף גם למזוודה של ${nmI(other)}`;
+  $('#eCopy').disabled = has || !name;
+}
+function copyToOther() {
+  const it = find(editId); const name = $('#eName').value.trim();
+  if (!it || !name) return;
+  submitEdit();                                          // keep any edits made in the dialog
+  const src = find(it.id) || it;
+  const copy = newItem({name: src.name, cat: src.cat, qty: src.qty, bag: flip(src.bag)});
+  state.items.push(copy); commit();
+  toast(`נוסף גם למזוודה של ${nmI(copy.bag)}`, 'בטל', () => { const x = byId(copy.id); if (x) touch(x, {deleted: true}); commit(); });
 }
 function submitEdit() {
   const it = find(editId); const name = $('#eName').value.trim();
-  if (!name) { $('#eName').focus(); return; }
+  if (!name) { $('#eErr').hidden = false; $('#eName').focus(); return; }
   if (it) {
     const packed = editBag === it.bag ? it.packed : false;
     touch(it, {name: cut(name, 80), cat: $('#eCat').value, qty: editQty, bag: editBag, packed});
@@ -813,10 +948,11 @@ function submitEdit() {
 
 /* ---------- export / import ---------- */
 function exportData() {
-  const data = {app: 'packing', version: 3, owner: state.owner, users: state.users, exportedAt: new Date().toISOString(), items: state.items};
+  const U = state.users && {count: state.users.count, names: state.users.names, ts: state.users.ts, sid: state.users.sid};
+  const data = {app: 'packing', version: 4, owner: state.owner, users: U, exportedAt: new Date().toISOString(), items: state.items};
   const d = new Date();
   const stamp = `${d.getFullYear()}-${String(d.getMonth() + 1).padStart(2, '0')}-${String(d.getDate()).padStart(2, '0')}`;
-  const who = single() ? nm('noga') : state.owner ? nm(state.owner) : '';
+  const who = single() ? nm(solo()) : state.owner ? nm(state.owner) : '';
   const safe = cut(who.replace(/[\\/:*?"<>|\u0000-\u001f]+/g, '').trim().replace(/\s+/g, '_'), 20);
   return {base: `packing-${safe ? safe + '-' : ''}${stamp}`, text: JSON.stringify(data)};
 }
@@ -858,18 +994,32 @@ async function readImport(file) {
   const obj = data && !Array.isArray(data) ? data : {};
   let users = cleanUsers(obj.users);
   if (!users && !obj.users && BAGS[obj.owner]) users = defaultUsers();     // file from before names were configurable
-  let from = BAGS[obj.owner] ? obj.owner : null;
-  if (isSwapped(users)) {                               // the other phone has the two people the other way round
-    items.forEach(i => { i.bag = flip(i.bag); });
-    users = flipUsers(users);
-    if (from) from = flip(from);
+  const from = BAGS[obj.owner] ? obj.owner : null;
+  const m = lineage(users);
+  if (m.flip === null) {                                 // names don't tell us who is who: ask once
+    const ans = await askWho(users);
+    if (ans === null) return;
+    m.flip = ans;
   }
-  pendingImport = items; pendingFrom = from; pendingUsers = users;
+  pendingImport = {items, users, from, flip: m.flip, first: !!m.first};
   const liveCount = items.filter(i => !i.deleted).length;
-  const fu = users || state.users;
-  const fromName = from && fu && fu.count === 2 ? fu.names[from] : '';
-  $('#importSub').textContent = `בקובץ${fromName ? ' מהטלפון של ' + iso(fromName) : ''}: ${many(liveCount, 'פריט אחד', 'פריטים')}. בטלפון הזה: ${many(live().length, 'פריט אחד', 'פריטים')}.`;
+  const fromName = from && users && users.count === 2 ? users.names[from] : '';
+  const here = live().length;
+  $('#importSub').textContent = `בקובץ${fromName ? ' מהטלפון של ' + iso(fromName) : ''}: ${many(liveCount, 'פריט אחד', 'פריטים')}. ` + (here ? `בטלפון הזה: ${many(here, 'פריט אחד', 'פריטים')}.` : 'בטלפון הזה עדיין אין פריטים.');
   $('#importDlg').showModal();
+}
+function askWho(u) {
+  return new Promise(res => {
+    const L = state.users, d = $('#whoDlg');
+    $('#whoText').textContent = `ברשימה שהגיעה השמות הם ${iso(u.names.noga)} ${and(u.names.nir)}, ובטלפון הזה ${iso(L.names.noga)} ${and(L.names.nir)}. מי מהם הוא ${iso(L.names.noga)}?`;
+    $('#whoA').textContent = u.names.noga; $('#whoB').textContent = u.names.nir;
+    let done = false; const fin = v => { if (!done) { done = true; res(v); } };
+    $('#whoA').onclick = () => { fin(false); d.close(); };
+    $('#whoB').onclick = () => { fin(true); d.close(); };
+    $('#whoCancel').onclick = () => { fin(null); d.close(); };
+    d.addEventListener('close', () => fin(null), {once: true});
+    d.showModal();
+  });
 }
 /* per-field merge: the newer change of each field wins */
 function mergeFields(cur, it) {
@@ -902,18 +1052,23 @@ function mergeItems(incoming) {
 
 /* ---------- Google Keep import ---------- */
 const KEYWORDS = {
-  clothes: ['חולצ','מכנס','תחתונ','גרב','חזיי','שמל','חצאית','סווטשירט','סוודר','מעיל','ג׳קט',"ג'קט",'גקט','פיג׳מ',"פיג'מ",'פיגמ','בגד','כובע','צעיף','כפפ','טייץ','גופי','חליפ','עניב','ז׳קט',"ז'קט",'קפוצ','טרנינג','ברמוד','ג׳ינס',"ג'ינס",'גינס','חגור','shirt','pants','sock','jacket','coat','dress','jeans','hoodie','sweater','underwear','hat'],
+  clothes: ['חולצ','מכנס','תחתונ','גרב','חזיי','חזיות','שמל','חצאית','סווטשירט','סוודר','מעיל','ג׳קט',"ג'קט",'גקט','פיג׳מ',"פיג'מ",'פיגמ','בגד','כובע','צעיף','כפפ','טייץ','גופי','חליפ','עניב','ז׳קט',"ז'קט",'קפוצ','טרנינג','ברמוד','שורט','ביקיני','ג׳ינס',"ג'ינס",'גינס','חגור','shirt','tshirt','sweatshirt','shorts','pants','sock','jacket','coat','dress','jeans','hoodie','sweater','underwear','bikini','swimsuit','hat'],
   shoes: ['נעל','סנדל','כפכפ','מגפ','shoe','sandal','boot','sneaker','slipper'],
-  toiletries: ['מברשת','משחת','שמפו','מרכך','סבון','דאודורנט','בושם','קרם','איפור','מגבת','מגבו','משקפ','מסקרה','שפתון','גילוח','תער','מסרק','חוט דנטלי','קיסמי','ספוג','לחות','הגנה','מקלחת','toothbrush','toothpaste','shampoo','soap','deodorant','razor','cream','lotion','sunscreen','makeup'],
-  meds: ['תרופ','כדור','אקמול','אדוויל','נורופן','פלסטר','ויטמינ','משכך','מרשם','אנטיהיסטמין','טיפות','med','pill','vitamin','aspirin','tylenol','advil','ibuprofen','bandaid'],
-  electronics: ['מטען','כבל','אוזני','טלפון','מחשב','לפטופ','טאבלט','אייפד','מצלמ','סוללה','סוללת','מתאם','שעון','קינדל','פן','מייבש','מחליק','מפצל','power bank','charger','cable','adapter','laptop','camera','headphone','earbud','airpods','ipad','kindle','tablet','phone','battery'],
-  docs: ['דרכון','ויזה','כרטיס','ביטוח','רישיון','תעוד','מסמכ','אשרה','ארנק','כסף','מזומן','אשראי','הזמנ','שובר','passport','visa','ticket','insurance','license','wallet','cash','booking']
+  toiletries: ['מברשת','משחת','שמפו','מרכך','סבון','דאודורנט','דיאודורנט','בושם','קרם','איפור','מגבת','מגבו','מגבונ','מסקרה','שפתון','גילוח','תער','מסרק','חוט דנטלי','קיסמי','ספוג','לחות','קרם הגנה','הגנה מהשמש','מקלחת','רחצה','טישו','טמפונ','אטמי','עדשות','תמיס','toothbrush','toothpaste','shampoo','soap','deodorant','razor','cream','lotion','sunscreen','makeup','towel'],
+  meds: ['תרופ','כדורים','כדורי ','אקמול','אדוויל','נורופן','פלסטר','ויטמינ','משכך','מרשם','אנטיהיסטמין','טיפות','גלול','משחה','מדחום','עזרה ראשונה','meds','medicine','medication','pill','vitamin','aspirin','tylenol','advil','ibuprofen','bandaid','band-aid','plaster'],
+  electronics: ['מטען','כבל','אוזניות','אוזניה','טלפון','אייפון','מחשב','לפטופ','טאבלט','אייפד','מצלמ','סולל','מתאם','ממיר','שעון','קינדל','פנס','זיכרון','סים','רמקול','פאוור','מייבש','מחליק','מפצל','power bank','powerbank','charger','cable','adapter','laptop','camera','headphone','earphone','earbud','airpods','iphone','ipad','kindle','tablet','phone','battery','batteries','speaker','sim'],
+  docs: ['דרכון','ויזה','כרטיס','ביטוח','רישיון','רשיון','תעוד','מסמכ','אשרה','ארנק','כסף','מזומן','אשראי','הזמנ','שובר','passport','visa','ticket','insurance','license','wallet','cash','booking','credit card']
 };
 const finals = s => s.toLowerCase().replace(/[ךםןףץ]/g, c => ({'ך':'כ','ם':'מ','ן':'נ','ף':'פ','ץ':'צ'}[c]));
-const KW = Object.entries(KEYWORDS).map(([cat, ws]) => [cat, ws.map(finals)]);
+const reEsc = s => s.replace(/[.*+?^${}()|[\]\\]/g, '\\$&');
+/* a keyword counts only at the start of a word (after up to two Hebrew prefix letters: ו ה ב ל מ ש כ),
+   so "חשמל" is not "שמלה" and "פנים" is not "פן" */
+const KW = Object.entries(KEYWORDS).map(([cat, ws]) => [cat, ws.map(w => /^[a-z]/.test(w)
+  ? new RegExp('(?:^|[^\\p{L}])' + reEsc(w) + '(?:e?s)?(?![a-z])', 'u')               // English: whole word (+ plural)
+  : new RegExp('(?:^|[^\\p{L}])[והבלמשכ]{0,2}' + reEsc(finals(w)), 'u'))]);
 function guessCat(name) {
-  const n = finals(name);                           // "דרכון" must also match "דרכונים"
-  for (const [cat, words] of KW) if (words.some(w => n.includes(w))) return cat;
+  const n = finals(name).replace(/\s+/g, ' ');      // "דרכון" must also match "דרכונים"
+  for (const [cat, res] of KW) if (res.some(r => r.test(n))) return cat;
   return 'other';
 }
 const MARK = /^\s*(?:\[\s*([xX✓✔])?\s*\]|([☐□○◻⬜•·▪◦●■\-–—*+>])|([☑☒✓✔✅]))\s*/;
@@ -944,11 +1099,12 @@ function titleLooksLikeHeader(text) {
   return !MARK.test(lines[0]) && lines.slice(1).some(l => MARK.test(l));
 }
 const keep = {bag: null, rows: []};
-function openKeep(prefill, title) {
+function openKeep(prefill, title, sub) {
   keep.bag = curBag();
+  $('#kHead').textContent = sub ? 'ייבוא רשימה' : 'ייבוא מ-Google Keep';
   $('#kText').value = prefill || '';
   $('#kTitle').checked = prefill ? (!title && titleLooksLikeHeader(prefill)) : false;
-  $('#kSub').innerHTML = title
+  $('#kSub').innerHTML = sub ? esc(sub) : title
     ? `מתוך הפתק <b>${esc(title)}</b>. בדקו את הרשימה ובחרו מזוודה.`
     : 'ב-Keep: פותחים את הפתק ← ⋮ ← <b>שליחה</b> ← <b>העתקה ללוח</b>, ומדביקים כאן. או בוחרים קובץ txt.';
   paintKeep();
@@ -959,32 +1115,33 @@ function paintKeep() {
   const rows = parseKeep($('#kText').value, $('#kTitle').checked);
   const existing = new Set(live().map(dupKey));
   const skipOn = $('#kSkip').checked;
-  rows.forEach(r => r.skip = skipOn && existing.has(dupKey({bag: keep.bag, name: r.name})));
+  const bags = targets(keep.bag);
+  rows.forEach(r => { r.bags = bags.filter(b => !(skipOn && existing.has(dupKey({bag: b, name: r.name})))); r.skip = !r.bags.length; });
   keep.rows = rows;
-  const n = rows.filter(r => !r.skip).length, sk = rows.length - n;
+  const n = rows.reduce((a, r) => a + r.bags.length, 0), sk = rows.length * bags.length - n;
   const d = rows.dupLines || 0;
   $('#kCount').textContent = rows.length
     ? (rows.length === 1 ? 'נמצא פריט אחד' : `נמצאו ${rows.length} פריטים`)
+      + (bags.length === 2 && n ? ` · ${n === 1 ? 'יתווסף אחד' : n + ' יתווספו'} לשתי המזוודות` : '')
       + (sk ? ' · ' + (sk === 1 ? 'אחד כבר קיים וידולג' : `${sk} כבר קיימים וידולגו`) : '')
       + (d ? ' · ' + (d === 1 ? 'שורה כפולה אחת בפתק' : `${d} שורות כפולות בפתק`) : '')
     : ($('#kText').value.trim() ? 'לא נמצאו פריטים' : '');
   $('#kPrev').hidden = !rows.length;
   $('#kPrev').innerHTML = rows.map(r =>
-    `<div class="${r.skip ? 'skip' : ''}"><span>${CAT[r.cat].icon}</span><span dir="auto">${esc(r.name)}${r.qty > 1 ? ` ×${r.qty}` : ''}${r.checked ? ' ✓' : ''}</span></div>`).join('');
+    `<div class="${r.skip ? 'skip' : ''}"><span>${CAT[r.cat].icon}</span><span dir="auto">${esc(r.name)}${r.qty > 1 ? ` ×${r.qty}` : ''}${r.checked ? ' ✓' : ''}${bags.length === 2 && r.bags.length === 1 ? ` <small>(רק ל${esc(nm(r.bags[0]))})</small>` : ''}</span></div>`).join('');
   $('#kGo').disabled = !n;
   $('#kGo').textContent = !n ? 'ייבוא' : n === 1 ? 'ייבוא פריט אחד' : `ייבוא ${n} פריטים`;
 }
 function doKeepImport() {
   const markPacked = $('#kChecked').checked;
-  const add = keep.rows.filter(r => !r.skip);
   const ids = [];
-  for (const r of add) {
-    const it = newItem({name: r.name, cat: r.cat, qty: r.qty, bag: keep.bag, packed: markPacked && r.checked});
+  for (const r of keep.rows) for (const b of r.bags) {
+    const it = newItem({name: r.name, cat: r.cat, qty: r.qty, bag: b, packed: markPacked && r.checked});
     state.items.push(it); ids.push(it.id);
   }
   $('#keepDlg').close();
   ui.tab = 'all'; resetOrder(); commit();
-  toast(`${ids.length === 1 ? 'נוסף פריט אחד' : `נוספו ${ids.length} פריטים`} ${single() ? 'לרשימה' : 'למזוודה של ' + nmI(keep.bag)}`, 'בטל', () => {
+  toast(`${ids.length === 1 ? 'נוסף פריט אחד' : `נוספו ${ids.length} פריטים`} ${whereTo(keep.bag)}`, 'בטל', () => {
     ids.forEach(id => { const x = byId(id); if (x && !x.deleted) touch(x, {deleted: true}); }); commit();
   });
 }
@@ -1007,11 +1164,25 @@ function bind() {
   document.querySelectorAll('textarea.one').forEach(el => {
     const enter = () => el.dispatchEvent(new CustomEvent('enter'));
     el.addEventListener('keydown', e => { if (e.key === 'Enter' && !e.isComposing) { e.preventDefault(); enter(); } });
-    el.addEventListener('beforeinput', e => { if (e.inputType === 'insertLineBreak' || e.inputType === 'insertParagraph') { e.preventDefault(); enter(); } });
+    el.addEventListener('beforeinput', e => {
+      const d = e.data || (e.dataTransfer && e.dataTransfer.getData('text/plain')) || '';
+      if (e.inputType === 'insertLineBreak' || e.inputType === 'insertParagraph' || (e.inputType === 'insertText' && d === '\n')) { e.preventDefault(); enter(); return; }
+      if (/[\r\n]/.test(d) && !el.dispatchEvent(new CustomEvent('multiline', {detail: d, cancelable: true}))) e.preventDefault();
+    });
     el.addEventListener('input', () => { if (/[\r\n]/.test(el.value)) el.value = el.value.replace(/[\r\n]+/g, ' '); });
   });
   $('#addName').addEventListener('enter', submitAdd);
+  // a pasted list (one item per line, e.g. from WhatsApp) goes to the list import instead of becoming one item
+  const pastedList = t => {
+    if (String(t).split(/\r?\n/).map(x => x.trim()).filter(Boolean).length < 2) return false;
+    openKeep(t, '', 'זיהינו רשימה — כל שורה תהיה פריט נפרד. בדקו ולחצו ייבוא.'); return true;
+  };
+  $('#addName').addEventListener('paste', e => { const t = e.clipboardData && e.clipboardData.getData('text'); if (t && pastedList(t)) e.preventDefault(); });
+  $('#addName').addEventListener('multiline', e => { if (pastedList(e.detail)) e.preventDefault(); });
   $('#search').addEventListener('enter', () => $('#search').blur());
+  const clearSearch = () => { $('#search').value = ''; ui.q = ''; resetOrder(); render(); };
+  $('#searchClear').addEventListener('click', clearSearch);
+  $('#search').addEventListener('keydown', e => { if (e.key === 'Escape') clearSearch(); });
   // keep the phone keyboard open while tapping these
   document.querySelectorAll('#addBtn,.stepper button,#addBag button').forEach(b => b.addEventListener('pointerdown', e => e.preventDefault()));
   document.querySelectorAll('#addBag button').forEach(b => b.addEventListener('click', () => { ui.addBag = b.dataset.bag; render(); }));
@@ -1026,6 +1197,7 @@ function bind() {
 
   $('#list').addEventListener('click', e => {
     if (e.target.closest('[data-act="dup-toggle"]')) { ui.dupOnly = !ui.dupOnly; resetOrder(); render(); return; }
+    if (e.target.closest('[data-act="clear-search"]')) { $('#searchClear').click(); return; }
     const row = e.target.closest('.item'); if (!row) return;
     const it = find(row.dataset.id); if (!it) return;
     const bagBtn = e.target.closest('.seg button');
@@ -1039,19 +1211,29 @@ function bind() {
     editQty = Math.min(99, Math.max(1, editQty + +b.dataset.estep)); paintEdit();
   }));
   document.querySelectorAll('#eBag button').forEach(b => b.addEventListener('click', () => { editBag = b.dataset.bag; paintEdit(); }));
+  $('#eCopy').addEventListener('click', copyToOther);
+  // print options
+  document.querySelectorAll('#pWho button').forEach(b => b.addEventListener('click', () => { pr.who = b.dataset.who; paintPrint(); }));
+  document.querySelectorAll('#pWhat button').forEach(b => b.addEventListener('click', () => { pr.what = b.dataset.what; paintPrint(); }));
+  document.querySelectorAll('#pSort button').forEach(b => b.addEventListener('click', () => { pr.sort = b.dataset.psort; paintPrint(); }));
+  $('#pGo').addEventListener('click', doPrint);
+  $('#pCancel').addEventListener('click', () => $('#printDlg').close());
+  $('#eName').addEventListener('input', paintEdit);
   $('#eSave').addEventListener('click', submitEdit);
   $('#eName').addEventListener('enter', submitEdit);
   $('#eCancel').addEventListener('click', () => $('#editDlg').close());
+  $('#eX').addEventListener('click', () => $('#editDlg').close());
+  $('#eName').addEventListener('input', () => { $('#eErr').hidden = true; });
   $('#eDelete').addEventListener('click', () => { $('#editDlg').close(); removeItem(editId); });
 
   // settings
   $('#menuBtn').addEventListener('click', () => {
     $('#menuSub').textContent = `${many(live().length, 'פריט אחד', 'פריטים')} בטלפון הזה · ` +
-      (state.lastExport ? 'נשלח/נשמר לאחרונה: ' + new Date(state.lastExport).toLocaleString('he-IL', {dateStyle: 'short', timeStyle: 'short'}) : 'עדיין לא נשלח ולא נשמר גיבוי');
+      (state.lastExport ? (single() ? 'גיבוי אחרון: ' : 'נשלח/נשמר לאחרונה: ') + new Date(state.lastExport).toLocaleString('he-IL', {dateStyle: 'short', timeStyle: 'short'}) : single() ? 'עדיין לא נשמר גיבוי' : 'עדיין לא נשלח ולא נשמר גיבוי');
     $('#syncSect').textContent = single() ? 'גיבוי' : 'סנכרון עם הטלפון השני';
     $('#importLbl').textContent = single() ? 'שחזור מגיבוי' : 'קבלת קובץ';
     $('#importDs').textContent = single() ? 'פתיחת קובץ גיבוי ששמרת' : 'מהטלפון השני, או שחזור מגיבוי';
-    $('#usersInfo').textContent = !state.users ? '' : single() ? `משתמש אחד: ${nmI('noga')} · אפשר לעבור לשניים` : `${nmI('noga')} ו${nmI('nir')} · הטלפון הזה של ${nmI(state.owner)}`;
+    $('#usersInfo').textContent = !state.users ? '' : single() ? `משתמש אחד: ${nmI(solo())} · אפשר לעבור לשניים` : `${nmI('noga')} ${and(nm('nir'))} · הטלפון הזה של ${nmI(state.owner)}`;
     paintTheme();
     $('#menuDlg').showModal();
   });
@@ -1065,6 +1247,7 @@ function bind() {
     else if (act === 'download') downloadFile();
     else if (act === 'import') { $('#fileIn').value = ''; $('#fileIn').click(); }
     else if (act === 'keep') openKeep('');
+    else if (act === 'print') openPrint();
     else if (act === 'unpack') {
       const packed = live().filter(i => i.packed);
       if (!packed.length) { toast('אין פריטים מסומנים כארוזים'); return; }
@@ -1085,7 +1268,7 @@ function bind() {
   });
   // users setup
   $('#ownerBtn').addEventListener('click', () => openSetup(!configured()));
-  document.querySelectorAll('#suCount button').forEach(b => b.addEventListener('click', () => { su.count = +b.dataset.count; paintSetup(); }));
+  document.querySelectorAll('#suCount button').forEach(b => b.addEventListener('click', () => { su.count = +b.dataset.count; fillSetupNames(); paintSetup(); }));
   document.querySelectorAll('#suOwner button').forEach(b => b.addEventListener('click', () => { su.owner = b.dataset.owner; paintSetup(); }));
   ['#suName1', '#suName2'].forEach(id => $(id).addEventListener('input', paintSetup));
   $('#suName1').addEventListener('enter', () => { if (!$('#suF2').hidden) $('#suName2').focus(); else saveSetup(); });
@@ -1098,7 +1281,9 @@ function bind() {
 
   // file import
   $('#fileIn').addEventListener('change', e => { const f = e.target.files[0]; if (f) readImport(f); });
-  const runMerge = (items, users, from) => {
+  const runMerge = (p) => {
+    const dupsBefore = dupKeys(live()).size;
+    const {items, users, from} = applyIncoming(p);
     const r = mergeItems(items);
     const u = adoptUsers(users);
     resetOrder(); commit();
@@ -1111,7 +1296,7 @@ function bind() {
     if (r.skipped) msg += ' · ' + many(r.skipped, 'פריט אחד מהקובץ נמחק כאן קודם ולא הוחזר', 'פריטים מהקובץ נמחקו כאן קודם ולא הוחזרו');
     if (u && u.countChanged) msg += single() ? ' · עברנו לרשימה אחת, כמו בטלפון השני' : ' · עברנו לשני משתמשים, כמו בטלפון השני';
     else if (u && u.changed && state.owner) msg += ' · שמות המשתמשים עודכנו';
-    if (dupKeys(live()).size) msg += ' · ⚠️ נמצאו כפילויות';
+    if (dupKeys(live()).size > dupsBefore) msg += ' · ⚠️ נמצאו כפילויות';
     afterImport(msg, from);
   };
   /* after loading a file: if this phone still needs setup, show it there; otherwise a toast */
@@ -1123,40 +1308,44 @@ function bind() {
     refreshSetupFromState();
   };
   $('#iMerge').addEventListener('click', () => {
-    const items = pendingImport, users = pendingUsers, from = pendingFrom; $('#importDlg').close();
-    if (items) runMerge(items, users, from);
+    const p = pendingImport; $('#importDlg').close();
+    if (p) runMerge(p);
   });
 
-  let replaceItems = null, replaceUsers = null, replaceFrom = null;
+  let replaceP = null;
   $('#iReplace').addEventListener('click', () => {
-    const items = pendingImport, from = pendingFrom, users = pendingUsers;
+    const p = pendingImport;
     $('#importDlg').close();
-    if (!items) return;
+    if (!p) return;
+    const {items, users, from} = p;
     const fileLive = items.filter(i => !i.deleted);
     if (!fileLive.length) { toast('הקובץ ריק — לא הוחלף דבר'); return; }
     const fileById = new Map(items.map(i => [i.id, i]));
     const here = live();
     const onlyHere = here.filter(i => { const f = fileById.get(i.id); return !f || f.deleted; }).length;
     const newerHere = here.filter(i => { const f = fileById.get(i.id); return f && !f.deleted && i.updatedAt > f.updatedAt; }).length;
-    const lines = [`הרשימה עכשיו: <b>${many(here.length, 'פריט אחד', 'פריטים')}</b> · בקובץ: ${many(fileLive.length, 'פריט אחד', 'פריטים')}`];
+    const lines = [`הרשימה עכשיו: <span class="nb">${many(here.length, 'פריט אחד', 'פריטים')}</span> · בקובץ: ${many(fileLive.length, 'פריט אחד', 'פריטים')}`];
     if (onlyHere) lines.push(`<b>${many(onlyHere, 'פריט אחד שנמצא רק בטלפון הזה יימחק', 'פריטים שנמצאים רק בטלפון הזה יימחקו')}</b>`);
     if (newerHere) lines.push(`<b>${many(newerHere, 'פריט אחד ששינית כאן אחרי שהקובץ נשמר יחזור לגרסה הישנה', 'פריטים ששינית כאן אחרי שהקובץ נשמר יחזרו לגרסה הישנה')}</b> (מזוודה, ״ארוז״, שם)`);
     if (!onlyHere && !newerHere) lines.push('לפי הבדיקה לא יאבד שום פריט — אבל מיזוג עדיין בטוח יותר');
     $('#rList').innerHTML = lines.map(l => `<li>${l}</li>`).join('');
     const fu = users || state.users;
-    const other = from && from !== state.owner && fu && fu.count === 2;
+    const mine = p.flip && state.owner ? flip(state.owner) : state.owner;
+    const other = from && from !== mine && fu && fu.count === 2;
     $('#rFrom').hidden = !other;
     if (other) $('#rFrom').textContent = `הקובץ הזה הגיע מהטלפון של ${iso(fu.names[from])} — כנראה התכוונת למיזוג.`;
-    replaceItems = items; replaceUsers = users; replaceFrom = from;
+    replaceP = p;
     $('#replaceDlg').showModal();
   });
-  $('#rMerge').addEventListener('click', () => { const items = replaceItems, users = replaceUsers, from = replaceFrom; $('#replaceDlg').close(); if (items) runMerge(items, users, from); });
+  $('#rMerge').addEventListener('click', () => { const p = replaceP; $('#replaceDlg').close(); if (p) runMerge(p); });
   $('#rReplace').addEventListener('click', () => {
-    const items = replaceItems, users = replaceUsers, from = replaceFrom;   // captured before close() clears them
+    const p = replaceP;                                  // captured before close() clears it
     $('#replaceDlg').close();
-    if (!items) return;
+    if (!p) return;
     const before = state.items, beforeUsers = state.users, beforeOwner = state.owner;
+    let from = null;
     try {
+      const inc = applyIncoming(p); const items = inc.items, users = inc.users; from = inc.from;
       if (users) adoptUsers(users, true);
       state.items = items;
     } catch (e) {
@@ -1167,9 +1356,9 @@ function bind() {
     afterImport('הרשימה הוחלפה בקובץ', from, () => { state.items = before; state.users = beforeUsers; state.owner = beforeOwner; resetOrder(); commit(); toast('ההחלפה בוטלה — הרשימה הקודמת חזרה'); });
   });
   $('#rCancel').addEventListener('click', () => $('#replaceDlg').close());
-  $('#replaceDlg').addEventListener('close', () => { replaceItems = null; replaceUsers = null; replaceFrom = null; });
+  $('#replaceDlg').addEventListener('close', () => { replaceP = null; });
   $('#iCancel').addEventListener('click', () => $('#importDlg').close());
-  $('#importDlg').addEventListener('close', () => { pendingImport = null; pendingFrom = null; pendingUsers = null; });
+  $('#importDlg').addEventListener('close', () => { pendingImport = null; });
 
   // Google Keep
   $('#kText').addEventListener('input', () => {
@@ -1194,17 +1383,20 @@ function bind() {
 
   // another window (installed app + browser tab) may have saved: reload when we come back
   document.addEventListener('visibilitychange', async () => {
-    if (document.hidden || store.readOnly || store.failed || anyDialogOpen()) return;
+    if (document.hidden) { flushLocal(); return; }
+    if (store.readOnly || store.failed || anyDialogOpen()) return;
     resetOrder();
     const saved = await store.get('state');
     if (saved && saved !== ERR && Array.isArray(saved.items)) {
       state.items = saved.items.map(cleanItem).filter(Boolean);
       if (BAGS[saved.owner]) state.owner = saved.owner;
-      const su2 = cleanUsers(saved.users); if (su2) state.users = su2;
+      const su2 = cleanUsers(saved.users, true); if (su2) state.users = su2;
       state.lastExport = saved.lastExport || state.lastExport;
       render();
     }
   });
+
+  window.addEventListener('pagehide', flushLocal);
 
   // the list couldn't be read: block every action so nothing looks saved when it isn't
   document.addEventListener('click', e => {
@@ -1221,6 +1413,61 @@ function bind() {
   });
 }
 
+/* ---------- print ---------- */
+const pr = {who: 'both', what: 'all', sort: 'cat'};
+const printBags = () => single() ? ['noga'] : pr.who === 'both' ? ['noga', 'nir'].filter(b => live().some(i => i.bag === b)) : [pr.who];
+const printItems = b => live().filter(i => (single() || i.bag === b) && (pr.what === 'all' || !i.packed));
+function openPrint() {
+  pr.who = single() ? 'noga' : 'both'; pr.what = 'all'; pr.sort = ui.sort;
+  document.querySelectorAll('#pWho button').forEach(b => { if (b.dataset.who !== 'both') b.textContent = nm(b.dataset.who); });
+  paintPrint(); $('#printDlg').showModal();
+}
+function paintPrint() {
+  document.querySelectorAll('#pWho button').forEach(b => b.classList.toggle('on', b.dataset.who === pr.who));
+  document.querySelectorAll('#pWhat button').forEach(b => b.classList.toggle('on', b.dataset.what === pr.what));
+  document.querySelectorAll('#pSort button').forEach(b => b.classList.toggle('on', b.dataset.psort === pr.sort));
+  const bags = printBags(), n = bags.reduce((a, b) => a + printItems(b).length, 0);
+  $('#pSum').textContent = (n ? many(n, 'פריט אחד', 'פריטים') : (pr.what === 'left' ? 'הכל כבר ארוז ✓' : 'אין פריטים'))
+    + (bags.length === 2 ? ' · כל מזוודה בעמוד נפרד' : '')
+    + ' · במסך ההדפסה אפשר לבחור מדפסת או ״שמירה כ-PDF״';
+  $('#pGo').disabled = !n;
+}
+function buildPrint() {
+  const date = new Date().toLocaleDateString('he-IL', {day: 'numeric', month: 'long', year: 'numeric'});
+  const row = i => `<div class="prow"><span class="pbox">${i.packed ? '✓' : ''}</span><span class="pname" dir="auto">${esc(i.name)}</span>${i.qty > 1 ? `<span class="pqty">×${i.qty}</span>` : ''}</div>`;
+  return printBags().map(b => {
+    const all = live().filter(i => single() || i.bag === b);
+    const items = printItems(b).sort((x, y) => heSort(x.name, y.name));
+    const packedN = all.filter(i => i.packed).length;
+    const who = single() ? `הרשימה של <bdi>${esc(nm(solo()))}</bdi>` : `המזוודה של <bdi>${esc(nm(b))}</bdi>`;
+    const count = pr.what === 'all'
+      ? `${many(all.length, 'פריט אחד', 'פריטים')} · ${packedN ? many(packedN, 'אחד ארוז', 'ארוזים') : 'עוד לא נארז כלום'}`
+      : items.length ? `${many(items.length, 'פריט אחד שעוד לא נארז', 'פריטים שעוד לא נארזו')}, מתוך ${all.length}` : `הכל ארוז ✓ · ${many(all.length, 'פריט אחד', 'פריטים')}`;
+    let body = '';
+    if (!items.length) body = `<p class="pempty">${pr.what === 'left' ? 'הכל ארוז ✓' : 'אין פריטים'}</p>`;
+    else if (pr.sort === 'az') body = items.map(row).join('');
+    else for (const [key, name, icon] of CATS) {
+      const g = items.filter(i => i.cat === key);
+      if (g.length) body += `<h2>${icon} ${name} · ${g.length}</h2>${g.map(row).join('')}`;
+    }
+    return `<section class="psheet"><header><div class="ptag">Packing — רשימת אריזה</div><h1>${who}</h1><div class="pmeta">${date} · ${count}</div></header><div class="pbody">${body}</div></section>`;
+  }).join('');
+}
+/* also when printing from Chrome's own menu: always print the current list, and name the PDF */
+let titleBefore = null;
+window.addEventListener('beforeprint', () => {
+  $('#printArea').innerHTML = buildPrint();
+  if (titleBefore === null) titleBefore = document.title;
+  const who = single() ? nm(solo()) : printBags().map(nm).join(' ו');
+  document.title = `Packing – ${who} – ${new Date().toLocaleDateString('he-IL')}`.replace(/[\\/:*?"<>|]/g, '.');
+});
+window.addEventListener('afterprint', () => { if (titleBefore !== null) document.title = titleBefore; titleBefore = null; $('#printArea').innerHTML = ''; });
+function doPrint() {
+  $('#printArea').innerHTML = buildPrint();
+  $('#printDlg').close();
+  setTimeout(() => { try { window.print(); } catch { toast('ההדפסה לא נתמכת כאן'); } }, 60);
+}
+
 /* ---------- users setup ---------- */
 const su = {count: 2, owner: null, first: false, fresh: true, loaded: null};
 function openSetup(first) {
@@ -1229,19 +1476,26 @@ function openSetup(first) {
   refreshSetupFromState();
   if (!$('#setupDlg').open) $('#setupDlg').showModal();
 }
+function fillSetupNames() {
+  const u = state.users; if (!u) return;
+  if (su.count === 1) { $('#suName1').value = u.names[state.owner || 'noga'] || u.names.noga; $('#suName2').value = ''; }
+  else { $('#suName1').value = u.names.noga; $('#suName2').value = u.names.nir || ''; }
+}
 function refreshSetupFromState() {
   const u = state.users;
   su.fresh = !u;
   su.count = u ? u.count : (su.count || 2);
   if (state.owner) su.owner = state.owner;
   else if (su.loaded && su.loaded.from && u && u.count === 2) su.owner = flip(su.loaded.from);   // the other phone's person isn't you
-  if (u) { $('#suName1').value = u.names.noga; $('#suName2').value = u.names.nir || ''; }
+  fillSetupNames();
   paintSetup();
 }
 function paintSetup() {
   const two = su.count === 2, L = su.loaded, prev = state.users;
   $('#suTitle').textContent = L ? 'כמעט סיימנו' : su.first ? 'ברוכים הבאים ל-Packing' : 'משתמשים';
   $('#suImport').hidden = !(su.first && su.fresh && !L);
+  $('#suImpT').textContent = two ? 'יש כבר רשימה בטלפון השני?' : 'יש לך קובץ גיבוי?';
+  $('#suImpD').textContent = two ? 'טענו את הקובץ שקיבלתם ממנו בוואטסאפ' : 'פתיחת קובץ גיבוי ששמרת';
   $('#suLoaded').hidden = !L;
   if (L) $('#suLoaded').textContent = `✓ הרשימה נטענה — ${many(L.n, 'פריט אחד', 'פריטים')}.` + (two ? ' נשאר רק לבחור מי את/ה:' : ' אפשר לשמור.');
   $('#suNew').hidden = !!L;
@@ -1276,14 +1530,15 @@ function saveSetup() {
     : '';
   if (err) { $('#suErr').textContent = '⚠️ ' + err; $('#suErr').hidden = false; return; }
   const prev = state.users;
-  const names = {noga: n1, nir: two ? n2 : (prev ? prev.names.nir : '')};
+  const me = state.owner || 'noga';
+  const names = two ? {noga: n1, nir: n2} : prev ? {...prev.names, [me]: n1} : {noga: n1, nir: ''};
   const base = prev ? Math.max(prev.ts.count, prev.ts.noga, prev.ts.nir) : 0;
   const t = Math.max(now(), base + 1);
   const ts = prev ? {...prev.ts} : {count: 0, noga: 0, nir: 0};
   if (!prev || prev.count !== su.count) ts.count = t;
   if (!prev || prev.names.noga !== names.noga) ts.noga = t;
   if (names.nir && (!prev || prev.names.nir !== names.nir)) ts.nir = t;
-  state.users = {count: su.count, names, ts};
+  state.users = {count: su.count, names, ts, sid: prev && prev.sid ? prev.sid : uid(), links: prev ? {...(prev.links || {})} : {}};
   if (two) state.owner = su.owner;                       // items keep their suitcase, so going back to two users restores the split
   ui.addBag = two ? state.owner : 'noga'; ui.tab = 'all';
   su.loaded = null;
@@ -1293,7 +1548,7 @@ function saveSetup() {
 
 function paintTheme() {
   document.querySelectorAll('[data-sort-set]').forEach(b => b.classList.toggle('on', b.dataset.sortSet === ui.sort));
-  $('#sortInfo').textContent = ui.sort === 'az' ? 'רשימה אחת לפי א–ב, בלי קבוצות' : 'בקבוצות לפי קטגוריה, הארוזים יורדים למטה';
+  $('#sortInfo').textContent = ui.sort === 'az' ? 'רשימה אחת לפי א–ת, בלי קבוצות' : 'בקבוצות לפי קטגוריה, הארוזים יורדים למטה';
   const m = PackingTheme.mode(), inf = PackingTheme.info();
   document.querySelectorAll('[data-theme-set]').forEach(b => b.classList.toggle('on', b.dataset.themeSet === m));
   $('#themeInfo').textContent = m === 'auto'
@@ -1312,7 +1567,8 @@ async function init() {
     store.readOnly = true;                       // don't overwrite a list we couldn't read
   } else if (saved && Array.isArray(saved.items)) {
     state.owner = BAGS[saved.owner] ? saved.owner : null;
-    state.users = cleanUsers(saved.users) || (state.owner ? defaultUsers() : null);
+    state.users = cleanUsers(saved.users, true) || (state.owner ? defaultUsers() : null);
+    if (state.users && !state.users.sid) { state.users.sid = uid(); save(); }      // lists from older versions get an identity
     state.items = saved.items.map(cleanItem).filter(Boolean);
     state.lastExport = saved.lastExport || null;
   }

@@ -1,7 +1,7 @@
 {
   "name": "Packing",
   "short_name": "Packing",
-  "description": "ארגון פריטים בין שתי מזוודות",
+  "description": "רשימת אריזה לנסיעה",
   "lang": "he",
   "dir": "rtl",
   "start_url": "./",
