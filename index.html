@@ -137,6 +137,32 @@ input:focus-visible,select:focus-visible,textarea:focus-visible,.search:focus{ou
 .addpk[aria-pressed="true"]{background:var(--ok);border-color:var(--ok);color:#fff}
 .addpk[aria-pressed="true"]::before{content:'✓ '}
 .addbag{display:flex;align-items:center;gap:8px;margin-top:8px}
+.sortrow .lbl{min-width:0}
+.sh{display:flex;width:100%;align-items:center;gap:8px;border:0;background:transparent;padding:6px 2px;margin-top:18px;font-size:16px;font-weight:800;color:var(--ink);text-align:start}
+.sh .n{color:var(--muted);font-weight:700}
+.sh .ar{margin-inline-start:auto;color:var(--muted);font-size:14px;font-weight:700}
+.sh.done{color:var(--ok)}
+.sect-st{border-top:2px solid var(--line);margin-top:6px}
+.sh.hid{color:var(--muted)}
+.hrow{display:flex;align-items:center;gap:10px;padding:6px 12px;min-height:48px;border:1px dashed var(--line);border-radius:12px;margin-bottom:6px;color:var(--muted)}
+.hrow .t{flex:1;min-width:0;overflow-wrap:anywhere}
+.hrow .who{font-size:13px}
+.hrow .back{flex:0 0 auto;height:40px;border-radius:999px;border:1.5px solid var(--line);background:var(--surface);padding:0 14px;font-weight:700;color:var(--ink)}
+.clr.all{display:block;margin:4px 0 0;min-height:40px;border-radius:10px;border:1px solid var(--line);background:var(--surface);padding:0 14px;font-weight:600}
+.selecting .l2,.selecting .pen{display:none}
+.selecting #list{padding-bottom:130px}
+.selbox{flex:0 0 auto;width:44px;height:44px;border-radius:10px;border:2px solid var(--ink);background:var(--surface);font-size:22px;font-weight:800;color:#fff}
+.selbox.on{background:var(--ink);color:var(--bg)}
+.item.chosen{box-shadow:0 0 0 2px var(--ink)}
+.selecting .item.packed{opacity:.55}
+.selbar{position:fixed;left:0;right:0;bottom:0;z-index:20;background:var(--surface);border-top:1px solid var(--line);box-shadow:0 -4px 16px rgba(0,0,0,.12);padding:10px 16px calc(env(safe-area-inset-bottom) + 10px)}
+.selbar .sl1{display:flex;align-items:center;justify-content:space-between;gap:8px;max-width:616px;margin:0 auto 8px;font-weight:700}
+.selbar .sl2{display:flex;gap:8px;max-width:616px;margin:0 auto}
+.selbar .lnk{border:0;background:transparent;color:var(--p2);font-weight:700;min-height:40px;padding:0 4px}
+.selbar .go{flex:1;height:48px;border:0;border-radius:12px;background:var(--ink);color:var(--bg);font-weight:800;font-size:16px}
+.selbar .go:disabled{opacity:.4}
+.selbar .no{flex:0 0 auto;height:48px;border:1px solid var(--line);border-radius:12px;background:var(--surface);padding:0 16px;font-weight:700}
+.selecting .toast{bottom:calc(env(safe-area-inset-bottom) + 130px)}
 .lbl{flex:0 0 auto;font-size:13px;color:var(--muted)}
 
 .tools{display:flex;gap:8px;margin-top:12px}
@@ -338,6 +364,10 @@ body.single #pWhoF{display:none}
     <textarea class="search one" id="search" rows="1" wrap="off" autocomplete="off" placeholder="חיפוש" enterkeyhint="search" dir="auto"></textarea>
     <button class="chip" id="unpackedBtn" type="button" aria-pressed="false">רק מה שלא נארז</button>
   </div>
+  <div class="addbag sortrow"><span class="lbl">מיון:</span>
+    <div class="seg" id="sortSeg" role="group" aria-label="מיון"><button type="button" data-sort-set="cat">קטגוריה</button><button type="button" data-sort-set="az">א–ת</button><button type="button" data-sort-set="status">ארוז / לא</button></div>
+    <button class="chip" id="selBtn" type="button" aria-pressed="false">בחירה</button>
+  </div>
 </div>
 
 <main class="wrap" id="list"></main>
@@ -381,7 +411,7 @@ body.single #pWhoF{display:none}
       <div class="sect">כלים</div>
       <button type="button" data-act="keep"><span class="ic">📝</span><span>ייבוא רשימה מ-Google Keep<span class="ds">הדבקה או קובץ txt</span></span></button>
       <button type="button" data-act="print"><span class="ic">🖨️</span><span>הדפסת הרשימה<span class="ds">לנייר או לקובץ PDF</span></span></button>
-      <button type="button" data-act="unpack"><span class="ic">🔄</span><span>איפוס סימוני ״ארוז״<span class="ds">לנסיעה הבאה — הפריטים נשארים</span></span></button>
+      <button type="button" data-act="unpack"><span class="ic">🔄</span><span>איפוס לנסיעה הבאה<span class="ds">הכל חוזר ל״לא ארוז״, ומה שהוסתר חוזר לרשימה</span></span></button>
 
       <div class="sect">משתמשים ותצוגה</div>
       <button type="button" data-act="users"><span class="ic">👥</span><span>משתמשים<span class="ds" id="usersInfo"></span></span></button>
@@ -391,13 +421,6 @@ body.single #pWhoF{display:none}
           <button type="button" data-theme-set="auto">יום / לילה</button>
           <button type="button" data-theme-set="light">בהיר</button>
           <button type="button" data-theme-set="dark">כהה</button>
-        </div>
-      </div>
-      <div class="setrow">
-        <div class="top2"><span class="ic">🔤</span><span>מיון<span class="ds" id="sortInfo"></span></span></div>
-        <div class="seg" id="sortSeg">
-          <button type="button" data-sort-set="cat">לפי קטגוריה</button>
-          <button type="button" data-sort-set="az">א–ת</button>
         </div>
       </div>
 
@@ -470,7 +493,7 @@ body.single #pWhoF{display:none}
       <div class="seg" id="pWhat"><button type="button" data-what="all">כל הפריטים</button><button type="button" data-what="left">רק מה שלא נארז</button></div>
     </div>
     <div class="f"><span>סדר</span>
-      <div class="seg" id="pSort"><button type="button" data-psort="cat">לפי קטגוריה</button><button type="button" data-psort="az">א–ת</button></div>
+      <div class="seg" id="pSort"><button type="button" data-psort="cat">לפי קטגוריה</button><button type="button" data-psort="az">א–ת</button><button type="button" data-psort="status">ארוז / לא</button></div>
     </div>
     <p class="note" id="pSum"></p>
     <div class="dfoot"><div class="row"><button class="btn main" type="button" id="pGo">הדפסה</button><button class="btn" type="button" id="pCancel">ביטול</button></div></div>
@@ -524,6 +547,10 @@ body.single #pWhoF{display:none}
 <div id="printArea" aria-hidden="true"></div>
 <input type="file" id="fileIn" hidden>
 <input type="file" id="kFile" hidden>
+<div class="selbar" id="selBar" hidden>
+  <div class="sl1"><span id="selN"></span><button type="button" id="selAll" class="lnk">בחירת כל מה שלא נארז</button></div>
+  <div class="sl2"><button type="button" id="selSkip" class="go">🙈 לא לנסיעה הזו</button><button type="button" id="selCancel" class="no">ביטול</button></div>
+</div>
 <div class="toast" id="toast" role="status" popover="manual"><span id="toastText"></span><button type="button" id="toastAct" hidden></button></div>
 
 <script>
@@ -538,13 +565,13 @@ const CATS = [
 const CAT = Object.assign(Object.create(null), Object.fromEntries(CATS.map(c => [c[0], {name:c[1], icon:c[2]}])));   // no inherited keys like 'toString'
 const BAGS = Object.assign(Object.create(null), {p1: 1, p2: 1});                       // internal suitcase slots: 1 = "p1" (pink), 2 = "p2" (blue)
 const defaultUsers = () => ({count: 2, names: {p1: 'משתמש/ת 1', p2: 'משתמש/ת 2'}, ts: {count: 1, p1: 1, p2: 1}, sid: '', links: {}});   // lists made before names were configurable
-const FIELDS = ['name','cat','qty','bag','packed','deleted'];
+const FIELDS = ['name','cat','qty','bag','packed','deleted','skip'];   // skip = not for this trip (kept for next time)
 const MAX_FILE = 5e6, MAX_ITEMS = 5000, MAX_FUTURE = 864e5 * 366;
 const ERR = Symbol('read-error');
 
 /* ---------- state ---------- */
 let state = {version:3, owner:null, users:null, items:[], lastExport:null};
-const ui = {tab:'all', q:'', unpacked:false, qty:1, cat:'auto', addBag:null, addPacked:false, dupOnly:false, sort:'cat', frozen: new Map()};
+const ui = {tab:'all', q:'', unpacked:false, qty:1, cat:'auto', addBag:null, addPacked:false, packedOpen:true, hidOpen:false, sel:null, dupOnly:false, sort:'cat', frozen: new Map()};
 const heSort = new Intl.Collator('he', {numeric: true, sensitivity: 'base'}).compare;
 let pendingImport = null;          // {items, users, from, flip, first} waiting for merge/replace
 const resetOrder = () => ui.frozen.clear();
@@ -559,6 +586,7 @@ const iso = s => '\u2068' + String(s).replace(/([A-Za-z0-9])([^\sA-Za-z0-9\u0590
 const pre = (l, s) => (/^[A-Za-z0-9]/.test(s) ? l + '-' : l) + `<bdi class="bn">${esc(s)}</bdi>`;   // "לדנה", "ל-Dan" (HTML)
 const and = s => (/^[A-Za-z0-9]/.test(s) ? 'ו-' : 'ו') + iso(s);   // "ודנה", but "ו-Dan"              // keep a Latin/Hebrew name from scrambling the sentence around it
 const live = () => state.items.filter(i => !i.deleted);
+const active = () => state.items.filter(i => !i.deleted && !i.skip);   // what this trip's list shows
 const byId = id => state.items.find(i => i.id === id);
 const find = id => { const i = byId(id); return i && !i.deleted ? i : null; };
 const single = () => !!state.users && state.users.count === 1;
@@ -748,8 +776,10 @@ function cleanItem(it) {
     bag: typeof it.bag === 'string' && BAGS[it.bag] ? it.bag : defaultBag(),
     packed: yes(it.packed),
     deleted: yes(it.deleted),
+    skip: yes(it.skip),
     ts
   };
+  if (it.skip === undefined && !(it.ts && clampTs(it.ts.skip))) ts.skip = 1;   // from a version without it: any real choice wins
   if (!(typeof it.bag === 'string' && BAGS[it.bag])) ts.bag = 1;        // a made-up suitcase loses to any real choice in the next merge
   out.updatedAt = Math.max(base, ...FIELDS.map(f => ts[f]));
   return out;
@@ -757,7 +787,7 @@ function cleanItem(it) {
 function newItem(fields) {
   const t = now(), ts = {};
   FIELDS.forEach(f => ts[f] = t);
-  return {id: uid(), name: '', cat: 'other', qty: 1, bag: defaultBag(), packed: false, deleted: false, ...fields, ts, updatedAt: t};
+  return {id: uid(), name: '', cat: 'other', qty: 1, bag: defaultBag(), packed: false, deleted: false, skip: false, ...fields, ts, updatedAt: t};
 }
 /* change fields; each changed field gets its own timestamp, always later than the item's last one */
 function touch(it, patch) {
@@ -772,17 +802,24 @@ function touch(it, patch) {
 }
 function commit() { if (store.readOnly) return; save(); render(); }
 
+function addOrRevive(fields) {
+  const old = state.items.find(i => !i.deleted && i.skip && dupKey(i) === dupKey(fields));
+  if (old) { touch(old, {skip: false, packed: !!fields.packed, qty: fields.qty || old.qty}); return {it: old, revived: true}; }
+  const it = newItem(fields); state.items.push(it); return {it, revived: false};
+}
 function addItem(name) {
   const bag = curBag(), bags = targets(bag);
   const cat = ui.cat === 'auto' ? guessCat(name) : ui.cat;
-  const dupBags = bags.filter(b => live().some(i => dupKey(i) === dupKey({bag: b, name})));
-  const made = bags.map(b => newItem({name, cat, qty: ui.qty, bag: b, packed: ui.addPacked}));
-  state.items.push(...made);
+  const dupBags = bags.filter(b => active().some(i => dupKey(i) === dupKey({bag: b, name})));
+  const res = bags.map(b => addOrRevive({name, cat, qty: ui.qty, bag: b, packed: ui.addPacked}));
+  const made = res.map(r => r.it), revived = res.some(r => r.revived);
   commit();
   if (dupBags.length) {
     const where = single() ? 'ברשימה' : dupBags.length === 2 ? 'בשתי המזוודות' : 'במזוודה של ' + nmI(dupBags[0]);
     const extra = made.filter(it => dupBags.includes(it.bag));
     toast(`⚠️ "${iso(name)}" כבר קיים ${where}`, 'הסר', () => { extra.forEach(it => { const x = byId(it.id); if (x) touch(x, {deleted: true}); }); commit(); });
+  } else if (revived) {
+    toast(`"${iso(name)}" חזר לרשימה — הוא היה מוסתר מהנסיעה הזו`);
   } else if (!single() && ui.tab !== 'all' && !bags.includes(ui.tab)) {
     toast(`נוסף למזוודה של ${nmI(bag)}`, 'הצג', () => { ui.tab = bag; render(); });
   } else if (bags.length === 2 && ui.tab !== 'all') {
@@ -790,6 +827,36 @@ function addItem(name) {
   } else {
     toast(`נוסף${bags.length === 2 ? ' לשתי המזוודות' : ''}${ui.addPacked ? ' כארוז ✓' : ''}: "${iso(name)}" · ${CAT[cat].icon} ${CAT[cat].name}`, 'שינוי', () => openEdit(made[0].id, made[1] && made[1].id));
   }
+}
+/* ---------- not for this trip ---------- */
+function paintSel() {
+  const on = !!ui.sel;
+  $('#selBtn').setAttribute('aria-pressed', on); $('#selBtn').textContent = on ? 'סיום בחירה' : 'בחירה';
+  $('#selBar').hidden = !on;
+  if (!on) return;
+  const n = ui.sel.size;
+  $('#selN').textContent = n ? (n === 1 ? 'נבחר פריט אחד' : `נבחרו ${n} פריטים`) : 'סמנו פריטים שלא צריך בנסיעה הזו';
+  $('#selSkip').disabled = !n;
+  const vis = [...document.querySelectorAll('#list .item:not(.packed)')].map(r => r.dataset.id);
+  $('#selAll').hidden = !vis.length;
+  $('#selAll').textContent = vis.length && vis.every(id => ui.sel.has(id)) ? 'ניקוי הבחירה' : 'בחירת כל מה שלא נארז';
+}
+function endSel() { ui.sel = null; render(); }
+function skipSelected() {
+  const its = [...ui.sel].map(find).filter(i => i && !i.packed);
+  ui.sel = null;
+  if (!its.length) { render(); return; }
+  its.forEach(i => touch(i, {skip: true})); resetOrder(); commit();
+  toast(`${its.length === 1 ? 'פריט אחד הוסתר' : `${its.length} פריטים הוסתרו`} מהנסיעה הזו — הם נשמרים לפעם הבאה`, 'בטל', () => {
+    its.forEach(i => { const x = find(i.id); if (x) touch(x, {skip: false}); }); commit();
+  });
+}
+function unskip(its) {
+  if (!its.length) return;
+  its.forEach(i => touch(i, {skip: false})); resetOrder(); commit();
+  toast(its.length === 1 ? `"${iso(its[0].name)}" חזר לרשימה` : `${its.length} פריטים חזרו לרשימה`, 'בטל', () => {
+    its.forEach(i => { const x = find(i.id); if (x) touch(x, {skip: true}); }); commit();
+  });
 }
 function removeItem(id) {
   const it = find(id); if (!it) return;
@@ -824,9 +891,11 @@ function stats(items) {
 }
 
 function render() {
-  const items = live();
+  const items = active();
+  document.body.classList.toggle('selecting', !!ui.sel);
   const s = stats(items);
   document.body.classList.toggle('single', single());
+  document.querySelectorAll('[data-sort-set]').forEach(b => b.classList.toggle('on', b.dataset.sortSet === ui.sort));
   if (single()) ui.tab = 'all';
   document.querySelectorAll('[data-name]').forEach(e => e.textContent = single() && e.dataset.name === 'p1' ? nm(solo()) : nm(e.dataset.name));
   document.querySelectorAll('#addBag button,#eBag button,#kBag button').forEach(b => { if (b.dataset.bag !== 'both') b.textContent = nm(b.dataset.bag); });
@@ -871,28 +940,44 @@ function render() {
 
   const bar = dupCount ? `<div class="dupbar"><span>⚠️ יש <b>${dupCount}</b> פריטים כפולים ${single() ? 'ברשימה' : 'באותה מזוודה'}</span><button type="button" data-act="dup-toggle">${ui.dupOnly ? 'הצג הכל' : 'הצג כפולים'}</button></div>` : '';
 
-  if (!items.length) { host.innerHTML = `<div class="empty"><div class="big">🧳</div>הרשימה ריקה.<br>הוסיפו פריט ראשון למעלה, או ייבאו רשימה מ‑Google Keep בהגדרות ☰.</div>`; return; }
+  const hid = state.items.filter(i => !i.deleted && i.skip && (ui.tab === 'all' || i.bag === ui.tab) && (!q || normName(i.name).includes(q)))
+    .sort((a, b) => heSort(a.name, b.name));
+  const hidHtml = !hid.length ? '' : `<section class="group sect-st"><button type="button" class="sh hid" data-act="hid-toggle" aria-expanded="${ui.hidOpen}">🙈 לא בנסיעה הזו <span class="n">· ${hid.length}</span><span class="ar">${ui.hidOpen ? 'הסתר ▴' : 'הצג ▾'}</span></button>`
+    + (ui.hidOpen ? hid.map(i => `<div class="hrow" data-hid="${esc(i.id)}"><span>${CAT[i.cat].icon}</span><span class="t" dir="auto">${bidi(i.name)}</span>${!single() && ui.tab === 'all' ? `<span class="who"><bdi>${esc(nm(i.bag))}</bdi></span>` : ''}<button type="button" class="back" data-act="unskip">החזרה</button></div>`).join('')
+      + (hid.length > 1 ? `<button type="button" class="clr all" data-act="unskip-all">החזרת כל ה-${hid.length} לרשימה</button>` : '') : '') + `</section>`;
+  if (!items.length && !hid.length) { host.innerHTML = `<div class="empty"><div class="big">🧳</div>הרשימה ריקה.<br>הוסיפו פריט ראשון למעלה, או ייבאו רשימה מ‑Google Keep בהגדרות ☰.</div>`; return; }
   if (!list.length) {
     const allPacked = ui.unpacked && !q && !ui.dupOnly && inTab.length && inTab.every(i => i.packed);
     host.innerHTML = bar + (allPacked
       ? `<div class="empty"><div class="big">✅</div>הכל ארוז!</div>`
       : q ? `<div class="empty"><div class="big">🔍</div>לא נמצא "<bdi>${esc(ui.q.trim())}</bdi>"<br><button type="button" class="clr" data-act="clear-search">ניקוי החיפוש</button></div>`
-      : `<div class="empty"><div class="big">🔍</div>אין פריטים כאן</div>`);
+      : hid.length && !inTab.length ? `<div class="empty"><div class="big">🙈</div>כל הפריטים כאן הוסתרו מהנסיעה הזו</div>`
+      : `<div class="empty"><div class="big">🔍</div>אין פריטים כאן</div>`) + hidHtml;
     return;
   }
   const row = (i, showCat) => {
     const isDup = dups.has(dupKey(i));
     const seg = ['p1', 'p2'].map(b => `<button type="button" data-bag="${b}" class="${i.bag === b ? 'on' : ''}">${esc(nm(b))}</button>`).join('');
-    return `<div class="item b-${i.bag}${i.packed ? ' packed' : ''}${isDup ? ' isdup' : ''}" data-id="${esc(i.id)}">
+    return `<div class="item b-${i.bag}${i.packed ? ' packed' : ''}${isDup ? ' isdup' : ''}${ui.sel && ui.sel.has(i.id) ? ' chosen' : ''}" data-id="${esc(i.id)}">
         <div class="l1">
           <button type="button" class="info" aria-label="עריכת ${esc(i.name)}"><span class="nm">${showCat ? `<span class="ci" title="${CAT[i.cat].name}">${CAT[i.cat].icon}</span>` : ''}<span class="t" dir="auto">${bidi(i.name)}</span><span class="pen">✏️</span></span>${i.qty > 1 ? `<span class="mt">כמות: ${i.qty}</span>` : ''}${single() && i.bag !== solo() ? `<span class="mt from">מהמזוודה של <bdi>${esc(nm(i.bag))}</bdi></span>` : ''}${isDup ? `<span class="dup">⚠️ מופיע פעמיים ${single() ? 'ברשימה' : 'במזוודה של <bdi>' + esc(nm(i.bag)) + '</bdi>'}</span>` : ''}</button>
-          <button type="button" class="pk">${i.packed ? '✓ ארוז' : 'סמן כארוז'}</button>
+          ${!ui.sel ? `<button type="button" class="pk">${i.packed ? '✓ ארוז' : 'סמן כארוז'}</button>`
+            : i.packed ? '' : `<button type="button" class="selbox${ui.sel.has(i.id) ? ' on' : ''}" aria-pressed="${ui.sel.has(i.id)}" aria-label="בחירה">${ui.sel.has(i.id) ? '✓' : ''}</button>`}
         </div>
         <div class="l2"><span class="lbl">מזוודה:</span><div class="seg">${seg}</div></div>
       </div>`;
   };
   let html = bar;
-  if (ui.sort === 'az') {
+  const catIx = Object.fromEntries(CATS.map((c, n) => [c[0], n]));
+  if (ui.sort === 'status') {
+    /* two sections: still to pack, then packed (open by default, can fold away); a row just tapped stays until the view changes */
+    const pkd = i => ui.frozen.has(i.id) ? ui.frozen.get(i.id) : i.packed;
+    list.sort((a, b) => (catIx[a.cat] - catIx[b.cat]) || heSort(a.name, b.name));
+    const todo = list.filter(i => !pkd(i)), done = list.filter(pkd);
+    if (todo.length) html += `<section class="group"><div class="sh">לא נארז <span class="n">· ${todo.length}</span></div>${todo.map(i => row(i, true)).join('')}</section>`;
+    else if (done.length) html += `<div class="empty" style="padding:14px 0 4px"><div class="big">✅</div>הכל ארוז!</div>`;
+    if (done.length) html += `<section class="group sect-st"><button type="button" class="sh done" data-act="packed-toggle" aria-expanded="${ui.packedOpen}">ארוז ✓ <span class="n">· ${done.length}</span><span class="ar">${ui.packedOpen ? 'הסתר ▴' : 'הצג ▾'}</span></button>${ui.packedOpen ? done.map(i => row(i, true)).join('') : ''}</section>`;
+  } else if (ui.sort === 'az') {
     /* one alphabetical list; packed items keep their place */
     list.sort((a, b) => heSort(a.name, b.name));
     html += `<section class="group">${list.map(i => row(i, true)).join('')}</section>`;
@@ -905,7 +990,8 @@ function render() {
       html += `<section class="group"><div class="gh">${icon} ${name} · ${g.length}</div>${g.map(i => row(i, false)).join('')}</section>`;
     }
   }
-  host.innerHTML = html;
+  host.innerHTML = html + hidHtml;
+  paintSel();
 }
 
 /* ---------- toast ---------- */
@@ -976,7 +1062,7 @@ function paintEdit() {
   document.querySelectorAll('#eBag button').forEach(b => b.classList.toggle('on', b.dataset.bag === editBag));
   $('#eHint').hidden = !(it && it.packed && editBag !== it.bag);
   const other = flip(editBag), name = $('#eName').value.trim();
-  const has = live().some(i => i.id !== editId && dupKey(i) === dupKey({bag: other, name}));
+  const has = active().some(i => i.id !== editId && dupKey(i) === dupKey({bag: other, name}));
   $('#eCopy').textContent = has ? `✓ קיים גם במזוודה של ${nmI(other)}` : `➕ להוסיף גם למזוודה של ${nmI(other)}`;
   $('#eCopy').disabled = has || !name;
 }
@@ -1175,7 +1261,7 @@ function openKeep(prefill, title, sub) {
 function paintKeep() {
   document.querySelectorAll('#kBag button').forEach(b => b.classList.toggle('on', b.dataset.bag === keep.bag));
   const rows = parseKeep($('#kText').value, $('#kTitle').checked);
-  const existing = new Set(live().map(dupKey));
+  const existing = new Set(active().map(dupKey));
   const skipOn = $('#kSkip').checked;
   const bags = targets(keep.bag);
   rows.forEach(r => { r.bags = bags.filter(b => !(skipOn && existing.has(dupKey({bag: b, name: r.name})))); r.skip = !r.bags.length; });
@@ -1198,8 +1284,8 @@ function doKeepImport() {
   const markPacked = $('#kChecked').checked;
   const ids = [];
   for (const r of keep.rows) for (const b of r.bags) {
-    const it = newItem({name: r.name, cat: r.cat, qty: r.qty, bag: b, packed: markPacked && r.checked});
-    state.items.push(it); ids.push(it.id);
+    const {it} = addOrRevive({name: r.name, cat: r.cat, qty: r.qty, bag: b, packed: markPacked && r.checked});
+    ids.push(it.id);
   }
   $('#keepDlg').close();
   ui.tab = 'all'; resetOrder(); commit();
@@ -1248,6 +1334,15 @@ function bind() {
   // keep the phone keyboard open while tapping these
   document.querySelectorAll('#addBtn,#addPacked,.stepper button,#addBag button').forEach(b => b.addEventListener('pointerdown', e => e.preventDefault()));
   document.querySelectorAll('#addBag button').forEach(b => b.addEventListener('click', () => { ui.addBag = b.dataset.bag; render(); }));
+  $('#selBtn').addEventListener('click', () => { ui.sel = ui.sel ? null : new Set(); render(); });
+  $('#selCancel').addEventListener('click', endSel);
+  $('#selSkip').addEventListener('click', skipSelected);
+  $('#selAll').addEventListener('click', () => {
+    const vis = [...document.querySelectorAll('#list .item:not(.packed)')].map(r => r.dataset.id);
+    if (vis.every(id => ui.sel.has(id))) vis.forEach(id => ui.sel.delete(id)); else vis.forEach(id => ui.sel.add(id));
+    render();
+  });
+  document.addEventListener('keydown', e => { if (e.key === 'Escape' && ui.sel && !anyDialogOpen()) endSel(); });
   $('#addPacked').addEventListener('click', () => {      // stays on for the next items, until tapped again
     ui.addPacked = !ui.addPacked;
     $('#addPacked').setAttribute('aria-pressed', ui.addPacked);
@@ -1264,9 +1359,18 @@ function bind() {
 
   $('#list').addEventListener('click', e => {
     if (e.target.closest('[data-act="dup-toggle"]')) { ui.dupOnly = !ui.dupOnly; resetOrder(); render(); return; }
+    if (e.target.closest('[data-act="packed-toggle"]')) { ui.packedOpen = !ui.packedOpen; resetOrder(); render(); return; }
     if (e.target.closest('[data-act="clear-search"]')) { $('#searchClear').click(); return; }
+    if (e.target.closest('[data-act="hid-toggle"]')) { ui.hidOpen = !ui.hidOpen; render(); return; }
+    if (e.target.closest('[data-act="unskip-all"]')) { unskip(state.items.filter(i => !i.deleted && i.skip && (ui.tab === 'all' || i.bag === ui.tab))); return; }
+    const hr = e.target.closest('[data-act="unskip"]');
+    if (hr) { const x = find(hr.closest('.hrow').dataset.hid); if (x) unskip([x]); return; }
     const row = e.target.closest('.item'); if (!row) return;
     const it = find(row.dataset.id); if (!it) return;
+    if (ui.sel) {                                          // selecting: a tap anywhere on the row picks it
+      if (it.packed) { toast('אפשר לבחור רק פריטים שעוד לא נארזו'); return; }
+      ui.sel.has(it.id) ? ui.sel.delete(it.id) : ui.sel.add(it.id); render(); return;
+    }
     const bagBtn = e.target.closest('.seg button');
     if (bagBtn) { moveItem(it, bagBtn.dataset.bag); return; }
     if (e.target.closest('.pk')) { togglePacked(it); return; }
@@ -1320,11 +1424,16 @@ function bind() {
     else if (act === 'keep') openKeep('');
     else if (act === 'print') openPrint();
     else if (act === 'unpack') {
-      const packed = live().filter(i => i.packed);
-      if (!packed.length) { toast('אין פריטים מסומנים כארוזים'); return; }
-      if (await confirmBox('איפוס סימוני ״ארוז״', `${many(packed.length, 'פריט אחד יסומן כלא ארוז', 'פריטים יסומנו כלא ארוזים')}.${single() ? '' : ' השיוך למזוודות נשאר.'}`, 'איפוס')) {
-        packed.forEach(i => touch(i, {packed: false})); resetOrder(); commit();
-        toast('הסימונים אופסו', 'בטל', () => { packed.forEach(i => { const x = find(i.id); if (x) touch(x, {packed: true}); }); commit(); });
+      const packed = live().filter(i => i.packed), hidden = live().filter(i => i.skip);
+      if (!packed.length && !hidden.length) { toast('אין פריטים מסומנים כארוזים'); return; }
+      const msg = [packed.length && many(packed.length, 'פריט אחד יסומן כלא ארוז', 'פריטים יסומנו כלא ארוזים'),
+                   hidden.length && many(hidden.length, 'פריט אחד שהוסתר מהנסיעה יחזור לרשימה', 'פריטים שהוסתרו מהנסיעה יחזרו לרשימה')].filter(Boolean).join(' · ');
+      if (await confirmBox('איפוס לנסיעה הבאה', `${msg}.${single() ? '' : ' השיוך למזוודות נשאר.'}`, 'איפוס')) {
+        packed.forEach(i => touch(i, {packed: false})); hidden.forEach(i => touch(i, {skip: false})); resetOrder(); commit();
+        toast('הרשימה מוכנה לנסיעה הבאה', 'בטל', () => {
+          packed.forEach(i => { const x = find(i.id); if (x) touch(x, {packed: true}); });
+          hidden.forEach(i => { const x = find(i.id); if (x) touch(x, {skip: true}); }); commit();
+        });
       }
     }
     else if (act === 'users') openSetup(false);
@@ -1353,7 +1462,7 @@ function bind() {
   // file import
   $('#fileIn').addEventListener('change', e => { const f = e.target.files[0]; if (f) readImport(f); });
   const runMerge = (p) => {
-    const dupsBefore = dupKeys(live()).size;
+    const dupsBefore = dupKeys(active()).size;
     const wasSingle = single();
     const {items, users, from} = applyIncoming(p);
     const r = mergeItems(items);
@@ -1369,7 +1478,7 @@ function bind() {
     if (r.skipped) msg += ' · ' + many(r.skipped, 'פריט אחד מהקובץ נמחק כאן קודם ולא הוחזר', 'פריטים מהקובץ נמחקו כאן קודם ולא הוחזרו');
     if (u && u.countChanged) msg += single() ? ' · עברנו לרשימה אחת, כמו בטלפון השני' : ' · עברנו לשני משתמשים, כמו בטלפון השני';
     else if (u && u.changed && state.owner) msg += ' · שמות המשתמשים עודכנו';
-    if (dupKeys(live()).size > dupsBefore) msg += ' · ⚠️ נמצאו כפילויות';
+    if (dupKeys(active()).size > dupsBefore) msg += ' · ⚠️ נמצאו כפילויות';
     afterImport(msg, from);
   };
   /* after loading a file: if this phone still needs setup, show it there; otherwise a toast */
@@ -1489,8 +1598,8 @@ function bind() {
 
 /* ---------- print ---------- */
 const pr = {who: 'both', what: 'all', sort: 'cat'};
-const printBags = () => single() ? ['p1'] : pr.who === 'both' ? ['p1', 'p2'].filter(b => live().some(i => i.bag === b)) : [pr.who];
-const printItems = b => live().filter(i => (single() || i.bag === b) && (pr.what === 'all' || !i.packed));
+const printBags = () => single() ? ['p1'] : pr.who === 'both' ? ['p1', 'p2'].filter(b => active().some(i => i.bag === b)) : [pr.who];
+const printItems = b => active().filter(i => (single() || i.bag === b) && (pr.what === 'all' || !i.packed));
 function openPrint() {
   pr.who = single() ? 'p1' : 'both'; pr.what = 'all'; pr.sort = ui.sort;
   document.querySelectorAll('#pWho button').forEach(b => { if (b.dataset.who !== 'both') b.textContent = nm(b.dataset.who); });
@@ -1510,7 +1619,7 @@ function buildPrint() {
   const date = new Date().toLocaleDateString('he-IL', {day: 'numeric', month: 'long', year: 'numeric'});
   const row = i => `<div class="prow"><span class="pbox">${i.packed ? '✓' : ''}</span><span class="pname" dir="auto">${bidi(i.name)}</span>${i.qty > 1 ? `<span class="pqty">×${i.qty}</span>` : ''}</div>`;
   return printBags().map(b => {
-    const all = live().filter(i => single() || i.bag === b);
+    const all = active().filter(i => single() || i.bag === b);
     const items = printItems(b).sort((x, y) => heSort(x.name, y.name));
     const packedN = all.filter(i => i.packed).length;
     const who = single() ? `הרשימה של <bdi>${esc(nm(solo()))}</bdi>` : `המזוודה של <bdi>${esc(nm(b))}</bdi>`;
@@ -1520,6 +1629,13 @@ function buildPrint() {
     let body = '';
     if (!items.length) body = `<p class="pempty">${pr.what === 'left' ? 'הכל ארוז ✓' : 'אין פריטים'}</p>`;
     else if (pr.sort === 'az') body = items.map(row).join('');
+    else if (pr.sort === 'status') {
+      const ci = Object.fromEntries(CATS.map((c, n) => [c[0], n]));
+      items.sort((x, y) => (ci[x.cat] - ci[y.cat]) || heSort(x.name, y.name));
+      const todo = items.filter(i => !i.packed), done = items.filter(i => i.packed);
+      if (todo.length) body += `<h2>לא נארז · ${todo.length}</h2>${todo.map(row).join('')}`;
+      if (done.length) body += `<h2>ארוז ✓ · ${done.length}</h2>${done.map(row).join('')}`;
+    }
     else for (const [key, name, icon] of CATS) {
       const g = items.filter(i => i.cat === key);
       if (g.length) body += `<h2>${icon} ${name} · ${g.length}</h2>${g.map(row).join('')}`;
@@ -1633,7 +1749,6 @@ async function saveSetup() {
 
 function paintTheme() {
   document.querySelectorAll('[data-sort-set]').forEach(b => b.classList.toggle('on', b.dataset.sortSet === ui.sort));
-  $('#sortInfo').textContent = ui.sort === 'az' ? 'רשימה אחת לפי א–ת, בלי קבוצות' : 'בקבוצות לפי קטגוריה, הארוזים יורדים למטה';
   const m = PackingTheme.mode(), inf = PackingTheme.info();
   document.querySelectorAll('[data-theme-set]').forEach(b => b.classList.toggle('on', b.dataset.themeSet === m));
   $('#themeInfo').textContent = m === 'auto'
@@ -1662,7 +1777,7 @@ async function init() {
     if (noSid || wasOld) save();                                                    // after the items are back in, so nothing is lost
   }
   const lc = await store.get('lastCat2'); if (lc !== ERR && (CAT[lc] || lc === 'auto')) ui.cat = lc;
-  const so = await store.get('sort'); if (so === 'az' || so === 'cat') ui.sort = so;
+  const so = await store.get('sort'); if (so === 'az' || so === 'cat' || so === 'status') ui.sort = so;
   $('#addCat').value = ui.cat;
 
   bind(); render();
