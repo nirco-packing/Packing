@@ -168,7 +168,9 @@ input:focus-visible,select:focus-visible,textarea:focus-visible,.search:focus{ou
 .tools{display:flex;gap:8px;margin-top:12px}
 .search{flex:1;min-width:0;height:42px;border-radius:10px;border:1px solid var(--line);background:var(--surface);padding:9px 10px;font-size:15px!important}
 .chip{height:42px;border-radius:10px;border:1px solid var(--line);background:var(--surface);padding:0 12px;font-size:14px;white-space:nowrap}
-.chip[aria-pressed="true"]{background:var(--ink);color:var(--bg);border-color:var(--ink)}
+.chip[aria-pressed="true"],.chip[data-show="todo"]{background:var(--ink);color:var(--bg);border-color:var(--ink)}
+.chip[data-show="done"]{background:var(--ok);color:#fff;border-color:var(--ok)}
+#unpackedBtn{font-weight:700}
 
 /* segmented suitcase switch (rows, add area, settings) */
 .seg{flex:1;display:flex;border:1px solid var(--line);border-radius:10px;overflow:hidden;background:var(--surface)}
@@ -362,10 +364,10 @@ body.single #pWhoF{display:none}
   <div class="tools">
     <button class="chip" id="searchClear" type="button" aria-label="ניקוי החיפוש" hidden>✕</button>
     <textarea class="search one" id="search" rows="1" wrap="off" autocomplete="off" placeholder="חיפוש" enterkeyhint="search" dir="auto"></textarea>
-    <button class="chip" id="unpackedBtn" type="button" aria-pressed="false">רק מה שלא נארז</button>
+    <button class="chip" id="unpackedBtn" type="button" data-show="all" aria-label="מה להציג — לחיצה מחליפה">הצג: הכל</button>
   </div>
   <div class="addbag sortrow"><span class="lbl">מיון:</span>
-    <div class="seg" id="sortSeg" role="group" aria-label="מיון"><button type="button" data-sort-set="cat">קטגוריה</button><button type="button" data-sort-set="az">א–ת</button><button type="button" data-sort-set="status">ארוז / לא</button></div>
+    <div class="seg" id="sortSeg" role="group" aria-label="מיון"><button type="button" data-sort-set="cat">קטגוריה</button><button type="button" data-sort-set="az">א–ת</button></div>
     <button class="chip" id="selBtn" type="button" aria-pressed="false">בחירה</button>
   </div>
 </div>
@@ -571,7 +573,7 @@ const ERR = Symbol('read-error');
 
 /* ---------- state ---------- */
 let state = {version:3, owner:null, users:null, items:[], lastExport:null};
-const ui = {tab:'all', q:'', unpacked:false, qty:1, cat:'auto', addBag:null, addPacked:false, packedOpen:true, hidOpen:false, sel:null, dupOnly:false, sort:'cat', frozen: new Map()};
+const ui = {tab:'all', q:'', show:'all', qty:1, cat:'auto', addBag:null, addPacked:false, hidOpen:false, sel:null, dupOnly:false, sort:'cat', frozen: new Map()};
 const heSort = new Intl.Collator('he', {numeric: true, sensitivity: 'base'}).compare;
 let pendingImport = null;          // {items, users, from, flip, first} waiting for merge/replace
 const resetOrder = () => ui.frozen.clear();
@@ -936,10 +938,14 @@ function render() {
   const list = inTab.filter(i =>
     (!ui.dupOnly || dups.has(dupKey(i))) &&
     (!q || normName(i.name).includes(q)) &&
-    (!ui.unpacked || !i.packed || ui.frozen.has(i.id)));   // a row just packed stays until the view changes
+    (ui.show === 'all' || ui.frozen.has(i.id) || (ui.show === 'todo' ? !i.packed : i.packed)));   // a row just tapped stays until the view changes
 
   const bar = dupCount ? `<div class="dupbar"><span>⚠️ יש <b>${dupCount}</b> פריטים כפולים ${single() ? 'ברשימה' : 'באותה מזוודה'}</span><button type="button" data-act="dup-toggle">${ui.dupOnly ? 'הצג הכל' : 'הצג כפולים'}</button></div>` : '';
 
+  const todoN = inTab.filter(i => !i.packed).length, doneN = inTab.length - todoN;
+  const sb = $('#unpackedBtn');
+  sb.dataset.show = ui.show;
+  sb.textContent = ui.show === 'todo' ? `הצג: לא נארז · ${todoN}` : ui.show === 'done' ? `הצג: ארוז ✓ · ${doneN}` : 'הצג: הכל';
   const hid = state.items.filter(i => !i.deleted && i.skip && (ui.tab === 'all' || i.bag === ui.tab) && (!q || normName(i.name).includes(q)))
     .sort((a, b) => heSort(a.name, b.name));
   const hidHtml = !hid.length ? '' : `<section class="group sect-st"><button type="button" class="sh hid" data-act="hid-toggle" aria-expanded="${ui.hidOpen}">🙈 לא בנסיעה הזו <span class="n">· ${hid.length}</span><span class="ar">${ui.hidOpen ? 'הסתר ▴' : 'הצג ▾'}</span></button>`
@@ -947,9 +953,11 @@ function render() {
       + (hid.length > 1 ? `<button type="button" class="clr all" data-act="unskip-all">החזרת כל ה-${hid.length} לרשימה</button>` : '') : '') + `</section>`;
   if (!items.length && !hid.length) { host.innerHTML = `<div class="empty"><div class="big">🧳</div>הרשימה ריקה.<br>הוסיפו פריט ראשון למעלה, או ייבאו רשימה מ‑Google Keep בהגדרות ☰.</div>`; return; }
   if (!list.length) {
-    const allPacked = ui.unpacked && !q && !ui.dupOnly && inTab.length && inTab.every(i => i.packed);
+    const allPacked = ui.show === 'todo' && !q && !ui.dupOnly && inTab.length && inTab.every(i => i.packed);
+    const noneYet = ui.show === 'done' && !q && !ui.dupOnly && inTab.length && !doneN;
     host.innerHTML = bar + (allPacked
       ? `<div class="empty"><div class="big">✅</div>הכל ארוז!</div>`
+      : noneYet ? `<div class="empty"><div class="big">🧳</div>עוד לא נארז כלום</div>`
       : q ? `<div class="empty"><div class="big">🔍</div>לא נמצא "<bdi>${esc(ui.q.trim())}</bdi>"<br><button type="button" class="clr" data-act="clear-search">ניקוי החיפוש</button></div>`
       : hid.length && !inTab.length ? `<div class="empty"><div class="big">🙈</div>כל הפריטים כאן הוסתרו מהנסיעה הזו</div>`
       : `<div class="empty"><div class="big">🔍</div>אין פריטים כאן</div>`) + hidHtml;
@@ -968,16 +976,7 @@ function render() {
       </div>`;
   };
   let html = bar;
-  const catIx = Object.fromEntries(CATS.map((c, n) => [c[0], n]));
-  if (ui.sort === 'status') {
-    /* two sections: still to pack, then packed (open by default, can fold away); a row just tapped stays until the view changes */
-    const pkd = i => ui.frozen.has(i.id) ? ui.frozen.get(i.id) : i.packed;
-    list.sort((a, b) => (catIx[a.cat] - catIx[b.cat]) || heSort(a.name, b.name));
-    const todo = list.filter(i => !pkd(i)), done = list.filter(pkd);
-    if (todo.length) html += `<section class="group"><div class="sh">לא נארז <span class="n">· ${todo.length}</span></div>${todo.map(i => row(i, true)).join('')}</section>`;
-    else if (done.length) html += `<div class="empty" style="padding:14px 0 4px"><div class="big">✅</div>הכל ארוז!</div>`;
-    if (done.length) html += `<section class="group sect-st"><button type="button" class="sh done" data-act="packed-toggle" aria-expanded="${ui.packedOpen}">ארוז ✓ <span class="n">· ${done.length}</span><span class="ar">${ui.packedOpen ? 'הסתר ▴' : 'הצג ▾'}</span></button>${ui.packedOpen ? done.map(i => row(i, true)).join('') : ''}</section>`;
-  } else if (ui.sort === 'az') {
+  if (ui.sort === 'az') {
     /* one alphabetical list; packed items keep their place */
     list.sort((a, b) => heSort(a.name, b.name));
     html += `<section class="group">${list.map(i => row(i, true)).join('')}</section>`;
@@ -1354,12 +1353,11 @@ function bind() {
   }));
   $('#search').addEventListener('input', e => { ui.q = e.target.value; resetOrder(); render(); });
   $('#unpackedBtn').addEventListener('click', e => {
-    ui.unpacked = !ui.unpacked; e.currentTarget.setAttribute('aria-pressed', ui.unpacked); resetOrder(); render();
+    ui.show = ui.show === 'all' ? 'todo' : ui.show === 'todo' ? 'done' : 'all'; resetOrder(); render();   // הכל → לא נארז → ארוז → הכל
   });
 
   $('#list').addEventListener('click', e => {
     if (e.target.closest('[data-act="dup-toggle"]')) { ui.dupOnly = !ui.dupOnly; resetOrder(); render(); return; }
-    if (e.target.closest('[data-act="packed-toggle"]')) { ui.packedOpen = !ui.packedOpen; resetOrder(); render(); return; }
     if (e.target.closest('[data-act="clear-search"]')) { $('#searchClear').click(); return; }
     if (e.target.closest('[data-act="hid-toggle"]')) { ui.hidOpen = !ui.hidOpen; render(); return; }
     if (e.target.closest('[data-act="unskip-all"]')) { unskip(state.items.filter(i => !i.deleted && i.skip && (ui.tab === 'all' || i.bag === ui.tab))); return; }
@@ -1777,7 +1775,7 @@ async function init() {
     if (noSid || wasOld) save();                                                    // after the items are back in, so nothing is lost
   }
   const lc = await store.get('lastCat2'); if (lc !== ERR && (CAT[lc] || lc === 'auto')) ui.cat = lc;
-  const so = await store.get('sort'); if (so === 'az' || so === 'cat' || so === 'status') ui.sort = so;
+  const so = await store.get('sort'); if (so === 'az' || so === 'cat') ui.sort = so;
   $('#addCat').value = ui.cat;
 
   bind(); render();
