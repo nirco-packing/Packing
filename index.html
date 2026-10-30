@@ -368,7 +368,7 @@ body.single #pWhoF{display:none}
   </div>
   <div class="addbag sortrow"><span class="lbl">מיון:</span>
     <div class="seg" id="sortSeg" role="group" aria-label="מיון"><button type="button" data-sort-set="cat">קטגוריה</button><button type="button" data-sort-set="az">א–ת</button></div>
-    <button class="chip" id="selBtn" type="button" aria-pressed="false">בחירה</button>
+    <button class="chip" id="selBtn" type="button" aria-pressed="false">בחירה מרובה</button>
   </div>
 </div>
 
@@ -835,7 +835,7 @@ function addItem(name) {
 /* ---------- not for this trip ---------- */
 function paintSel() {
   const on = !!ui.sel;
-  $('#selBtn').setAttribute('aria-pressed', on); $('#selBtn').textContent = on ? 'סיום בחירה' : 'בחירה';
+  $('#selBtn').setAttribute('aria-pressed', on); $('#selBtn').textContent = on ? 'סיום בחירה' : 'בחירה מרובה';
   $('#selBar').hidden = !on;
   if (!on) return;
   const n = ui.sel.size;
