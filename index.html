@@ -33,7 +33,7 @@
     var off = d.getTimezoneOffset();
     return { rise: 720 - 4 * (lon + ha) - eq - off, set: 720 - 4 * (lon - ha) - eq - off };
   }
-  function mode() { try { return localStorage.getItem('packing-theme') || 'auto'; } catch (e) { return 'auto'; } }
+  function mode() { try { return localStorage.getItem('packing-theme') || 'light'; } catch (e) { return 'light'; } }   // light unless chosen otherwise
   function info() {
     var d = new Date(), s = sun(d), m = d.getHours() * 60 + d.getMinutes();
     var night = m < s.rise || m >= s.set;
@@ -364,7 +364,7 @@ body.single #pWhoF{display:none}
   <div class="tools">
     <button class="chip" id="searchClear" type="button" aria-label="ניקוי החיפוש" hidden>✕</button>
     <textarea class="search one" id="search" rows="1" wrap="off" autocomplete="off" placeholder="חיפוש" enterkeyhint="search" dir="auto"></textarea>
-    <button class="chip" id="unpackedBtn" type="button" data-show="all" aria-label="מה להציג — לחיצה מחליפה">הצג: הכל</button>
+    <button class="chip" id="unpackedBtn" type="button" data-show="done" aria-label="מה להציג — לחיצה מחליפה">הצג: ארוז ✓</button>
   </div>
   <div class="addbag sortrow"><span class="lbl">מיון:</span>
     <div class="seg" id="sortSeg" role="group" aria-label="מיון"><button type="button" data-sort-set="cat">קטגוריה</button><button type="button" data-sort-set="az">א–ת</button></div>
@@ -573,7 +573,7 @@ const ERR = Symbol('read-error');
 
 /* ---------- state ---------- */
 let state = {version:3, owner:null, users:null, items:[], lastExport:null};
-const ui = {tab:'all', q:'', show:'all', qty:1, cat:'auto', addBag:null, addPacked:false, hidOpen:false, sel:null, dupOnly:false, sort:'cat', frozen: new Map()};
+const ui = {tab:'all', q:'', show:'done', qty:1, cat:'auto', addBag:null, addPacked:false, hidOpen:false, sel:null, dupOnly:false, sort:'cat', frozen: new Map()};
 const heSort = new Intl.Collator('he', {numeric: true, sensitivity: 'base'}).compare;
 let pendingImport = null;          // {items, users, from, flip, first} waiting for merge/replace
 const resetOrder = () => ui.frozen.clear();
@@ -820,6 +820,8 @@ function addItem(name) {
     const where = single() ? 'ברשימה' : dupBags.length === 2 ? 'בשתי המזוודות' : 'במזוודה של ' + nmI(dupBags[0]);
     const extra = made.filter(it => dupBags.includes(it.bag));
     toast(`⚠️ "${iso(name)}" כבר קיים ${where}`, 'הסר', () => { extra.forEach(it => { const x = byId(it.id); if (x) touch(x, {deleted: true}); }); commit(); });
+  } else if (ui.show === 'done' && !ui.addPacked) {                 // added while only packed items are shown
+    toast(`נוסף: "${iso(name)}" — כרגע מוצגים רק פריטים ארוזים`, 'הצג', () => { ui.show = 'todo'; resetOrder(); render(); });
   } else if (revived) {
     toast(`"${iso(name)}" חזר לרשימה — הוא היה מוסתר מהנסיעה הזו`);
   } else if (!single() && ui.tab !== 'all' && !bags.includes(ui.tab)) {
