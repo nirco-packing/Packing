@@ -132,6 +132,10 @@ input:focus-visible,select:focus-visible,textarea:focus-visible,.search:focus{ou
 .stepper{display:flex;align-items:center;border:1px solid var(--line);border-radius:10px;background:var(--surface);height:44px}
 .stepper button{width:44px;height:100%;border:0;background:transparent;font-size:20px}
 .stepper output{min-width:24px;text-align:center;font-weight:700}
+.addpk{flex:0 0 auto;height:44px;border-radius:10px;border:1.5px solid var(--line);background:var(--surface);padding:0 12px;font-weight:700;white-space:nowrap}
+.addpk::before{content:'☐ '}
+.addpk[aria-pressed="true"]{background:var(--ok);border-color:var(--ok);color:#fff}
+.addpk[aria-pressed="true"]::before{content:'✓ '}
 .addbag{display:flex;align-items:center;gap:8px;margin-top:8px}
 .lbl{flex:0 0 auto;font-size:13px;color:var(--muted)}
 
@@ -324,6 +328,7 @@ body.single #pWhoF{display:none}
       <output id="addQty">1</output>
       <button type="button" data-step="-1" aria-label="פחות">−</button>
     </div>
+    <button type="button" id="addPacked" class="addpk" aria-pressed="false">כבר ארוז</button>
   </div>
   <div class="addbag"><span class="lbl">מוסיפים למזוודה:</span>
     <div class="seg" id="addBag"><button type="button" data-bag="p1"></button><button type="button" data-bag="p2"></button><button type="button" data-bag="both">שניהם</button></div>
@@ -539,7 +544,7 @@ const ERR = Symbol('read-error');
 
 /* ---------- state ---------- */
 let state = {version:3, owner:null, users:null, items:[], lastExport:null};
-const ui = {tab:'all', q:'', unpacked:false, qty:1, cat:'auto', addBag:null, dupOnly:false, sort:'cat', frozen: new Map()};
+const ui = {tab:'all', q:'', unpacked:false, qty:1, cat:'auto', addBag:null, addPacked:false, dupOnly:false, sort:'cat', frozen: new Map()};
 const heSort = new Intl.Collator('he', {numeric: true, sensitivity: 'base'}).compare;
 let pendingImport = null;          // {items, users, from, flip, first} waiting for merge/replace
 const resetOrder = () => ui.frozen.clear();
@@ -771,7 +776,7 @@ function addItem(name) {
   const bag = curBag(), bags = targets(bag);
   const cat = ui.cat === 'auto' ? guessCat(name) : ui.cat;
   const dupBags = bags.filter(b => live().some(i => dupKey(i) === dupKey({bag: b, name})));
-  const made = bags.map(b => newItem({name, cat, qty: ui.qty, bag: b}));
+  const made = bags.map(b => newItem({name, cat, qty: ui.qty, bag: b, packed: ui.addPacked}));
   state.items.push(...made);
   commit();
   if (dupBags.length) {
@@ -783,7 +788,7 @@ function addItem(name) {
   } else if (bags.length === 2 && ui.tab !== 'all') {
     toast('נוסף לשתי המזוודות', 'הצג הכל', () => { ui.tab = 'all'; render(); });
   } else {
-    toast(`נוסף${bags.length === 2 ? ' לשתי המזוודות' : ''}: "${iso(name)}" · ${CAT[cat].icon} ${CAT[cat].name}`, 'שינוי', () => openEdit(made[0].id, made[1] && made[1].id));
+    toast(`נוסף${bags.length === 2 ? ' לשתי המזוודות' : ''}${ui.addPacked ? ' כארוז ✓' : ''}: "${iso(name)}" · ${CAT[cat].icon} ${CAT[cat].name}`, 'שינוי', () => openEdit(made[0].id, made[1] && made[1].id));
   }
 }
 function removeItem(id) {
@@ -1241,8 +1246,13 @@ function bind() {
   $('#searchClear').addEventListener('click', clearSearch);
   $('#search').addEventListener('keydown', e => { if (e.key === 'Escape') clearSearch(); });
   // keep the phone keyboard open while tapping these
-  document.querySelectorAll('#addBtn,.stepper button,#addBag button').forEach(b => b.addEventListener('pointerdown', e => e.preventDefault()));
+  document.querySelectorAll('#addBtn,#addPacked,.stepper button,#addBag button').forEach(b => b.addEventListener('pointerdown', e => e.preventDefault()));
   document.querySelectorAll('#addBag button').forEach(b => b.addEventListener('click', () => { ui.addBag = b.dataset.bag; render(); }));
+  $('#addPacked').addEventListener('click', () => {      // stays on for the next items, until tapped again
+    ui.addPacked = !ui.addPacked;
+    $('#addPacked').setAttribute('aria-pressed', ui.addPacked);
+    $('#addName').placeholder = ui.addPacked ? 'הוספת פריט שכבר ארוז…' : 'הוספת פריט…';
+  });
   $('#addCat').addEventListener('change', e => { ui.cat = e.target.value; store.set('lastCat2', ui.cat); });
   document.querySelectorAll('[data-step]').forEach(b => b.addEventListener('click', () => {
     ui.qty = Math.min(99, Math.max(1, ui.qty + +b.dataset.step)); $('#addQty').textContent = ui.qty;
