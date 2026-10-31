@@ -478,7 +478,7 @@ body.single #pWhoF{display:none}
       <div class="seg" id="eBag"><button type="button" data-bag="p1"></button><button type="button" data-bag="p2"></button></div>
       <div class="seg" id="eBox" style="margin-top:8px"></div>
       <div class="hint" id="eHint" hidden>⚠️ העברה למזוודה אחרת תאפס את סימון ״ארוז״</div>
-      <div class="hint" id="eTwin" hidden style="color:var(--muted)">שינוי שם, קטגוריה וכמות יחול גם על העותק במזוודה השנייה</div>
+      <div class="hint" id="eTwin" hidden style="color:var(--muted)">שינוי שם, קטגוריה, כמות ותיק יחול גם על העותק במזוודה השנייה</div>
     </div>
     <div class="row"><button class="btn" type="button" id="eCopy"></button></div>
     <div class="row"><button class="btn" type="button" id="eSkip">🙈 לא לנסיעה הזו (נשמר לפעם הבאה)</button></div>
@@ -691,7 +691,7 @@ function mergeBags(a, b) {                              // each setting: the new
   for (const k of BAG_KEYS) if ((B.t[k] || 0) > (o.t[k] || 0)) { bagSet(o, k, bagGet(B, k)); o.t[k] = B.t[k]; }
   o.ts = Math.max(o.ts, B.ts); return o;
 }
-const APP_VERSION = '2.13', APP_DATE = '31.10.2026';   // shown at the bottom of settings — bump on every release
+const APP_VERSION = '2.14', APP_DATE = '31.10.2026';   // shown at the bottom of settings — bump on every release
 const MAX_FILE = 5e6, MAX_ITEMS = 5000, MAX_FUTURE = 864e5 * 366;
 const ERR = Symbol('read-error');
 
@@ -875,7 +875,7 @@ const store = {
 };
 const save = () => { state.savedAt = now(); return store.set('state', state); };
 /* the phone may close the app right after a tap: keep a synchronous copy too */
-const flushLocal = () => { if (store.readOnly) return; try { state.savedAt = now(); localStorage.setItem('mizvadot:state', JSON.stringify(state)); } catch {} };
+const flushLocal = () => { if (store.readOnly) return; try { localStorage.setItem('mizvadot:state', JSON.stringify(state)); } catch {} };   // keeps the last save's time: only a mirror, never "newer"
 
 /* ---------- items ---------- */
 /* Lists and files from before the suitcase ids were renamed: the two old ids were short lowercase words starting
@@ -1385,7 +1385,10 @@ function submitEdit(quiet) {                             // quiet: the caller sh
       commit();
     }), 0);
     const tw = editTwin && find(editTwin);                 // just added to both suitcases: fix both copies
-    if (tw) touch(tw, {name: cut(name, 80), cat: $('#eCat').value, qty: editQty});
+    if (tw) {                                              // the twin also moves to that kind of bag, if its owner has one (one shared trolley: one item)
+      const twBox = hasBox(tw.bag, box) && !(box === 'carry' && sharedCarry()) ? box : tw.box;
+      touch(tw, {name: cut(name, 80), cat: $('#eCat').value, qty: editQty, box: twBox, ...(twBox !== tw.box ? {packed: false} : {})});
+    }
     commit();
   }
   editTwin = null; $('#editDlg').close();
@@ -1836,7 +1839,7 @@ function bind() {
     const dupsBefore = dupKeys(active()).size;
     const wasSingle = single();
     const {items, users, from, bags} = applyIncoming(p);
-    const bagsWas = JSON.stringify(BAG_KEYS.map(k => bagGet(state.bags, k)));
+    const bagsWas = JSON.stringify(BAG_KEYS.map(k => bagGet(state.bags, k))), sharedWas = state.bags.shared;
     if (bags) state.bags = mergeBags(state.bags, bags);                // each bag setting: the newer one wins
     const r = mergeItems(items);
     const u = adoptUsers(users, false, p.first);
@@ -1845,7 +1848,8 @@ function bind() {
        removing it while this one filled it): keep it, and the next sync carries that back */
     const kept = new Set(), T = Math.max(now(), state.bags.ts + 1);
     for (const i of live()) if (i.box !== 'main' && BOXES[i.box] && !hasBox(i.bag, i.box)) {
-      const k = i.bag + '.' + i.box; bagSet(state.bags, k, true); state.bags.t[k] = T; kept.add(k);
+      const k = i.box === 'carry' && sharedWas ? 'shared' : i.bag + '.' + i.box;   // it was the shared trolley: keep it shared
+      bagSet(state.bags, k, true); state.bags.t[k] = T; kept.add(k);
     }
     if (kept.size) state.bags.ts = T;
     const bagsChanged = JSON.stringify(BAG_KEYS.map(k => bagGet(state.bags, k))) !== bagsWas;
@@ -1907,7 +1911,7 @@ function bind() {
     const p = replaceP;                                  // captured before close() clears it
     $('#replaceDlg').close();
     if (!p) return;
-    const before = state.items, beforeUsers = state.users, beforeOwner = state.owner, beforeBags = state.bags;
+    const before = state.items, beforeUsers = state.users, beforeOwner = state.owner, beforeBags = state.bags, beforeUi = {tab: ui.tab, addBag: ui.addBag};
     let from = null;
     try {
       const inc = applyIncoming(p); const items = inc.items, users = inc.users; from = inc.from;
@@ -1915,11 +1919,11 @@ function bind() {
       if (users) adoptUsers(users, true);
       state.items = items;
     } catch (e) {
-      state.items = before; state.users = beforeUsers; state.owner = beforeOwner; state.bags = beforeBags;
+      state.items = before; state.users = beforeUsers; state.owner = beforeOwner; state.bags = beforeBags; Object.assign(ui, beforeUi);
       toast('ההחלפה נכשלה — הרשימה לא השתנתה'); return;
     }
     resetOrder(); commit();
-    afterImport('הרשימה הוחלפה בקובץ', from, () => { state.items = before; state.users = beforeUsers; state.owner = beforeOwner; state.bags = beforeBags; resetOrder(); commit(); toast('ההחלפה בוטלה — הרשימה הקודמת חזרה'); });
+    afterImport('הרשימה הוחלפה בקובץ', from, () => { state.items = before; state.users = beforeUsers; state.owner = beforeOwner; state.bags = beforeBags; Object.assign(ui, beforeUi); resetOrder(); commit(); toast('ההחלפה בוטלה — הרשימה הקודמת חזרה'); });
   });
   $('#rCancel').addEventListener('click', () => $('#replaceDlg').close());
   $('#replaceDlg').addEventListener('close', () => { replaceP = null; });

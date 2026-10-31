@@ -3,7 +3,7 @@
 // It only ever touches caches whose name starts with "packing-", so it is safe
 // next to other apps on the same website.
 const PREFIX = 'packing-';
-const CACHE = PREFIX + 'v4';
+const CACHE = PREFIX + 'v5';
 const ASSETS = ['./', './index.html', './packing.webmanifest', './icon-192.png', './icon-512.png', './icon-maskable-512.png'];
 const TIMEOUT_MS = 4000;
 
@@ -32,16 +32,18 @@ self.addEventListener('fetch', e => {
       ? cache.match('./index.html').then(r => r || cache.match(req, { ignoreSearch: true }))
       : cache.match(req, { ignoreSearch: true });
     const net = fetch(req, nav ? { cache: 'no-cache' } : {}).then(res => {
-      if (res.ok) cache.put(nav ? './index.html' : req, res.clone());
+      // keep only the app's own good pages: not an error page, and not a hotel/airport Wi-Fi login page it was redirected to
+      if (res.ok && !res.redirected && new URL(res.url).origin === location.origin) cache.put(nav ? './index.html' : req, res.clone());
       return res;
     });
     net.catch(() => {});
     const timeout = new Promise(res => setTimeout(res, TIMEOUT_MS, null));
     try {
       const first = await Promise.race([net, timeout]);
-      if (first) return first;
-      const cached = await fromCache();
-      return cached || await net;
+      if (first && first.ok) return first;
+      const cached = await fromCache();                  // slow, or an error page: the offline copy is better
+      if (cached) return cached;
+      return first || await net;
     } catch {
       const cached = await fromCache();
       if (cached) return cached;
