@@ -116,7 +116,7 @@ textarea.one{display:block;resize:none;overflow:hidden;white-space:pre;line-heig
 input:focus-visible,select:focus-visible,textarea:focus-visible,.search:focus{outline:2px solid var(--p2);outline-offset:-1px}
 .addbtn{height:48px;max-width:45%;overflow:hidden;text-overflow:ellipsis;border:0;border-radius:12px;color:#fff;font-weight:700;padding:0 14px;white-space:nowrap;background:var(--p2-fill)}
 .addbtn.p1{background:var(--p1-fill)}
-.addbtn .bn{display:inline-block;min-width:2.5em;max-width:6em;overflow:hidden;text-overflow:ellipsis;vertical-align:bottom}
+.addbtn .bn{display:inline-block;min-width:2.5em;max-width:6em;overflow:hidden;text-overflow:ellipsis;vertical-align:bottom;text-align:start}
 
 /* add options: only while adding */
 .addmore{display:none}
@@ -174,7 +174,9 @@ dialog .toast{bottom:calc(env(safe-area-inset-bottom) + 96px)}
 .mlbl{font-size:13px;font-weight:700;color:var(--muted);margin:14px 0 6px}
 .boxseg{margin-top:8px}
 .boxseg button{font-size:13px;white-space:nowrap;padding:0 4px}
-.boxseg small{font-weight:600;opacity:.7}
+.boxseg small{font-weight:700;opacity:.75}
+.boxseg small.lft{opacity:1;background:var(--ink);color:var(--bg);border-radius:999px;padding:0 7px;font-size:12px}
+.boxseg small.ok{opacity:1;color:var(--ok);font-size:15px}
 .boxp{flex:0 0 auto;font-size:12px;font-weight:700;border-radius:999px;padding:3px 8px;background:var(--fill);color:var(--ink);white-space:nowrap}
 .bxp{border-top:1px solid var(--line);padding:12px 0}
 .bxp:first-child{border-top:0}
@@ -627,7 +629,7 @@ function cleanBags(b) {                                 // which extra bags each
   o.shared = b.shared === true; o.ts = clampTs(b.ts); return o;
 }
 const flipBags = b => ({...b, p1: b.p2, p2: b.p1});
-const APP_VERSION = '2.5', APP_DATE = '31.10.2026';   // shown at the bottom of settings — bump on every release
+const APP_VERSION = '2.7', APP_DATE = '31.10.2026';   // shown at the bottom of settings — bump on every release
 const MAX_FILE = 5e6, MAX_ITEMS = 5000, MAX_FUTURE = 864e5 * 366;
 const ERR = Symbol('read-error');
 
@@ -949,8 +951,11 @@ function paintBoxSeg(items) {
   const inTabAll = items.filter(i => ui.tab === 'all' || i.bag === ui.tab);
   const opts = ['all', ...BOX_ORDER.filter(b => (ui.tab === 'all' ? people() : [ui.tab]).some(p => hasBox(p, b)))];
   seg.innerHTML = opts.map(b => {
-    const n = b === 'all' ? inTabAll.length : b === 'carry' && sharedCarry() ? items.filter(i => i.box === 'carry').length : inTabAll.filter(i => i.box === b).length;
-    return `<button type="button" data-box="${b}" class="${ui.box === b ? 'on' : ''}">${b === 'all' ? 'הכל' : BOXES[b].icon + ' ' + (b === 'carry' && sharedCarry() ? 'משותף' : BOXES[b].name)} <small>${n}</small></button>`;
+    const its = b === 'all' ? inTabAll : b === 'carry' && sharedCarry() ? items.filter(i => i.box === 'carry') : inTabAll.filter(i => i.box === b);
+    const left = its.filter(i => !i.packed).length;         // how much is still to pack here; ✓ when done, – when empty
+    const mark = !its.length ? '<small>–</small>' : left ? `<small class="lft">${left}</small>` : '<small class="ok">✓</small>';
+    const say = !its.length ? 'ריק' : left ? `נשארו ${left} לארוז` : 'הכל ארוז';
+    return `<button type="button" data-box="${b}" class="${ui.box === b ? 'on' : ''}" aria-label="${b === 'all' ? 'כל התיקים' : boxName(b)}: ${say}">${b === 'all' ? 'הכל' : BOXES[b].icon + ' ' + (b === 'carry' && sharedCarry() ? 'משותף' : BOXES[b].name)} ${mark}</button>`;
   }).join('');
 }
 function paintSel() {
