@@ -287,6 +287,9 @@ dialog::backdrop{background:rgba(10,14,20,.5)}
 .setrow{padding:10px 4px 12px;border-bottom:1px solid var(--line)}
 .setrow .top2{display:flex;align-items:center;gap:12px;margin-bottom:8px}
 .lprow{display:flex;align-items:center;gap:10px;min-height:44px}
+.mineopt{display:flex;align-items:center;gap:12px;min-height:44px;cursor:pointer}
+.mineopt input{width:22px;height:22px;flex:0 0 auto;accent-color:var(--ink);margin:0}
+.mineopt .ds{display:block}
 .lprow input{flex:1;accent-color:var(--ink);height:32px}
 .lpe{font-size:13px;color:var(--muted)}
 .owners{display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-top:8px}
@@ -301,7 +304,7 @@ dialog::backdrop{background:rgba(10,14,20,.5)}
 .addbtn.both{background:var(--ink);color:var(--bg)}
 body.single #eCopy,
 body.single .tiles, body.single .addbag:not(#addBoxRow), body.single .who,
-body.single #eBag, body.single #kBagField, body.single [data-act="share"]{display:none}
+body.single #eBag, body.single #kBagField, body.single [data-act="share"], body.mine #kBagField{display:none}
 .note{font-size:12px;color:var(--muted);margin-top:12px}
 .btn.dangerfill{background:var(--danger-fill);color:#fff;border-color:var(--danger-fill)}
 .rlist .nb{font-weight:700}
@@ -401,7 +404,7 @@ body.single #pWhoF{display:none}
           </div>
           <button type="button" id="addPacked" class="addpk pill" aria-pressed="false">כבר ארוז</button>
         </div>
-        <div class="addbag"><span class="lbl">למזוודה:</span>
+        <div class="addbag" id="addBagRow"><span class="lbl">למזוודה:</span>
           <div class="seg soft" id="addBag"><button type="button" data-bag="p1"></button><button type="button" data-bag="p2"></button><button type="button" data-bag="both">שניהם</button></div>
         </div>
         <div class="addbag" id="addBoxRow" hidden><span class="lbl">לתוך:</span><div class="seg soft" id="addBox"></div></div>
@@ -517,6 +520,10 @@ body.single #pWhoF{display:none}
       <div class="setrow">
         <div class="top2"><span class="ic">👆</span><span>לחיצה ארוכה לבחירה מרובה<span class="ds" id="lpInfo"></span></span></div>
         <div class="lprow"><span class="lpe">מהר</span><input type="range" id="lpRange" min="500" max="1000" step="100" value="500" aria-label="משך לחיצה ארוכה, במילישניות"><span class="lpe">לאט</span></div>
+      </div>
+
+      <div class="setrow" id="mineRow">
+        <label class="mineopt"><input type="checkbox" id="mineOnly"><span class="ic">🙋</span><span>רק הפריטים שלי בטלפון הזה<span class="ds" id="mineInfo"></span></span></label>
       </div>
 
       <div class="sect danger-sect">אזור מסוכן</div>
@@ -684,13 +691,13 @@ function mergeBags(a, b) {                              // each setting: the new
   for (const k of BAG_KEYS) if ((B.t[k] || 0) > (o.t[k] || 0)) { bagSet(o, k, bagGet(B, k)); o.t[k] = B.t[k]; }
   o.ts = Math.max(o.ts, B.ts); return o;
 }
-const APP_VERSION = '2.12', APP_DATE = '31.10.2026';   // shown at the bottom of settings — bump on every release
+const APP_VERSION = '2.13', APP_DATE = '31.10.2026';   // shown at the bottom of settings — bump on every release
 const MAX_FILE = 5e6, MAX_ITEMS = 5000, MAX_FUTURE = 864e5 * 366;
 const ERR = Symbol('read-error');
 
 /* ---------- state ---------- */
 let state = {version:3, owner:null, users:null, items:[], lastExport:null, bags:noBags()};
-const ui = {tab:'all', q:'', show:'todo', searchOpen:false, qty:1, cat:'auto', addBag:null, addBox:'main', box:'all', addPacked:false, lpMs:500, hidOpen:false, sel:null, dupOnly:false, sort:'cat', frozen: new Map()};
+const ui = {mineOnly:false, tab:'all', q:'', show:'todo', searchOpen:false, qty:1, cat:'auto', addBag:null, addBox:'main', box:'all', addPacked:false, lpMs:500, hidOpen:false, sel:null, dupOnly:false, sort:'cat', frozen: new Map()};
 const heSort = new Intl.Collator('he', {numeric: true, sensitivity: 'base'}).compare;
 let pendingImport = null;          // {items, users, from, flip, first} waiting for merge/replace
 const resetOrder = () => ui.frozen.clear();
@@ -725,7 +732,9 @@ const flip = b => b === 'p1' ? 'p2' : 'p1';
 /* one-user mode belongs to this phone's owner: shows their name, and new items go to their own suitcase */
 const solo = () => state.owner || 'p1';
 const defaultBag = () => single() ? solo() : (state.owner || 'p1');
-const curBag = () => single() ? solo() : (ui.addBag || defaultBag());
+/* "only my items on this phone": the other traveller's items stay (and keep syncing), they are just not shown here */
+const mine = () => ui.mineOnly && !single() && !!BAGS[state.owner];
+const curBag = () => single() ? solo() : mine() ? state.owner : (ui.addBag || defaultBag());
 const targets = bag => single() ? [solo()] : bag === 'both' ? ['p1', 'p2'] : [bag];   // 'both' = one item in each suitcase
 const whereTo = bag => single() ? 'לרשימה' : bag === 'both' ? 'לשתי המזוודות' : 'למזוודה של ' + nmI(bag);
 /* users.sid = this list's identity (shared by phones that set up from each other's file);
@@ -1058,7 +1067,7 @@ function skipSelected() {
 /* where picked items can go: every bag of every person (the shared trolley once) */
 function destinations() {
   const out = [];
-  for (const p of people()) for (const b of BOX_ORDER) if (hasBox(p, b) && !(b === 'carry' && sharedCarry())) out.push({p, b});
+  for (const p of mine() ? [state.owner] : people()) for (const b of BOX_ORDER) if (hasBox(p, b) && !(b === 'carry' && sharedCarry())) out.push({p, b});
   if (sharedCarry()) out.push({p: '*', b: 'carry'});
   return out.length > 1 ? out : [];
 }
@@ -1069,7 +1078,7 @@ function openMove() {
   const ds = destinations();
   const btn = d => { const here = its.every(i => at(i, d)); const n = its.filter(i => !at(i, d)).length;
     return `<button type="button" class="mvb" data-mp="${d.p}" data-mb="${d.b}" ${here ? 'disabled' : ''}>${BOXES[d.b].icon} ${d.p === '*' ? 'טרולי משותף' : BOXES[d.b].name}<small>${here ? 'כבר כאן' : n < its.length ? `${n} יעברו` : ''}</small></button>`; };
-  const groups = [...(single() ? [solo()] : ['p1', 'p2']).map(p => ({p, ds: ds.filter(d => d.p === p)})), {p: '*', ds: ds.filter(d => d.p === '*')}].filter(g => g.ds.length);
+  const groups = [...(single() ? [solo()] : mine() ? [state.owner] : ['p1', 'p2']).map(p => ({p, ds: ds.filter(d => d.p === p)})), {p: '*', ds: ds.filter(d => d.p === '*')}].filter(g => g.ds.length);
   $('#mvHead').textContent = its.length === 1 ? 'להעביר פריט אחד אל…' : `להעביר ${its.length} פריטים אל…`;
   $('#mvSub').textContent = its.some(i => i.packed) ? 'פריטים שכבר נארזו יסומנו כלא ארוזים, כדי לארוז אותם במקום החדש.' : '';
   $('#mvBody').innerHTML = groups.map(g => `<div class="mvp ${g.p === '*' ? '' : g.p}">${g.p === '*' ? '' : `<span class="who" dir="auto">${single() ? 'התיקים' : esc(nm(g.p))}</span>`}<div class="opts">${g.ds.map(btn).join('')}</div></div>`).join('');
@@ -1143,6 +1152,15 @@ function render() {
   document.body.classList.toggle('single', single());
   document.querySelectorAll('[data-sort-set]').forEach(b => b.classList.toggle('on', b.dataset.sortSet === ui.sort));
   if (single() || (ui.tab !== 'all' && !BAGS[ui.tab])) ui.tab = 'all';
+  if (mine()) { ui.tab = state.owner; ui.addBag = state.owner; }
+  document.body.classList.toggle('mine', mine());
+  document.querySelectorAll('.tab').forEach(t => t.hidden = mine() && t.dataset.tab !== state.owner);
+  $('#addBagRow').hidden = mine();
+  $('#mineRow').hidden = single() || !BAGS[state.owner];
+  $('#mineOnly').checked = mine();
+  if (!single() && BAGS[state.owner]) $('#mineInfo').textContent = mine()
+    ? `הפריטים של ${nm(flip(state.owner))} לא נמחקו — הם רק לא מוצגים כאן, והסנכרון ממשיך כרגיל`
+    : `מסתיר כאן את הפריטים של ${nm(flip(state.owner))}. שום דבר לא נמחק`;
   document.querySelectorAll('[data-name]').forEach(e => e.textContent = single() && e.dataset.name === 'p1' ? nm(solo()) : nm(e.dataset.name));
   document.querySelectorAll('#addBag button,#eBag button,#kBag button').forEach(b => { if (b.dataset.bag !== 'both') b.textContent = nm(b.dataset.bag); });
 
@@ -1223,7 +1241,7 @@ function render() {
     host.innerHTML = bar + (allPacked
       ? `<div class="empty"><div class="big">✅</div>הכל ארוז!</div>`
       : noneYet ? `<div class="empty"><div class="big">🧳</div>עוד לא נארז כלום</div>`
-      : q ? (() => { const out = (ui.tab !== 'all' || ui.box !== 'all') ? active().filter(i => normName(i.name).includes(q)).length : 0;
+      : q ? (() => { const out = (ui.tab !== 'all' || ui.box !== 'all') ? active().filter(i => normName(i.name).includes(q) && (!mine() || i.bag === state.owner)).length : 0;
           return `<div class="empty"><div class="big">🔍</div>לא נמצא "<bdi>${esc(ui.q.trim())}</bdi>" ${ui.tab !== 'all' || ui.box !== 'all' ? 'כאן' : ''}${out ? `<br>${out === 1 ? 'יש פריט אחד' : `יש ${out}`} בתיקים אחרים<br><button type="button" class="clr" data-act="search-all">הצג בכל התיקים</button>` : `<br><button type="button" class="clr" data-act="clear-search">ניקוי החיפוש</button>`}</div>`; })()
       : hid.length && !inTab.length ? `<div class="empty"><div class="big">🙈</div>כל הפריטים כאן הוסתרו מהנסיעה הזו</div>`
       : `<div class="empty"><div class="big">🔍</div>אין פריטים כאן</div>`) + hidHtml;
@@ -1581,6 +1599,7 @@ function doKeepImport() {
 /* ---------- events ---------- */
 function bind() {
   document.querySelectorAll('[data-tab]').forEach(b => b.addEventListener('click', () => {
+    if (mine()) return;
     ui.tab = (b.dataset.tab !== 'all' && ui.tab === b.dataset.tab) ? 'all' : b.dataset.tab;
     if (BAGS[ui.tab]) ui.addBag = ui.tab;
     resetOrder(); render();
@@ -1676,6 +1695,12 @@ function bind() {
   const paintLp = () => { $('#lpRange').value = ui.lpMs; $('#lpInfo').textContent = `${(ui.lpMs / 1000).toLocaleString('he-IL')} שנ׳${ui.lpMs === 500 ? ' (ברירת מחדל)' : ''} · בטלפון הזה`; };
   $('#lpRange').addEventListener('input', e => { ui.lpMs = Math.min(1000, Math.max(500, Math.round(+e.target.value / 100) * 100)); paintLp(); });
   $('#lpRange').addEventListener('change', () => store.set('lpMs', ui.lpMs));
+  $('#mineOnly').addEventListener('change', e => {
+    ui.mineOnly = e.target.checked; store.set('mineOnly', ui.mineOnly);
+    if (!ui.mineOnly) ui.tab = 'all';
+    ui.sel = null; resetOrder(); render();
+    toast(ui.mineOnly ? `מוצגים רק הפריטים של ${nmI(state.owner)} — שום דבר לא נמחק` : 'מוצגים שוב הפריטים של שניכם');
+  });
   $('#menuBtn').addEventListener('click', paintLp);
   $('#bxSave').addEventListener('click', saveBoxes);
   $('#bxCancel').addEventListener('click', () => $('#boxDlg').close()); $('#bxX').addEventListener('click', () => $('#boxDlg').close());
@@ -1768,11 +1793,12 @@ function bind() {
     else if (act === 'keep') openKeep('');
     else if (act === 'print') openPrint();
     else if (act === 'unpack') {
-      const packed = live().filter(i => i.packed), hidden = live().filter(i => i.skip);
+      const its = live().filter(i => !mine() || i.bag === state.owner);   // only my items: the other traveller's list is theirs
+      const packed = its.filter(i => i.packed), hidden = its.filter(i => i.skip);
       if (!packed.length && !hidden.length) { toast('אין פריטים מסומנים כארוזים'); return; }
       const msg = [packed.length && many(packed.length, 'פריט אחד יסומן כלא ארוז', 'פריטים יסומנו כלא ארוזים'),
                    hidden.length && many(hidden.length, 'פריט אחד שהוסתר מהנסיעה יחזור לרשימה', 'פריטים שהוסתרו מהנסיעה יחזרו לרשימה')].filter(Boolean).join(' · ');
-      if (await confirmBox('איפוס לנסיעה הבאה', `${msg}.${single() ? '' : ' השיוך למזוודות נשאר.'}`, 'איפוס')) {
+      if (await confirmBox('איפוס לנסיעה הבאה', `${msg}.${single() ? '' : ' השיוך למזוודות נשאר.'}${mine() ? ` הפריטים של ${nmI(flip(state.owner))} לא משתנים.` : ''}`, 'איפוס')) {
         packed.forEach(i => touch(i, {packed: false})); hidden.forEach(i => touch(i, {skip: false})); resetOrder(); commit();
         toast('הרשימה מוכנה לנסיעה הבאה', 'בטל', () => {
           packed.forEach(i => { const x = find(i.id); if (x) touch(x, {packed: true}); });
@@ -1783,9 +1809,9 @@ function bind() {
     else if (act === 'users') openSetup(false);
     else if (act === 'boxes') openBoxes();
     else if (act === 'clear') {
-      const all = live();
+      const all = live().filter(i => !mine() || i.bag === state.owner);   // only my items: hers are not shown here, so they are not deleted either
       if (!all.length) { toast('הרשימה כבר ריקה'); return; }
-      if (await confirmBox('מחיקת כל הפריטים', `${many(all.length, 'פריט אחד יימחק', 'פריטים יימחקו')} מהטלפון הזה${single() ? '.' : ' — ובסנכרון הבא גם מהטלפון השני.'}`, 'מחיקה')) {
+      if (await confirmBox(mine() ? 'מחיקת כל הפריטים שלי' : 'מחיקת כל הפריטים', `${many(all.length, 'פריט אחד יימחק', 'פריטים יימחקו')} מהטלפון הזה${single() ? '.' : ' — ובסנכרון הבא גם מהטלפון השני.'}${mine() ? ` הפריטים של ${nmI(flip(state.owner))} נשארים.` : ''}`, 'מחיקה')) {
         all.forEach(i => touch(i, {deleted: true})); commit();
         toast('כל הפריטים נמחקו', 'בטל', () => { all.forEach(i => { const x = byId(i.id); if (x && x.deleted) touch(x, {deleted: false}); }); commit(); });
       }
@@ -1815,9 +1841,14 @@ function bind() {
     const r = mergeItems(items);
     const u = adoptUsers(users, false, p.first);
     if (wasSingle && !single() && !state.owner) state.owner = 'p1';    // this phone's one-user list was p1's
+    /* a bag that still has things in it is never removed by a file (an older app version, or the other phone
+       removing it while this one filled it): keep it, and the next sync carries that back */
+    const kept = new Set(), T = Math.max(now(), state.bags.ts + 1);
+    for (const i of live()) if (i.box !== 'main' && BOXES[i.box] && !hasBox(i.bag, i.box)) {
+      const k = i.bag + '.' + i.box; bagSet(state.bags, k, true); state.bags.t[k] = T; kept.add(k);
+    }
+    if (kept.size) state.bags.ts = T;
     const bagsChanged = JSON.stringify(BAG_KEYS.map(k => bagGet(state.bags, k))) !== bagsWas;
-    const orphans = live().filter(i => i.box !== 'main' && !hasBox(i.bag, i.box));   // a bag removed on one phone while the other put things in it
-    orphans.forEach(i => touch(i, {box: 'main'}));
     resetOrder(); commit();
     const parts = [];
     if (r.added) parts.push(r.added === 1 ? 'נוסף 1' : `נוספו ${r.added}`);
@@ -1826,7 +1857,7 @@ function bind() {
     if (r.restored) parts.push(r.restored === 1 ? 'שוחזר 1' : `שוחזרו ${r.restored}`);
     if (bagsChanged) parts.push('התיקים עודכנו');
     let msg = parts.length ? 'מוזג: ' + parts.join(' · ') : 'אין שינויים חדשים בקובץ';
-    if (orphans.length) msg += ' · ' + (orphans.length === 1 ? 'פריט אחד עבר למזוודה כי התיק שלו הוסר' : `${orphans.length} פריטים עברו למזוודה כי התיק שלהם הוסר`);
+    if (kept.size) msg += ' · ' + (kept.size === 1 ? 'תיק אחד נשמר כי יש בו פריטים' : `${kept.size} תיקים נשמרו כי יש בהם פריטים`);
     if (r.skipped) msg += ' · ' + many(r.skipped, 'פריט אחד מהקובץ נמחק כאן קודם ולא הוחזר', 'פריטים מהקובץ נמחקו כאן קודם ולא הוחזרו');
     if (u && u.countChanged) msg += single() ? ' · עברנו לרשימה אחת, כמו בטלפון השני' : ' · עברנו לשני משתמשים, כמו בטלפון השני';
     else if (u && u.changed && state.owner) msg += ' · שמות המשתמשים עודכנו';
@@ -1958,7 +1989,7 @@ const printBags = () => single() ? ['p1'] : pr.who === 'both'
   : [pr.who, ...(sharedCarry() && active().some(i => i.box === 'carry') ? ['shared'] : [])];   // one person's list includes the trolley they share
 const printItems = b => active().filter(i => inSheet(i, b) && (pr.what === 'all' || !i.packed));
 function openPrint() {
-  pr.who = single() ? 'p1' : 'both'; pr.what = 'all'; pr.sort = ui.sort;
+  pr.who = single() ? 'p1' : mine() ? state.owner : 'both'; pr.what = 'all'; pr.sort = ui.sort;
   document.querySelectorAll('#pWho button').forEach(b => { if (b.dataset.who !== 'both') b.textContent = nm(b.dataset.who); });
   paintPrint(); $('#printDlg').showModal();
 }
@@ -2173,6 +2204,7 @@ async function init() {
   }
   const lc = await store.get('lastCat2'); if (lc !== ERR && (CAT[lc] || lc === 'auto')) ui.cat = lc;
   const so = await store.get('sort'); if (so === 'az' || so === 'cat') ui.sort = so;
+  ui.mineOnly = (await store.get('mineOnly')) === true;   // this phone only
   const lpv = await store.get('lpMs'); if (Number.isFinite(lpv) && lpv >= 500 && lpv <= 1000) ui.lpMs = lpv;   // this phone only
   const sh = await store.get('show'); if (sh === 'todo' || sh === 'done' || sh === 'all') ui.show = sh;
   $('#addCat').value = ui.cat;
