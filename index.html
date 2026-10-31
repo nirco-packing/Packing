@@ -116,7 +116,7 @@ textarea.one{display:block;resize:none;overflow:hidden;white-space:pre;line-heig
 input:focus-visible,select:focus-visible,textarea:focus-visible,.search:focus{outline:2px solid var(--p2);outline-offset:-1px}
 .addbtn{height:48px;max-width:45%;overflow:hidden;text-overflow:ellipsis;border:0;border-radius:12px;color:#fff;font-weight:700;padding:0 14px;white-space:nowrap;background:var(--p2-fill)}
 .addbtn.p1{background:var(--p1-fill)}
-.addbtn .bn{display:inline-block;min-width:2.5em;max-width:6em;overflow:hidden;text-overflow:ellipsis;vertical-align:bottom;text-align:start}
+.addbtn .bn{display:inline-block;min-width:2.5em;max-width:4.6em;overflow:hidden;text-overflow:ellipsis;vertical-align:bottom;text-align:start}
 
 /* add options: only while adding */
 .addmore{display:none}
@@ -141,11 +141,11 @@ input:focus-visible,select:focus-visible,textarea:focus-visible,.search:focus{ou
 .sh .ar{margin-inline-start:auto;color:var(--muted);font-size:14px;font-weight:700}
 .sh.done{color:var(--ok)}
 .sect-st{border-top:2px solid var(--line);margin-top:6px}
-.sh.hid{color:var(--muted)}
+.sh.hid{color:var(--muted);min-height:44px}
 .hrow{display:flex;align-items:center;gap:10px;padding:6px 12px;min-height:48px;border:1px dashed var(--line);border-radius:12px;margin-bottom:6px;color:var(--muted)}
 .hrow .t{flex:1;min-width:0;overflow-wrap:anywhere}
 .hrow .back{flex:0 0 auto;height:44px;border-radius:999px;border:1.5px solid var(--line);background:var(--surface);padding:0 14px;font-weight:700;color:var(--ink)}
-.clr.all{display:block;margin:4px 0 0;min-height:40px;border-radius:10px;border:1px solid var(--line);background:var(--surface);padding:0 14px;font-weight:600}
+.clr.all{display:block;margin:4px 0 0;min-height:44px;border-radius:10px;border:1px solid var(--line);background:var(--surface);padding:0 14px;font-weight:600}
 .selecting .more{display:none}
 .selecting #list{padding-bottom:130px}
 .selbox{flex:0 0 auto;width:36px;height:36px;margin:4px;border-radius:50%;border:2px solid var(--ink);background:var(--surface);font-size:18px;font-weight:800;color:#fff;padding:0}
@@ -153,15 +153,17 @@ input:focus-visible,select:focus-visible,textarea:focus-visible,.search:focus{ou
 .item.chosen{background:var(--fill)}
 .item.chosen .q{background:var(--surface)}
 .selbar{position:fixed;left:0;right:0;bottom:0;z-index:20;background:var(--surface);border-top:1px solid var(--line);box-shadow:0 -4px 16px rgba(0,0,0,.12);padding:10px 16px calc(env(safe-area-inset-bottom) + 10px)}
-.selbar .sl1{display:flex;align-items:center;justify-content:space-between;gap:8px;max-width:616px;margin:0 auto 8px;font-weight:700}
+.selbar .sl1{display:flex;align-items:center;gap:8px;max-width:616px;margin:0 auto 8px;font-weight:700}
+.selbar .sl1 .sp{flex:1}
+.selbar .sl1 #selN{min-width:0;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
 .selbar .sl2{display:flex;gap:8px;max-width:616px;margin:0 auto}
 .selbar .lnk{border:0;background:transparent;color:var(--p2);font-weight:700;min-height:44px;padding:0 4px}
 .selbar .go{flex:1;min-width:0;height:48px;border:0;border-radius:12px;background:var(--ink);color:var(--bg);font-weight:800;font-size:15px;white-space:nowrap;padding:0 8px}
 .selbar .go.alt{background:var(--fill);color:var(--ink)}
 .selbar .go:disabled{opacity:.4}
-.selbar .no{flex:0 0 auto;height:48px;border:1px solid var(--line);border-radius:12px;background:var(--surface);padding:0 16px;font-weight:700}
+.selbar .no{flex:0 0 auto;height:44px;border:1px solid var(--line);border-radius:12px;background:var(--surface);padding:0 14px;font-weight:700}
 .selecting .toast{bottom:calc(env(safe-area-inset-bottom) + 130px)}
-dialog .toast{bottom:calc(env(safe-area-inset-bottom) + 96px)}
+dialog .toast{bottom:auto;top:calc(env(safe-area-inset-top) + 12px)}
 .lbl{flex:0 0 auto;font-size:13px;color:var(--muted)}
 
 .tools{display:flex;gap:8px;margin-top:10px;align-items:center}
@@ -173,7 +175,7 @@ dialog .toast{bottom:calc(env(safe-area-inset-bottom) + 96px)}
 #showSeg.all3 .sall{display:block}
 .mlbl{font-size:13px;font-weight:700;color:var(--muted);margin:14px 0 6px}
 .mvp{margin-top:12px}
-.mvp .who{display:block;font-weight:800;font-size:15px;margin:0 2px 6px;background:none;padding:0}
+.mvp .who{display:block;max-width:none;font-weight:800;font-size:15px;margin:0 2px 6px;background:none;padding:0;white-space:normal}
 .mvp .opts{display:flex;flex-wrap:wrap;gap:8px}
 .mvb{flex:1 1 30%;min-height:52px;border:1px solid var(--line);border-radius:12px;background:var(--surface);font-weight:700;font-size:15px;padding:6px 8px}
 .mvb small{display:block;font-weight:500;font-size:12px;color:var(--muted)}
@@ -190,7 +192,7 @@ dialog .toast{bottom:calc(env(safe-area-inset-bottom) + 96px)}
 .bgc .bar i{background:var(--c)}
 .bgc.done .lf{color:var(--ok)} .bgc.done .bar i{background:var(--ok)}
 .bgc.on{box-shadow:inset 0 0 0 2px var(--c);background:var(--s)}
-.bgc.all .i{font-size:15px;font-weight:800;color:var(--ink)}
+.bgc.all .i{font-size:13px;font-weight:800;color:var(--ink);white-space:nowrap;overflow:hidden;text-overflow:ellipsis;line-height:23px}
 .scope{font-size:13.5px;color:var(--muted);margin:8px 4px 0}
 .scope b{color:var(--ink)}
 .scope .pc1{color:var(--p1);font-weight:700} .scope .pc2{color:var(--p2);font-weight:700}
@@ -221,6 +223,9 @@ dialog .toast{bottom:calc(env(safe-area-inset-bottom) + 96px)}
 .seg.soft button{height:42px;border-radius:9px}
 .seg.soft button+button{border:0}
 .seg.soft button.on{background:var(--surface);color:var(--ink);box-shadow:0 1px 2px rgba(0,0,0,.14)}
+.seg.soft button{white-space:nowrap;overflow:hidden;text-overflow:ellipsis;min-width:0}
+:root[data-theme="dark"] .seg.soft button.on{background:#3d4654;box-shadow:inset 0 0 0 1px rgba(255,255,255,.18)}
+.lprow input[type=range]{height:44px}
 #showSeg button[data-show-set="done"].on{color:var(--ok)}
 .seg button[data-bag="p1"].on{background:var(--p1-fill);color:#fff}
 .seg button[data-bag="p2"].on{background:var(--p2-fill);color:#fff}
@@ -252,7 +257,7 @@ dialog .toast{bottom:calc(env(safe-area-inset-bottom) + 96px)}
 .info .dup{display:block;font-size:12px;font-weight:600;color:var(--warn)}
 .dupbar{display:flex;align-items:center;justify-content:space-between;gap:10px;background:var(--warn-soft);border:1px solid var(--warn);border-radius:12px;padding:10px 12px;margin-top:14px;font-size:14px}
 .dupbar b{color:var(--warn)}
-.dupbar button{flex:0 0 auto;height:40px;border-radius:9px;border:1px solid var(--warn);background:var(--surface);color:var(--warn);font-weight:700;padding:0 12px}
+.dupbar button{flex:0 0 auto;height:44px;border-radius:9px;border:1px solid var(--warn);background:var(--surface);color:var(--warn);font-weight:700;padding:0 12px}
 .empty{text-align:center;color:var(--muted);padding:40px 16px}
 .empty .big{font-size:40px;margin-bottom:6px}
 .fatal{margin-top:20px;border:1px solid var(--danger);border-radius:12px;padding:16px;color:var(--danger);font-weight:600;text-align:center}
@@ -287,7 +292,7 @@ dialog::backdrop{background:rgba(10,14,20,.5)}
 .owners{display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-top:8px}
 .owners button{height:76px;border-radius:14px;border:2px solid var(--line);background:var(--surface-2);font-size:20px;font-weight:800}
 .owners [data-owner="p1"]{color:var(--p1)} .owners [data-owner="p2"]{color:var(--p2)}
-.linkbtn{display:block;margin:12px auto 0;min-height:40px;border:0;background:none;color:var(--muted);text-decoration:underline;font-size:13px;padding:0 8px}
+.linkbtn{display:block;margin:12px auto 0;min-height:44px;border:0;background:none;color:var(--muted);text-decoration:underline;font-size:13px;padding:0 8px}
 .warnbox{background:var(--warn-soft);border:1px solid var(--warn);border-radius:10px;padding:10px 12px;margin:8px 0 12px;font-size:14px;font-weight:600}
 .rlist{margin:0 0 12px;padding-inline-start:20px;font-size:14px;line-height:1.7}
 .rlist b{color:var(--danger)}
@@ -300,7 +305,7 @@ body.single #eBag, body.single #kBagField, body.single [data-act="share"]{displa
 .note{font-size:12px;color:var(--muted);margin-top:12px}
 .btn.dangerfill{background:var(--danger-fill);color:#fff;border-color:var(--danger-fill)}
 .rlist .nb{font-weight:700}
-.empty .clr{margin-top:12px;min-height:40px;border-radius:10px;border:1px solid var(--line);background:var(--surface);padding:0 14px;font-weight:600}
+.empty .clr{margin-top:12px;min-height:44px;border-radius:10px;border:1px solid var(--line);background:var(--surface);padding:0 14px;font-weight:600}
 .dhead{position:sticky;top:0;z-index:2;display:flex;align-items:center;justify-content:space-between;gap:8px;background:var(--surface);margin:-18px -18px 0;padding:12px 18px 4px 8px}
 .dhead h2{margin:0!important}
 .xbtn{flex:0 0 auto;width:44px;height:44px;border-radius:12px;border:0;background:transparent;font-size:20px;color:var(--muted)}
@@ -352,7 +357,7 @@ body.single #pWhoF{display:none}
 .pdoc .prow{display:flex;align-items:center;gap:8px;font-size:11.5pt;line-height:1.3;padding:2.5px 0}
 .pdoc .pbox{flex:0 0 auto;width:12px;height:12px;border:1.5px solid #000;border-radius:2px;display:inline-flex;align-items:center;justify-content:center;font-size:10px;line-height:1;font-weight:700}
 .pdoc .pname{flex:0 1 auto}
-.pdoc .pqty{color:#333;font-size:10.5pt}
+.pdoc .pqty{color:#333;font-size:10.5pt;white-space:nowrap;flex:0 0 auto}
 .pdoc .pempty{font-size:12pt;margin-top:14px}
 #pMeasure{position:absolute;left:-10000px;top:0;visibility:hidden;pointer-events:none}
 @media print{
@@ -576,7 +581,7 @@ body.single #pWhoF{display:none}
 <!-- print -->
 <dialog id="printDlg">
   <div class="dlg">
-    <h2>הדפסת הרשימה</h2>
+    <div class="dhead"><h2>הדפסת הרשימה</h2><button class="xbtn" type="button" id="pX" aria-label="סגירה">✕</button></div>
     <div class="f" id="pWhoF" style="margin-top:12px"><span>מה להדפיס</span>
       <div class="seg" id="pWho"><button type="button" data-who="p1" data-bag="p1"></button><button type="button" data-who="p2" data-bag="p2"></button><button type="button" data-who="both" data-bag="both">שניהם</button></div>
     </div>
@@ -584,7 +589,7 @@ body.single #pWhoF{display:none}
       <div class="seg" id="pWhat"><button type="button" data-what="all">כל הפריטים</button><button type="button" data-what="left">רק מה שלא נארז</button></div>
     </div>
     <div class="f"><span>סדר</span>
-      <div class="seg" id="pSort"><button type="button" data-psort="cat">לפי קטגוריה</button><button type="button" data-psort="az">א–ת</button><button type="button" data-psort="status">ארוז / לא</button></div>
+      <div class="seg" id="pSort"><button type="button" data-psort="cat">לפי קטגוריה</button><button type="button" data-psort="az">א–ת</button><button type="button" data-psort="status">ארוז / לא ארוז</button></div>
     </div>
     <p class="note" id="pSum"></p>
     <div class="dfoot"><div class="row"><button class="btn main" type="button" id="pGo">הדפסה</button><button class="btn" type="button" id="pCancel">ביטול</button></div></div>
@@ -640,8 +645,8 @@ body.single #pWhoF{display:none}
 <input type="file" id="fileIn" hidden>
 <input type="file" id="kFile" hidden>
 <div class="selbar" id="selBar" hidden>
-  <div class="sl1"><span id="selN"></span><button type="button" id="selAll" class="lnk">בחירת הכל</button></div>
-  <div class="sl2"><button type="button" id="selMove" class="go">🔀 העברה</button><button type="button" id="selSkip" class="go alt">🙈 לא לנסיעה הזו</button><button type="button" id="selCancel" class="no">ביטול</button></div>
+  <div class="sl1"><span id="selN"></span><span class="sp"></span><button type="button" id="selAll" class="lnk">בחירת הכל</button><button type="button" id="selCancel" class="no">ביטול</button></div>
+  <div class="sl2"><button type="button" id="selMove" class="go">🔀 העברה</button><button type="button" id="selSkip" class="go alt">🙈 לא לנסיעה הזו</button></div>
 </div>
 <div class="toast" id="toast" role="status" popover="manual"><span id="toastText"></span><button type="button" id="toastAct" hidden></button></div>
 
@@ -660,14 +665,26 @@ const defaultUsers = () => ({count: 2, names: {p1: 'משתמש/ת 1', p2: 'מש�
 const FIELDS = ['name','cat','qty','bag','packed','deleted','skip','box'];   // skip = not for this trip (kept for next time); box = which bag of that person
 const BOXES = Object.assign(Object.create(null), {main: {icon: '🧳', name: 'מזוודה'}, carry: {icon: '🛄', name: 'טרולי'}, back: {icon: '🎒', name: 'תיק גב'}});
 const BOX_ORDER = ['main', 'carry', 'back'];
-const noBags = () => ({p1: {carry: false, back: false}, p2: {carry: false, back: false}, shared: false, ts: 0});
-function cleanBags(b) {                                 // which extra bags each traveller has (synced, newest setting wins)
+const BAG_KEYS = ['p1.carry', 'p1.back', 'p2.carry', 'p2.back', 'shared'];   // each setting has its own time, so two phones can change different ones
+const noBags = () => ({p1: {carry: false, back: false}, p2: {carry: false, back: false}, shared: false, ts: 0, t: {}});
+const bagGet = (b, k) => k === 'shared' ? b.shared : b[k.slice(0, 2)][k.slice(3)];
+const bagSet = (b, k, v) => { if (k === 'shared') b.shared = v; else b[k.slice(0, 2)][k.slice(3)] = v; };
+function cleanBags(b) {                                 // which extra bags each traveller has (synced per setting, newest wins)
   const o = noBags(); if (!b || typeof b !== 'object') return o;
-  for (const k of ['p1', 'p2']) { const x = b[k] && typeof b[k] === 'object' ? b[k] : {}; o[k] = {carry: x.carry === true, back: x.back === true}; }
-  o.shared = b.shared === true; o.ts = clampTs(b.ts); return o;
+  for (const k of ['p1', 'p2']) { const x = b[k] && typeof b[k] === 'object' ? b[k] : {}; o[k] = {carry: yes(x.carry), back: yes(x.back)}; }
+  o.shared = yes(b.shared); o.ts = clampTs(b.ts);
+  const t = b.t && typeof b.t === 'object' ? b.t : {};
+  for (const k of BAG_KEYS) o.t[k] = clampTs(t[k]) || o.ts;   // from a version with one time for everything
+  return o;
 }
-const flipBags = b => ({...b, p1: b.p2, p2: b.p1});
-const APP_VERSION = '2.10', APP_DATE = '31.10.2026';   // shown at the bottom of settings — bump on every release
+const copyBags = b => cleanBags(JSON.parse(JSON.stringify(b)));
+const flipBags = b => { const t = b.t || {}; return {...b, p1: b.p2, p2: b.p1, t: {...t, 'p1.carry': t['p2.carry'], 'p1.back': t['p2.back'], 'p2.carry': t['p1.carry'], 'p2.back': t['p1.back']}}; };
+function mergeBags(a, b) {                              // each setting: the newer one wins
+  const o = copyBags(a), B = cleanBags(b);
+  for (const k of BAG_KEYS) if ((B.t[k] || 0) > (o.t[k] || 0)) { bagSet(o, k, bagGet(B, k)); o.t[k] = B.t[k]; }
+  o.ts = Math.max(o.ts, B.ts); return o;
+}
+const APP_VERSION = '2.12', APP_DATE = '31.10.2026';   // shown at the bottom of settings — bump on every release
 const MAX_FILE = 5e6, MAX_ITEMS = 5000, MAX_FUTURE = 864e5 * 366;
 const ERR = Symbol('read-error');
 
@@ -689,10 +706,13 @@ const pre = (l, s) => (/^[A-Za-z0-9]/.test(s) ? l + '-' : l) + `<bdi class="bn">
 const and = s => (/^[A-Za-z0-9]/.test(s) ? 'ו-' : 'ו') + iso(s);   // "ודנה", but "ו-Dan"              // keep a Latin/Hebrew name from scrambling the sentence around it
 const live = () => state.items.filter(i => !i.deleted);
 const sharedCarry = () => !single() && state.bags.shared;
-const hasBox = (p, box) => box === 'main' || (box === 'carry' ? sharedCarry() || state.bags[p].carry : state.bags[p].back);
+const hasBox = (p, box) => box === 'main' || (box === 'carry' ? state.bags.shared || state.bags[p].carry : state.bags[p].back);   // one user: the shared trolley is theirs
 const people = () => single() ? [solo()] : ['p1', 'p2'];
-const anyBoxes = () => sharedCarry() || people().some(p => state.bags[p].carry || state.bags[p].back);
+const anyBoxes = () => state.bags.shared || people().some(p => state.bags[p].carry || state.bags[p].back);
 const boxName = box => box === 'carry' && sharedCarry() ? 'טרולי משותף' : BOXES[box].name;
+const boxShort = box => box === 'carry' && sharedCarry() ? 'טרולי 👥' : BOXES[box].name;   // narrow places: cards and buttons
+/* bags to offer: the ones set up, plus any bag that still has items in it (e.g. removed on the other phone) */
+const boxOpts = (ppl, items) => BOX_ORDER.filter(b => ppl.some(p => hasBox(p, b)) || items.some(i => i.box === b && (single() || ppl.includes(i.bag))));
 const hiddenNow = i => i.skip && !i.packed;               // hidden from this trip (if the other phone packed it meanwhile, packed wins)
 const active = () => state.items.filter(i => !i.deleted && !hiddenNow(i));   // what this trip's list shows
 const byId = id => state.items.find(i => i.id === id);
@@ -789,7 +809,7 @@ function applyIncoming(p) {
   };
 }
 const normName = n => String(n).trim().replace(/\s+/g, ' ').toLowerCase();
-const dupKey = i => i.bag + '|' + (i.box || 'main') + '|' + normName(i.name);   // duplicates only within the same bag of the same person
+const dupKey = i => (i.box === 'carry' && sharedCarry() ? '*' : i.bag) + '|' + (i.box || 'main') + '|' + normName(i.name);   // duplicates only within the same bag (the shared trolley is one bag)
 const bidi = s => esc(s).replace(/([A-Za-z0-9])([^\sA-Za-z0-9\u0590-\u05FF]+)(?=\s|$)/g, '$1$2\u200E');   // item names: "SPF 50+" stays in order
 const esc = s => String(s).replace(/[&<>"']/g, c => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
 const anyDialogOpen = () => !!document.querySelector('dialog[open]');
@@ -890,7 +910,7 @@ function cleanItem(it) {
     box: typeof it.box === 'string' && BOXES[it.box] ? it.box : 'main',
     ts
   };
-  if (it.box === undefined && !(it.ts && clampTs(it.ts.box))) ts.box = 1;    // from a version without bags: any real choice wins
+  if (!(typeof it.box === 'string' && BOXES[it.box]) && !(it.box === undefined && it.ts && clampTs(it.ts.box))) ts.box = 1;   // missing or made-up bag: any real choice wins    // from a version without bags: any real choice wins
   if (it.skip === undefined && !(it.ts && clampTs(it.ts.skip))) ts.skip = 1;   // from a version without it: any real choice wins
   if (!(typeof it.bag === 'string' && BAGS[it.bag])) ts.bag = 1;        // a made-up suitcase loses to any real choice in the next merge
   out.updatedAt = Math.max(base, ...FIELDS.map(f => ts[f]));
@@ -950,8 +970,9 @@ function addItem(name) {
     toast(`נוסף כארוז ✓: "${iso(name)}" — כרגע מוצג רק מה שלארוז`, 'הצג', () => { ui.show = 'done'; resetOrder(); render(); });
   } else if (revived) {
     toast(`"${iso(name)}" חזר לרשימה — הוא היה מוסתר מהנסיעה הזו`);
-  } else if (!single() && ui.tab !== 'all' && !bags.includes(ui.tab)) {
-    toast(`נוסף למזוודה של ${nmI(bag)}`, 'הצג', () => { ui.tab = bag; render(); });
+  } else if (!single() && ui.tab !== 'all' && !bags.includes(ui.tab) && bags.length) {
+    const t = bags[0];
+    toast(`נוסף ל${boxName(box)} של ${nmI(t)}`, 'הצג', () => { ui.tab = t; resetOrder(); render(); });
   } else if (bags.length === 2 && ui.tab !== 'all') {
     toast('נוסף לשתי המזוודות', 'הצג הכל', () => { ui.tab = 'all'; render(); });
   } else {
@@ -959,11 +980,11 @@ function addItem(name) {
   }
 }
 /* ---------- not for this trip ---------- */
-const hiddenHere = () => { const q = normName(ui.q); return state.items.filter(i => !i.deleted && hiddenNow(i) && (ui.tab === 'all' || i.bag === ui.tab) && (!q || normName(i.name).includes(q))); };
+const hiddenHere = () => { const q = normName(ui.q); return state.items.filter(i => !i.deleted && hiddenNow(i) && (ui.tab === 'all' || i.bag === ui.tab) && (ui.box === 'all' || i.box === ui.box) && (!q || normName(i.name).includes(q))); };
 function openBoxes() {
   const B = state.bags, sh = !single();
   $('#bxBody').innerHTML = people().map(p => `<div class="bxp"><span class="who" dir="auto">${esc(nm(p))}</span>
-      <label class="bxc"><input type="checkbox" data-p="${p}" data-k="carry" ${B[p].carry ? 'checked' : ''}> 🛄 טרולי</label>
+      <label class="bxc"><input type="checkbox" data-p="${p}" data-k="carry" ${B[p].carry || (!sh && B.shared) ? 'checked' : ''}> 🛄 טרולי</label>
       <label><input type="checkbox" data-p="${p}" data-k="back" ${B[p].back ? 'checked' : ''}> 🎒 תיק גב</label></div>`).join('')
     + (sh ? `<label class="bxsh"><input type="checkbox" id="bxShared" ${B.shared ? 'checked' : ''}> 🛄 טרולי אחד משותף לשניים</label>` : '');
   const paint = () => { const on = sh && $('#bxShared').checked; document.querySelectorAll('#bxBody .bxc').forEach(l => l.hidden = on); };
@@ -971,41 +992,52 @@ function openBoxes() {
   paint(); $('#menuDlg').close(); $('#boxDlg').showModal();
 }
 async function saveBoxes() {
-  const n = noBags();
-  document.querySelectorAll('#bxBody [data-p]').forEach(c => { n[c.dataset.p][c.dataset.k] = c.checked; });
-  n.shared = !single() && !!($('#bxShared') && $('#bxShared').checked);
+  const was = state.bags, n = copyBags(was);              // start from what is there: one user changes only their own bags
+  document.querySelectorAll('#bxBody [data-p]').forEach(c => {
+    if (single() && c.dataset.k === 'carry' && was.shared) { if (!c.checked) n.shared = false; else return; }   // their trolley is the shared one
+    n[c.dataset.p][c.dataset.k] = c.checked;
+  });
+  if (!single()) n.shared = !!($('#bxShared') && $('#bxShared').checked);
   if (n.shared) { n.p1.carry = false; n.p2.carry = false; }
-  const was = state.bags; state.bags = {...n, ts: was.ts};
-  const orphans = live().filter(i => i.box !== 'main' && !hasBox(i.bag, i.box));   // things in a bag that is being removed
+  const changed = BAG_KEYS.filter(k => bagGet(n, k) !== bagGet(was, k));
+  if (!changed.length) { $('#boxDlg').close(); return; }      // nothing changed: don't override the other phone's newer setup
+  const ppl = people();
+  state.bags = n;
+  const orphans = live().filter(i => i.box !== 'main' && ppl.includes(i.bag) && !hasBox(i.bag, i.box));   // things in a bag that is being removed
   state.bags = was;
   if (orphans.length && !await confirmBox('להעביר למזוודה?', `${many(orphans.length, 'פריט אחד נמצא', 'פריטים נמצאים')} בתיק שמוסר — ${orphans.length === 1 ? 'הוא יעבור' : 'הם יעברו'} למזוודה.`, 'העברה')) return;
-  state.bags = {...n, ts: Math.max(now(), was.ts + 1)};
+  const T = Math.max(now(), was.ts + 1);
+  changed.forEach(k => n.t[k] = T); n.ts = T;
+  state.bags = n;
   orphans.forEach(i => touch(i, {box: 'main'}));
   $('#boxDlg').close(); resetOrder(); commit();
   toast('התיקים עודכנו');
 }
-function paintBoxSeg(items) {
-  const seg = $('#boxSeg'); seg.hidden = !anyBoxes(); if (seg.hidden) return;
+function paintBoxSeg(items, bo) {
+  const seg = $('#boxSeg'); seg.hidden = bo.length < 2; if (seg.hidden) { seg.innerHTML = ''; return; }
   const inTabAll = items.filter(i => ui.tab === 'all' || i.bag === ui.tab);
-  const opts = ['all', ...BOX_ORDER.filter(b => (ui.tab === 'all' ? people() : [ui.tab]).some(p => hasBox(p, b)))];
+  const opts = ['all', ...bo];
   const pc = ui.tab === 'all' ? '' : ui.tab;                // cards take the colour of the person shown above them
   seg.innerHTML = opts.map(b => {
-    const its = b === 'all' ? inTabAll : b === 'carry' && sharedCarry() ? items.filter(i => i.box === 'carry') : inTabAll.filter(i => i.box === b);
+    const its = b === 'all' ? inTabAll : inTabAll.filter(i => i.box === b);   // a person's cards add up to their "all" card
     const left = its.filter(i => !i.packed).length, pct = its.length ? (its.length - left) / its.length * 100 : 0;
     const say = !its.length ? 'ריק' : left ? `${left} לארוז` : '✓ הכל נארז';
-    const name = b === 'all' ? 'כל התיקים' : boxName(b);
-    return `<button type="button" data-box="${b}" class="bgc ${pc} ${b === 'all' ? 'all' : ''} ${ui.box === b ? 'on' : ''} ${its.length && !left ? 'done' : ''}" aria-pressed="${ui.box === b}" aria-label="${name}: ${say}">
-      <span class="i">${b === 'all' ? 'הכל' : BOXES[b].icon}</span><span class="nm">${b === 'all' ? '' : name}</span><span class="lf">${say}</span><span class="bar"><i style="width:${pct}%"></i></span></button>`;
+    const name = b === 'all' ? 'כל התיקים' : boxShort(b);
+    return `<button type="button" data-box="${b}" class="bgc ${pc} ${b === 'all' ? 'all' : ''} ${ui.box === b ? 'on' : ''} ${its.length && !left ? 'done' : ''}" aria-pressed="${ui.box === b}" aria-label="${b === 'all' ? name : boxName(b)}: ${say}">
+      <span class="i">${b === 'all' ? 'כל התיקים' : BOXES[b].icon}</span><span class="nm">${b === 'all' ? '' : name}</span><span class="lf">${say}</span><span class="bar"><i style="width:${pct}%"></i></span></button>`;
   }).join('');
 }
+let selWas = false;
 function paintSel() {
   const on = !!ui.sel;
+  if (on && !selWas) hideToast();                         // starting to pick: an old undo is not about this
+  selWas = on;
   $('#selBar').hidden = !on;
   if (!on) return;
   const n = ui.sel.size;
   const vis = [...document.querySelectorAll('#list .item')].map(r => r.dataset.id), vs = new Set(vis);
   const off = [...ui.sel].filter(id => !vs.has(id)).length;
-  $('#selN').textContent = n ? (n === 1 ? 'נבחר פריט אחד' : `נבחרו ${n} פריטים`) + (off ? ` · ${off} לא מוצגים כאן` : '') : 'סמנו פריטים שלא צריך בנסיעה הזו';
+  $('#selN').textContent = n ? (n === 1 ? 'נבחר פריט אחד' : `נבחרו ${n} פריטים`) + (off ? ` · ${off} לא מוצגים כאן` : '') : 'סמנו פריטים להעברה או להסתרה';
   $('#selSkip').disabled = !n;
   $('#selAll').hidden = !vis.length;
   $('#selAll').textContent = vis.length && vis.every(id => ui.sel.has(id)) ? 'ניקוי הבחירה' : 'בחירת הכל';
@@ -1033,7 +1065,7 @@ function destinations() {
 const destLabel = d => d.p === '*' ? 'לטרולי המשותף' : `ל${boxName(d.b)}${single() ? '' : ' של ' + iso(nm(d.p))}`;
 function openMove() {
   const its = [...ui.sel].map(find).filter(Boolean); if (!its.length) return;
-  const at = (i, d) => i.box === d.b && (d.p === '*' || i.bag === d.p);
+  const at = (i, d) => i.box === d.b && (d.p === '*' || single() || i.bag === d.p);
   const ds = destinations();
   const btn = d => { const here = its.every(i => at(i, d)); const n = its.filter(i => !at(i, d)).length;
     return `<button type="button" class="mvb" data-mp="${d.p}" data-mb="${d.b}" ${here ? 'disabled' : ''}>${BOXES[d.b].icon} ${d.p === '*' ? 'טרולי משותף' : BOXES[d.b].name}<small>${here ? 'כבר כאן' : n < its.length ? `${n} יעברו` : ''}</small></button>`; };
@@ -1044,20 +1076,23 @@ function openMove() {
   $('#moveDlg').showModal();
 }
 function moveSelected(d) {
-  const its = [...ui.sel].map(find).filter(Boolean).filter(i => !(i.box === d.b && (d.p === '*' || i.bag === d.p)));
+  const keep = d.p === '*' || single();                     // the shared trolley / one user: items stay whose they are
+  const its = [...ui.sel].map(find).filter(Boolean).filter(i => !(i.box === d.b && (keep || i.bag === d.p)));
   $('#moveDlg').close();
   if (!its.length) return;
   const undo = [];
   for (const it of its) {
-    const prev = {bag: it.bag, box: it.box, packed: it.packed};
-    touch(it, {bag: d.p === '*' ? it.bag : d.p, box: d.b, packed: false});
+    const prev = {bag: it.bag, box: it.box, packed: it.packed, skip: it.skip};
+    touch(it, {bag: keep ? it.bag : d.p, box: d.b, packed: false, skip: false});
     const twin = state.items.find(x => x !== it && !x.deleted && hiddenNow(x) && dupKey(x) === dupKey(it));   // a hidden copy there is replaced
     if (twin) touch(twin, {deleted: true});
     undo.push({id: it.id, prev, twin: twin && twin.id});
   }
   ui.sel = null; resetOrder(); commit();
   const reset = undo.filter(u => u.prev.packed).length;
-  toast(`${its.length === 1 ? 'פריט אחד הועבר' : `${its.length} פריטים הועברו`} ${destLabel(d)}${reset ? ` · סימון ״נארז״ אופס ל־${reset}` : ''}`, 'בטל', () => {
+  const owners = new Set(undo.map(u => u.prev.bag)), moved = undo.filter(u => u.prev.bag !== d.p).length;
+  const whose = !keep && owners.size > 1 && moved ? ` · ${moved === 1 ? 'אחד מהם היה' : `${moved} מהם היו`} של ${nmI(flip(d.p))}` : '';   // picked from both people
+  toast(`${its.length === 1 ? 'פריט אחד הועבר' : `${its.length} פריטים הועברו`} ${destLabel(d)}${whose}${reset ? ` · סימון ״ארוז״ אופס ל־${reset}` : ''}`, 'בטל', () => {
     undo.forEach(u => { const x = byId(u.id); if (x) touch(x, u.prev); if (u.twin) { const y = byId(u.twin); if (y) touch(y, {deleted: false}); } });
     commit();
   });
@@ -1107,11 +1142,11 @@ function render() {
   const s = stats(items);
   document.body.classList.toggle('single', single());
   document.querySelectorAll('[data-sort-set]').forEach(b => b.classList.toggle('on', b.dataset.sortSet === ui.sort));
-  if (single()) ui.tab = 'all';
+  if (single() || (ui.tab !== 'all' && !BAGS[ui.tab])) ui.tab = 'all';
   document.querySelectorAll('[data-name]').forEach(e => e.textContent = single() && e.dataset.name === 'p1' ? nm(solo()) : nm(e.dataset.name));
   document.querySelectorAll('#addBag button,#eBag button,#kBag button').forEach(b => { if (b.dataset.bag !== 'both') b.textContent = nm(b.dataset.bag); });
 
-  const tileTxt = (p, n, all) => !n ? (all ? 'אין פריטים' : 'ריקה') : p === n ? `הכל ארוז ✓ · ${n}` : `${p}/${n} ארוזים`;
+  const tileTxt = (p, n, all) => !n ? (all ? 'אין פריטים' : 'ריקה') : p === n ? 'הכל ארוז ✓' : `${n - p} לארוז`;   // same measure as the bag cards
   for (const b of ['p1', 'p2']) {
     const B = b === 'p1' ? 'P1' : 'P2', n = s[b], p = s[b + 'Packed'];
     $('#t' + B).textContent = tileTxt(p, n);
@@ -1127,8 +1162,8 @@ function render() {
   { const tg = targets(ab), opts = BOX_ORDER.filter(b => tg.some(p => hasBox(p, b)));
     if (!opts.includes(ui.addBox)) ui.addBox = 'main';
     $('#addBoxRow').hidden = opts.length < 2;
-    $('#addBox').innerHTML = opts.map(b => `<button type="button" data-abox="${b}" class="${ui.addBox === b ? 'on' : ''}">${BOXES[b].icon} ${boxName(b)}</button>`).join(''); }
-  $('#addBtn').innerHTML = single() ? 'הוסף' : ab === 'both' ? 'הוסף לשניהם' : `הוסף ${pre('ל', nm(ab))}`;
+    $('#addBox').innerHTML = opts.map(b => `<button type="button" data-abox="${b}" class="${ui.addBox === b ? 'on' : ''}">${BOXES[b].icon} ${boxShort(b)}</button>`).join(''); }
+  $('#addBtn').innerHTML = single() ? 'הוסף' : ab === 'both' ? 'הוסף לשניהם' : ((f => f.length <= 7 ? `הוסף ${pre('ל', f)}` : 'הוסף')(nm(ab).trim().split(/[\s-]+/)[0]));
   $('#addBtn').classList.toggle('p1', !single() && ab === 'p1');
   $('#addBtn').classList.toggle('one', single());
   $('#addBtn').classList.toggle('both', !single() && ab === 'both');
@@ -1147,10 +1182,11 @@ function render() {
     return;
   }
 
-  if (!anyBoxes() || (ui.box !== 'all' && !people().some(p => hasBox(p, ui.box)))) ui.box = 'all';
-  const shCarry = sharedCarry() && ui.box === 'carry';                      // the shared trolley shows both people's things
-  const inTab = items.filter(i => (ui.box === 'all' || i.box === ui.box) && (ui.tab === 'all' || i.bag === ui.tab || shCarry));
-  paintBoxSeg(items);
+  const bo = boxOpts(ui.tab === 'all' ? people() : [ui.tab], items);
+  if (bo.length < 2 || !bo.includes(ui.box)) { if (ui.box !== 'all') ui.addBox = 'main'; ui.box = 'all'; }
+  const shCarry = sharedCarry() && ui.box === 'carry' && ui.tab === 'all';   // everything in the shared trolley
+  const inTab = items.filter(i => (ui.box === 'all' || i.box === ui.box) && (ui.tab === 'all' || i.bag === ui.tab));
+  paintBoxSeg(items, bo);
   const dups = dupKeys(items);
   const dupCount = inTab.filter(i => dups.has(dupKey(i))).length;
   if (!dupCount) ui.dupOnly = false;
@@ -1163,9 +1199,9 @@ function render() {
 
   const bar = dupCount ? `<div class="dupbar"><span>⚠️ יש <b>${dupCount}</b> פריטים כפולים ${single() ? 'ברשימה' : 'באותה מזוודה'}</span><button type="button" data-act="dup-toggle">${ui.dupOnly ? 'הצג הכל' : 'הצג כפולים'}</button></div>` : '';
 
-  const inView = q ? inTab.filter(i => normName(i.name).includes(q)) : inTab;
+  const inView = inTab.filter(i => (!q || normName(i.name).includes(q)) && (!ui.dupOnly || dups.has(dupKey(i))));
   const todoN = inView.filter(i => !i.packed).length, doneN = inView.length - todoN;
-  { const who = ui.tab === 'all' ? '' : `<span class="pc${ui.tab === 'p1' ? 1 : 2}">${esc(nm(ui.tab))}</span>`;
+  { const who = ui.tab === 'all' ? '' : `<span class="pc${ui.tab === 'p1' ? 1 : 2}" dir="auto">${esc(nm(ui.tab))}</span>`;
     const bx = ui.box !== 'all';
     const where = single() ? (bx ? `ב${boxName(ui.box)}` : 'ברשימה')
       : shCarry ? 'בטרולי המשותף'
@@ -1187,7 +1223,8 @@ function render() {
     host.innerHTML = bar + (allPacked
       ? `<div class="empty"><div class="big">✅</div>הכל ארוז!</div>`
       : noneYet ? `<div class="empty"><div class="big">🧳</div>עוד לא נארז כלום</div>`
-      : q ? `<div class="empty"><div class="big">🔍</div>לא נמצא "<bdi>${esc(ui.q.trim())}</bdi>"<br><button type="button" class="clr" data-act="clear-search">ניקוי החיפוש</button></div>`
+      : q ? (() => { const out = (ui.tab !== 'all' || ui.box !== 'all') ? active().filter(i => normName(i.name).includes(q)).length : 0;
+          return `<div class="empty"><div class="big">🔍</div>לא נמצא "<bdi>${esc(ui.q.trim())}</bdi>" ${ui.tab !== 'all' || ui.box !== 'all' ? 'כאן' : ''}${out ? `<br>${out === 1 ? 'יש פריט אחד' : `יש ${out}`} בתיקים אחרים<br><button type="button" class="clr" data-act="search-all">הצג בכל התיקים</button>` : `<br><button type="button" class="clr" data-act="clear-search">ניקוי החיפוש</button>`}</div>`; })()
       : hid.length && !inTab.length ? `<div class="empty"><div class="big">🙈</div>כל הפריטים כאן הוסתרו מהנסיעה הזו</div>`
       : `<div class="empty"><div class="big">🔍</div>אין פריטים כאן</div>`) + hidHtml;
     paintSel(); return;
@@ -1290,18 +1327,18 @@ function paintEdit() {
   const it = find(editId);
   $('#eQty').textContent = editQty;
   document.querySelectorAll('#eBag button').forEach(b => b.classList.toggle('on', b.dataset.bag === editBag));
-  { const opts = BOX_ORDER.filter(b => hasBox(editBag, b));
+  { const opts = BOX_ORDER.filter(b => hasBox(editBag, b) || (it && editBag === it.bag && it.box === b));   // a bag removed meanwhile still shows for its items
     if (!opts.includes(editBox)) editBox = 'main';
     $('#eBox').hidden = opts.length < 2;
     $('#eBagLbl').textContent = single() ? 'באיזה תיק' : anyBoxes() ? 'של מי ובאיזה תיק' : 'מזוודה';
     $('#eBagField').hidden = single() && opts.length < 2;
-    $('#eBox').innerHTML = opts.map(b => `<button type="button" data-ebox="${b}" class="${editBox === b ? 'on' : ''}">${BOXES[b].icon} ${boxName(b)}</button>`).join(''); }
-  $('#eHint').hidden = !(it && it.packed && editBag !== it.bag);
+    $('#eBox').innerHTML = opts.map(b => `<button type="button" data-ebox="${b}" class="${editBox === b ? 'on' : ''}">${BOXES[b].icon} ${boxShort(b)}</button>`).join(''); }
+  $('#eHint').hidden = !(it && it.packed && (editBag !== it.bag || editBox !== it.box));
   const other = flip(editBag), name = $('#eName').value.trim();
   const has = active().some(i => i.id !== editId && dupKey(i) === dupKey({bag: other, name, box: it && hasBox(other, it.box) ? it.box : 'main'}));
   $('#eCopy').textContent = has ? `✓ קיים גם במזוודה של ${nmI(other)}` : `➕ להוסיף גם למזוודה של ${nmI(other)}`;
   $('#eCopy').disabled = has || !name;
-  $('#eCopy').hidden = !!(it && it.box === 'carry' && sharedCarry());   // one shared trolley: a copy would just sit next to it
+  $('#eCopy').hidden = !!(editBox === 'carry' && sharedCarry());   // one shared trolley: a copy would just sit next to it
   $('#eSkip').hidden = !it || it.packed;                  // only items not packed yet can be left out of the trip
 }
 function copyToOther() {
@@ -1317,9 +1354,10 @@ function submitEdit(quiet) {                             // quiet: the caller sh
   const it = find(editId); const name = $('#eName').value.trim();
   if (!name) { $('#eErr').hidden = false; $('#eName').focus(); return; }
   if (it) {
-    const packed = editBag === it.bag ? it.packed : false;
-    const prev = editBag !== it.bag ? {bag: it.bag, packed: it.packed} : null;
-    touch(it, {name: cut(name, 80), cat: $('#eCat').value, qty: editQty, bag: editBag, packed, box: hasBox(editBag, editBox) ? editBox : 'main'});
+    const box = hasBox(editBag, editBox) || (editBag === it.bag && editBox === it.box) ? editBox : 'main';
+    const packed = editBag === it.bag && box === it.box ? it.packed : false;   // packed again in its new place
+    const prev = editBag !== it.bag ? {bag: it.bag, box: it.box, packed: it.packed, skip: it.skip} : null;
+    touch(it, {name: cut(name, 80), cat: $('#eCat').value, qty: editQty, bag: editBag, packed, box, ...(it.packed && !packed ? {skip: false} : {})});
     const twinHidden = prev ? state.items.find(x => x !== it && !x.deleted && hiddenNow(x) && dupKey(x) === dupKey(it)) : null;
     if (twinHidden) touch(twinHidden, {deleted: true});
     const nb = editBag;
@@ -1624,7 +1662,7 @@ function bind() {
   $('#boxSeg').addEventListener('click', e => {
     const b = e.target.closest('[data-box]'); if (!b) return;
     ui.box = ui.box === b.dataset.box && b.dataset.box !== 'all' ? 'all' : b.dataset.box;    // tapping the open bag again shows all bags
-    if (BOXES[ui.box]) ui.addBox = ui.box; resetOrder(); render();
+    ui.addBox = BOXES[ui.box] ? ui.box : 'main'; resetOrder(); render();
   });
   document.querySelectorAll('[data-show-set]').forEach(b => b.addEventListener('click', () => {
     ui.show = b.dataset.showSet; store.set('show', ui.show); resetOrder(); render();
@@ -1644,7 +1682,7 @@ function bind() {
   $('#moreX').addEventListener('click', () => $('#moreDlg').close());
   $('#moreDlg').addEventListener('click', e => { if (e.target === $('#moreDlg')) $('#moreDlg').close(); });
   // add options show only while adding (focus inside the add area, or text typed)
-  const addingNow = () => { document.body.classList.toggle('adding', $('#addZone').contains(document.activeElement) || !!$('#addName').value.trim()); };
+  const addingNow = () => { document.body.classList.toggle('adding', $('#addZone').contains(document.activeElement)); };   // leaving the field folds it, typed text stays
   $('#addZone').addEventListener('focusin', addingNow);
   // collapse only after the press that moved focus is over, so the list doesn't shift under the finger mid-tap
   let ptrDown = false, collapseLater = false;
@@ -1656,6 +1694,7 @@ function bind() {
 
   $('#list').addEventListener('click', e => {
     if (e.target.closest('[data-act="dup-toggle"]')) { ui.dupOnly = !ui.dupOnly; resetOrder(); render(); return; }
+    if (e.target.closest('[data-act="search-all"]')) { if (!single()) ui.tab = 'all'; ui.box = 'all'; ui.addBox = 'main'; ui.show = 'all'; resetOrder(); render(); return; }
     if (e.target.closest('[data-act="clear-search"]')) { $('#searchClear').click(); return; }
     if (e.target.closest('[data-act="hid-toggle"]')) { ui.hidOpen = !ui.hidOpen; render(); return; }
     if (e.target.closest('[data-act="unskip-all"]')) { unskip(hiddenHere()); return; }
@@ -1691,7 +1730,7 @@ function bind() {
   document.querySelectorAll('#pWhat button').forEach(b => b.addEventListener('click', () => { pr.what = b.dataset.what; paintPrint(); }));
   document.querySelectorAll('#pSort button').forEach(b => b.addEventListener('click', () => { pr.sort = b.dataset.psort; paintPrint(); }));
   $('#pGo').addEventListener('click', doPrint);
-  $('#pCancel').addEventListener('click', () => $('#printDlg').close());
+  $('#pCancel').addEventListener('click', () => $('#printDlg').close()); $('#pX').addEventListener('click', () => $('#printDlg').close());
   $('#eName').addEventListener('input', paintEdit);
   $('#eSave').addEventListener('click', submitEdit);
   $('#eName').addEventListener('enter', submitEdit);
@@ -1771,17 +1810,23 @@ function bind() {
     const dupsBefore = dupKeys(active()).size;
     const wasSingle = single();
     const {items, users, from, bags} = applyIncoming(p);
-    if (bags && bags.ts > state.bags.ts) state.bags = bags;            // the newer bag setup wins
+    const bagsWas = JSON.stringify(BAG_KEYS.map(k => bagGet(state.bags, k)));
+    if (bags) state.bags = mergeBags(state.bags, bags);                // each bag setting: the newer one wins
     const r = mergeItems(items);
     const u = adoptUsers(users, false, p.first);
     if (wasSingle && !single() && !state.owner) state.owner = 'p1';    // this phone's one-user list was p1's
+    const bagsChanged = JSON.stringify(BAG_KEYS.map(k => bagGet(state.bags, k))) !== bagsWas;
+    const orphans = live().filter(i => i.box !== 'main' && !hasBox(i.bag, i.box));   // a bag removed on one phone while the other put things in it
+    orphans.forEach(i => touch(i, {box: 'main'}));
     resetOrder(); commit();
     const parts = [];
     if (r.added) parts.push(r.added === 1 ? 'נוסף 1' : `נוספו ${r.added}`);
     if (r.updated) parts.push(r.updated === 1 ? 'עודכן 1' : `עודכנו ${r.updated}`);
     if (r.removed) parts.push(r.removed === 1 ? 'נמחק 1' : `נמחקו ${r.removed}`);
     if (r.restored) parts.push(r.restored === 1 ? 'שוחזר 1' : `שוחזרו ${r.restored}`);
+    if (bagsChanged) parts.push('התיקים עודכנו');
     let msg = parts.length ? 'מוזג: ' + parts.join(' · ') : 'אין שינויים חדשים בקובץ';
+    if (orphans.length) msg += ' · ' + (orphans.length === 1 ? 'פריט אחד עבר למזוודה כי התיק שלו הוסר' : `${orphans.length} פריטים עברו למזוודה כי התיק שלהם הוסר`);
     if (r.skipped) msg += ' · ' + many(r.skipped, 'פריט אחד מהקובץ נמחק כאן קודם ולא הוחזר', 'פריטים מהקובץ נמחקו כאן קודם ולא הוחזרו');
     if (u && u.countChanged) msg += single() ? ' · עברנו לרשימה אחת, כמו בטלפון השני' : ' · עברנו לשני משתמשים, כמו בטלפון השני';
     else if (u && u.changed && state.owner) msg += ' · שמות המשתמשים עודכנו';
@@ -1831,7 +1876,7 @@ function bind() {
     const p = replaceP;                                  // captured before close() clears it
     $('#replaceDlg').close();
     if (!p) return;
-    const before = state.items, beforeUsers = state.users, beforeOwner = state.owner;
+    const before = state.items, beforeUsers = state.users, beforeOwner = state.owner, beforeBags = state.bags;
     let from = null;
     try {
       const inc = applyIncoming(p); const items = inc.items, users = inc.users; from = inc.from;
@@ -1839,11 +1884,11 @@ function bind() {
       if (users) adoptUsers(users, true);
       state.items = items;
     } catch (e) {
-      state.items = before; state.users = beforeUsers; state.owner = beforeOwner;
+      state.items = before; state.users = beforeUsers; state.owner = beforeOwner; state.bags = beforeBags;
       toast('ההחלפה נכשלה — הרשימה לא השתנתה'); return;
     }
     resetOrder(); commit();
-    afterImport('הרשימה הוחלפה בקובץ', from, () => { state.items = before; state.users = beforeUsers; state.owner = beforeOwner; resetOrder(); commit(); toast('ההחלפה בוטלה — הרשימה הקודמת חזרה'); });
+    afterImport('הרשימה הוחלפה בקובץ', from, () => { state.items = before; state.users = beforeUsers; state.owner = beforeOwner; state.bags = beforeBags; resetOrder(); commit(); toast('ההחלפה בוטלה — הרשימה הקודמת חזרה'); });
   });
   $('#rCancel').addEventListener('click', () => $('#replaceDlg').close());
   $('#replaceDlg').addEventListener('close', () => { replaceP = null; });
@@ -1923,7 +1968,7 @@ function paintPrint() {
   document.querySelectorAll('#pSort button').forEach(b => b.classList.toggle('on', b.dataset.psort === pr.sort));
   const bags = printBags(), n = bags.reduce((a, b) => a + printItems(b).length, 0);
   $('#pSum').textContent = (n ? many(n, 'פריט אחד', 'פריטים') : (pr.what === 'left' ? 'הכל כבר ארוז ✓' : 'אין פריטים'))
-    + (bags.length === 2 ? ' · כל מזוודה בעמוד נפרד' : '')
+    + (bags.length > 1 ? ' · כל מזוודה בעמוד נפרד' : '')
     + ' · במסך ההדפסה אפשר לבחור מדפסת או ״שמירה כ-PDF״';
   $('#pGo').disabled = !n;
 }
