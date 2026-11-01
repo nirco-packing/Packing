@@ -283,6 +283,15 @@ dialog::backdrop{background:rgba(10,14,20,.5)}
 .menu .ic{width:28px;text-align:center;font-size:19px;flex:0 0 auto}
 .menu .ds{display:block;font-size:12px;color:var(--muted)}
 .menu .danger{color:var(--danger)}
+.guide details{border-bottom:1px solid var(--line)}
+.guide summary{display:flex;align-items:center;gap:10px;min-height:48px;font-weight:700;font-size:15px;cursor:pointer;list-style:none;padding:0 2px}
+.guide summary::-webkit-details-marker{display:none}
+.guide summary::after{content:'▾';margin-inline-start:auto;color:var(--muted);transition:transform .2s}
+.guide details[open] summary::after{transform:rotate(180deg)}
+.guide .gi{width:24px;text-align:center}
+.guide .gb{padding:0 6px 12px 2px;font-size:14.5px;line-height:1.6}
+.guide .gb p{margin:0 0 8px} .guide .gb ul,.guide .gb ol{margin:0 0 8px;padding-inline-start:22px} .guide .gb li{margin-bottom:5px}
+.guide .gtip{background:var(--fill);border-radius:10px;padding:8px 10px}
 .menu .sect{font-size:12px;font-weight:700;color:var(--muted);padding:14px 4px 2px;letter-spacing:.2px}
 .setrow{padding:10px 4px 12px;border-bottom:1px solid var(--line)}
 .setrow .top2{display:flex;align-items:center;gap:12px;margin-bottom:8px}
@@ -496,6 +505,7 @@ body.single #pWhoF{display:none}
     <div class="dhead"><h2>הגדרות</h2><button class="xbtn" type="button" data-act="close" aria-label="סגירה">✕</button></div>
     <p class="sub" id="menuSub"></p>
     <div class="menu">
+      <button type="button" data-act="guide"><span class="ic">📖</span><span>מדריך למשתמש<span class="ds">איך עושים כל דבר באפליקציה</span></span></button>
       <div class="sect" id="syncSect">סנכרון עם הטלפון השני</div>
       <button type="button" data-act="share"><span class="ic">📤</span><span>שליחת הרשימה לטלפון השני<span class="ds">בוואטסאפ. בטלפון השני: הגדרות ← קבלת קובץ ← מיזוג</span></span></button>
       <button type="button" data-act="import"><span class="ic">📥</span><span><span id="importLbl">קבלת קובץ</span><span class="ds" id="importDs">מהטלפון השני, או שחזור מגיבוי</span></span></button>
@@ -582,6 +592,16 @@ body.single #pWhoF{display:none}
       <button class="btn main" type="button" id="kGo" disabled>ייבוא</button>
       <button class="btn" type="button" id="kCancel">ביטול</button>
     </div></div>
+  </div>
+</dialog>
+
+<!-- user guide -->
+<dialog id="guideDlg" dir="rtl" lang="he">
+  <div class="dlg">
+    <div class="dhead"><h2>📖 מדריך למשתמש</h2><button class="xbtn" type="button" id="gX" aria-label="סגירה">✕</button></div>
+    <p class="sub">האפליקציה Packing היא רשימת אריזה לשני אנשים. כל אחד עובד בטלפון שלו, והרשימות מסונכרנות באמצעות קובץ שנשלח בוואטסאפ. האפליקציה פועלת גם ללא חיבור לאינטרנט, והרשימה נשמרת בטלפון בלבד ולא בשום שרת.</p>
+    <div class="guide"><details><summary><span class="gi">🚀</span><span>התחלה</span></summary><div class="gb"><p><b>התקנה:</b> פותחים את הקישור לאפליקציה בדפדפן כרום, ובוחרים ⋮ ← <b>הוספה למסך הבית</b>. מעכשיו האפליקציה נפתחת כמו כל אפליקציה אחרת, גם ללא אינטרנט.</p><p><b>בטלפון הראשון:</b> במסך הפתיחה בוחרים כמה אנשים אורזים (משתמש אחד או שני משתמשים), מקלידים את השמות ומציינים של מי הטלפון.</p><p><b>בטלפון השני:</b> במסך הפתיחה לוחצים על <b>📥 יש כבר רשימה בטלפון השני?</b> וטוענים את הקובץ שנשלח מהטלפון הראשון (ראו ״סנכרון בין שני הטלפונים״). כך שני הטלפונים מתחילים מאותה רשימה.</p></div></details><details><summary><span class="gi">📱</span><span>המסך הראשי</span></summary><div class="gb"><ul><li><b>האריחים בראש המסך</b> – אריח לכל אחד מכם ואריח לכולם יחד. בכל אריח מופיע מספר הפריטים שנותרו לארוז. הקשה על אריח מציגה רק את הפריטים של אותו אדם.</li><li><b>כרטיסי התיקים</b> (כשמוגדרים טרולי או תיק גב) – מספר הפריטים שנותרו לארוז בכל תיק. הקשה על כרטיס מציגה רק את התיק הזה, והקשה נוספת מחזירה לתצוגת כל התיקים.</li><li><b>המתג ״לארוז | נארז ✓״</b> – מעבר בין מה שעדיין צריך לארוז לבין מה שכבר נארז.</li><li><b>השורה ״מציג:״</b> – מתארת בדיוק מה מוצג כעת, למשל: ״מציג: 12 לארוז במזוודה של דנה״.</li><li><b>הלחצן 🔍</b> – חיפוש לפי שם. <b>הלחצן ⋯</b> – מיון (לפי קטגוריה או לפי א–ת), בחירת תצוגה ובחירה מרובה.</li></ul></div></details><details><summary><span class="gi">➕</span><span>הוספת פריטים</span></summary><div class="gb"><p>מקלידים את שם הפריט בשדה <b>הוספת פריט</b> ולוחצים על מקש האישור במקלדת או על לחצן ההוספה. בזמן ההקלדה מופיעות אפשרויות נוספות:</p><ul><li><b>קטגוריה</b> – נקבעת אוטומטית לפי השם (למשל ״מטען״ ← אלקטרוניקה), ואפשר לשנות אותה.</li><li><b>כמות</b> – בעזרת הלחצנים + ו־−.</li><li><b>כבר ארוז</b> – לפריט שכבר נמצא בתיק.</li><li><b>למזוודה:</b> – של מי הפריט, או <b>שניהם</b> (נוצר פריט נפרד לכל אחד).</li><li><b>לתוך:</b> – באיזה תיק (מזוודה, טרולי או תיק גב), כשמוגדר יותר מתיק אחד.</li></ul><p class="gtip">💡 אם הפריט כבר קיים באותו תיק, תופיע אזהרה עם הלחצן <b>הסר</b>. אם פריט באותו שם הוסתר מהנסיעה, הוא פשוט יחזור לרשימה.</p></div></details><details><summary><span class="gi">✅</span><span>אריזה</span></summary><div class="gb"><p>הקשה על הריבוע שליד הפריט מסמנת אותו כארוז. השורה נשארת במקומה עד שמחליפים תצוגה, כדי שאפשר יהיה לתקן הקשה שגויה. הקשה נוספת מבטלת את הסימון.</p><p>כדי לראות מה כבר נארז, עוברים לתצוגה <b>נארז ✓</b>.</p></div></details><details><summary><span class="gi">✏️</span><span>עריכת פריט</span></summary><div class="gb"><p>הקשה על שם הפריט או על <b>⋯</b> שבשורה פותחת את חלון העריכה:</p><ul><li>שינוי השם, הקטגוריה והכמות.</li><li><b>של מי ובאיזה תיק</b> – העברה לאדם אחר או לתיק אחר מבטלת את הסימון ״ארוז״, כי צריך לארוז את הפריט במקומו החדש.</li><li><b>➕ להוסיף גם למזוודה של…</b> – יצירת עותק אצל האדם השני.</li><li><b>🙈 לא לנסיעה הזו</b> – הסתרת הפריט בלי למחוק אותו (פרטים בהמשך).</li><li><b>מחיקת הפריט</b> – מתבצעת לאחר אישור, ומיד לאחריה מופיע הלחצן <b>בטל</b>.</li></ul></div></details><details><summary><span class="gi">🎒</span><span>תיקים: טרולי ותיק גב</span></summary><div class="gb"><p>בהגדרות ☰ ← <b>🎒 תיקים</b> אפשר להוסיף לכל אחד טרולי, תיק גב או שניהם, או <b>טרולי אחד משותף לשניים</b>. את המזוודה הראשית אין צורך להגדיר.</p><ul><li>לאחר בחירת כרטיס של תיק, פריטים חדשים נכנסים לתוכו.</li><li>בטרולי המשותף: מהאריח של כולם רואים את כל תכולת הטרולי, ומהאריח של אדם מסוים רואים רק את הפריטים שלו.</li><li>בהסרת תיק שיש בו פריטים, האפליקציה תבקש אישור והפריטים יועברו למזוודה.</li></ul></div></details><details><summary><span class="gi">🔀</span><span>בחירה מרובה: העברה והסתרה</span></summary><div class="gb"><p><b>לחיצה ארוכה</b> על פריט (או ⋯ ← <b>בחירה מרובה</b>) פותחת מצב בחירה. מסמנים כמה פריטים, ואז אפשר:</p><ul><li><b>🔀 העברה</b> – לתיק אחר או לאדם אחר, למשל ארבעה פריטים מהמזוודה לטרולי. פריטים שכבר נארזו יסומנו כלא ארוזים.</li><li><b>🙈 לא לנסיעה הזו</b> – הסתרת הפריטים שנבחרו (רק פריטים שעדיין לא נארזו).</li><li><b>בחירת הכל</b> – בחירת כל מה שמוצג כעת. <b>ביטול</b> – יציאה ממצב הבחירה.</li></ul><p class="gtip">💡 את משך הלחיצה הארוכה אפשר לכוונן בהגדרות ☰, בין חצי שנייה לשנייה.</p></div></details><details><summary><span class="gi">🙈</span><span>לא לנסיעה הזו</span></summary><div class="gb"><p>אין צורך למחוק פריטים שלא נחוצים הפעם (למשל בגד ים בנסיעת חורף): מסתירים אותם, והם נשמרים לנסיעה הבאה.</p><p>הפריטים המוסתרים מופיעים בתחתית הרשימה, תחת <b>🙈 לא בנסיעה הזו</b>. משם אפשר להחזיר פריט אחד או את כולם.</p></div></details><details><summary><span class="gi">🔄</span><span>סנכרון בין שני הטלפונים</span></summary><div class="gb"><p>אין שרת: מעבירים את הרשימה באמצעות קובץ.</p><ol><li>בטלפון שבו נעשו השינויים: ☰ ← <b>📤 שליחת הרשימה לטלפון השני</b> ← בוחרים את השיחה בוואטסאפ.</li><li>בטלפון השני: שומרים את הקובץ מהוואטסאפ, ואז ☰ ← <b>📥 קבלת קובץ</b> ← בוחרים את הקובץ ← <b>מיזוג (מומלץ)</b>.</li><li>כדי ששני הטלפונים יהיו זהים, שולחים קובץ גם בכיוון ההפוך.</li></ol><p><b>מה קורה במיזוג:</b> פריטים חדשים נוספים, ולכל פרט (שם, כמות, תיק, ארוז וכדומה) נשמר השינוי האחרון שנעשה בו, בלי קשר לטלפון שבו נעשה. גם מחיקות עוברות. מיזוג לעולם אינו מוחק את הרשימה שבטלפון.</p><p class="gtip">💡 חשוב ששני הטלפונים יהיו באותה גרסה. מספר הגרסה מופיע בתחתית מסך ההגדרות.</p></div></details><details><summary><span class="gi">🙋</span><span>רק הפריטים שלי בטלפון הזה</span></summary><div class="gb"><p>בהגדרות ☰ ← <b>🙋 רק הפריטים שלי בטלפון הזה</b> – הטלפון מציג רק את הפריטים, האריח והתיקים שלך. הפריטים של האדם השני אינם נמחקים: הם רק אינם מוצגים, והסנכרון ממשיך כרגיל.</p><p>כשההגדרה פעילה, גם ״איפוס לנסיעה הבאה״ ו״מחיקת כל הפריטים״ חלים רק על הפריטים שלך. כדי לראות שוב את הפריטים של שניכם, מבטלים את הסימון.</p></div></details><details><summary><span class="gi">📝</span><span>ייבוא מ־Google Keep</span></summary><div class="gb"><p>באפליקציה Google Keep: פותחים את הפתק ← ⋮ ← <b>שליחה</b> ← <b>העתקה ללוח</b>. באפליקציה: ☰ ← <b>📝 ייבוא רשימה מ-Google Keep</b> ← מדביקים את הרשימה (או בוחרים קובץ txt).</p><ul><li>כל שורה היא פריט. ״3 חולצות״ או ״חולצה x3״ נקלטים ככמות.</li><li>בוחרים לאיזו מזוודה לייבא (או לשניהם) ולוחצים על <b>ייבוא</b>.</li><li>אפשר לדלג על שורת הכותרת של הפתק ועל פריטים שכבר קיימים, ולסמן כ״ארוז״ פריטים שסומנו ✓ ב־Keep.</li><li>הקטגוריה נקבעת אוטומטית לפי השם, ואפשר לתקן אותה אחר כך בחלון העריכה.</li></ul></div></details><details><summary><span class="gi">🖨️</span><span>הדפסה ושמירה כ־PDF</span></summary><div class="gb"><p>בוחרים בהגדרות ☰ ← <b>🖨️ הדפסת הרשימה</b>, ושם מציינים את מי להדפיס, אם להדפיס את כל הפריטים או רק את מה שלא נארז, ואת סדר הפריטים. במסך ההדפסה של הטלפון בוחרים מדפסת או <b>שמירה כ־PDF</b>.</p><p>כל מזוודה מודפסת בעמוד נפרד, והטרולי המשותף בעמוד משלו.</p></div></details><details><summary><span class="gi">🧳</span><span>איפוס לנסיעה הבאה</span></summary><div class="gb"><p>בבחירה בהגדרות ☰ ← <b>🔄 איפוס לנסיעה הבאה</b>, כל הפריטים חוזרים למצב ״לא ארוז״, והפריטים שהוסתרו חוזרים לרשימה. השיוך לאנשים ולתיקים נשמר. אפשר לבטל את האיפוס מיד לאחר מכן.</p></div></details><details><summary><span class="gi">💾</span><span>גיבוי, שחזור ומחיקה</span></summary><div class="gb"><ul><li><b>💾 שמירת גיבוי</b> – עותק של הרשימה נשמר בתיקיית ההורדות.</li><li><b>שחזור מגיבוי</b> – ☰ ← 📥 קבלת קובץ ← <b>שחזור מגיבוי (החלפת הכל)</b>. הפעולה מחליפה את כל הרשימה בתוכן הקובץ, ואפשר לבטל אותה מיד לאחר מכן. לסנכרון רגיל משתמשים תמיד ב<b>מיזוג</b>.</li><li><b>🗑 מחיקת כל הפריטים</b> – נמצאת באזור המסוכן. המחיקה עוברת לטלפון השני בסנכרון הבא.</li></ul></div></details><details><summary><span class="gi">⚙️</span><span>הגדרות נוספות</span></summary><div class="gb"><ul><li><b>👥 משתמשים</b> – שינוי שמות, מעבר בין משתמש אחד לשני משתמשים, וקביעה של מי הטלפון.</li><li><b>🌗 ערכת צבעים</b> – בהירה, כהה, או לפי השעה (יום / לילה).</li><li><b>👆 לחיצה ארוכה לבחירה מרובה</b> – כמה זמן צריך להחזיק את האצבע עד שנפתח מצב הבחירה.</li></ul></div></details><details><summary><span class="gi">❓</span><span>שאלות נפוצות</span></summary><div class="gb"><ul><li><b>פריט נעלם?</b> בדקו את התצוגה <b>נארז ✓</b>, את הרשימה <b>🙈 לא בנסיעה הזו</b> בתחתית המסך, וודאו שלא נבחר אריח או כרטיס תיק אחר. גם החיפוש 🔍 מציין אם הפריט נמצא בתיק אחר.</li><li><b>המספרים לא מסתדרים?</b> השורה ״מציג:״ מראה בדיוק מה נספר. סכום המספרים בכרטיסי התיקים של אדם שווה למספר שבאריח שלו.</li><li><b>אחרי מיזוג משהו לא התעדכן?</b> ודאו ששני הטלפונים באותה גרסה ושבחרתם בקובץ האחרון שנשלח.</li><li><b>משהו נמחק בטעות?</b> מיד לאחר כל פעולה מופיע הלחצן <b>בטל</b> בתחתית המסך.</li></ul></div></details></div>
+    <div class="dfoot"><div class="row"><button class="btn" type="button" id="gClose">סגירה</button></div></div>
   </div>
 </dialog>
 
@@ -691,7 +711,7 @@ function mergeBags(a, b) {                              // each setting: the new
   for (const k of BAG_KEYS) if ((B.t[k] || 0) > (o.t[k] || 0)) { bagSet(o, k, bagGet(B, k)); o.t[k] = B.t[k]; }
   o.ts = Math.max(o.ts, B.ts); return o;
 }
-const APP_VERSION = '2.14', APP_DATE = '31.10.2026';   // shown at the bottom of settings — bump on every release
+const APP_VERSION = '2.16', APP_DATE = '31.10.2026';   // shown at the bottom of settings — bump on every release
 const MAX_FILE = 5e6, MAX_ITEMS = 5000, MAX_FUTURE = 864e5 * 366;
 const ERR = Symbol('read-error');
 
@@ -1758,7 +1778,8 @@ function bind() {
   document.querySelectorAll('#pWhat button').forEach(b => b.addEventListener('click', () => { pr.what = b.dataset.what; paintPrint(); }));
   document.querySelectorAll('#pSort button').forEach(b => b.addEventListener('click', () => { pr.sort = b.dataset.psort; paintPrint(); }));
   $('#pGo').addEventListener('click', doPrint);
-  $('#pCancel').addEventListener('click', () => $('#printDlg').close()); $('#pX').addEventListener('click', () => $('#printDlg').close());
+  $('#pCancel').addEventListener('click', () => $('#printDlg').close());
+  ['#gX', '#gClose'].forEach(id => $(id).addEventListener('click', () => $('#guideDlg').close())); $('#pX').addEventListener('click', () => $('#printDlg').close());
   $('#eName').addEventListener('input', paintEdit);
   $('#eSave').addEventListener('click', submitEdit);
   $('#eName').addEventListener('enter', submitEdit);
@@ -1795,6 +1816,7 @@ function bind() {
     else if (act === 'import') { $('#fileIn').value = ''; $('#fileIn').click(); }
     else if (act === 'keep') openKeep('');
     else if (act === 'print') openPrint();
+    else if (act === 'guide') { $('#guideDlg').querySelectorAll('details').forEach(d => d.open = false); $('#guideDlg').showModal(); }
     else if (act === 'unpack') {
       const its = live().filter(i => !mine() || i.bag === state.owner);   // only my items: the other traveller's list is theirs
       const packed = its.filter(i => i.packed), hidden = its.filter(i => i.skip);
