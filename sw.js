@@ -3,7 +3,7 @@
 // It only ever touches caches whose name starts with "packing-", so it is safe
 // next to other apps on the same website.
 const PREFIX = 'packing-';
-const CACHE = PREFIX + 'v5';
+const CACHE = PREFIX + 'v6';
 const ASSETS = ['./', './index.html', './packing.webmanifest', './icon-192.png', './icon-512.png', './icon-maskable-512.png'];
 const TIMEOUT_MS = 4000;
 

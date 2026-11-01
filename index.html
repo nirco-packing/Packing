@@ -711,7 +711,7 @@ function mergeBags(a, b) {                              // each setting: the new
   for (const k of BAG_KEYS) if ((B.t[k] || 0) > (o.t[k] || 0)) { bagSet(o, k, bagGet(B, k)); o.t[k] = B.t[k]; }
   o.ts = Math.max(o.ts, B.ts); return o;
 }
-const APP_VERSION = '2.16', APP_DATE = '31.10.2026';   // shown at the bottom of settings — bump on every release
+const APP_VERSION = '2.17', APP_DATE = '31.10.2026';   // shown at the bottom of settings — bump on every release
 const MAX_FILE = 5e6, MAX_ITEMS = 5000, MAX_FUTURE = 864e5 * 366;
 const ERR = Symbol('read-error');
 
