@@ -628,7 +628,7 @@ body.single #pWhoF{display:none}
 <dialog id="setupDlg">
   <div class="dlg">
     <h2 id="suTitle">ברוכים הבאים ל-Packing</h2>
-    <button class="bigimport" type="button" id="suImport"><span style="font-size:24px">📥</span><span><span id="suImpT">יש כבר רשימה בטלפון השני?</span><span class="ds" id="suImpD">טענו את הקובץ שקיבלתם ממנו בוואטסאפ</span></span></button>
+    <button class="bigimport" type="button" id="suImport"><span style="font-size:24px">📥</span><span><span id="suImpT">יש כבר רשימה בטלפון השני?</span><span class="ds" id="suImpD">טענו את הקובץ שקיבלתם ממנו בוואטסאפ, או קובץ גיבוי</span></span></button>
     <div class="okbox" id="suLoaded" hidden></div>
     <div id="suNew">
       <p class="sub" id="suLead">כמה אנשים אורזים עם הרשימה?</p>
@@ -713,7 +713,7 @@ function mergeBags(a, b) {                              // each setting: the new
   for (const k of BAG_KEYS) if ((B.t[k] || 0) > (o.t[k] || 0)) { bagSet(o, k, bagGet(B, k)); o.t[k] = B.t[k]; }
   o.ts = Math.max(o.ts, B.ts); return o;
 }
-const APP_VERSION = '2.19', APP_DATE = '31.10.2026';   // shown at the bottom of settings — bump on every release
+const APP_VERSION = '2.20', APP_DATE = '31.10.2026';   // shown at the bottom of settings — bump on every release
 const MAX_FILE = 5e6, MAX_ITEMS = 5000, MAX_FUTURE = 864e5 * 366;
 const ERR = Symbol('read-error');
 
@@ -1418,9 +1418,9 @@ function submitEdit(quiet) {                             // quiet: the caller sh
 }
 
 /* ---------- export / import ---------- */
-function exportData() {
+function exportData(kind) {                             // kind: 'backup' (your own copy) or 'sync' (for the other phone)
   const U = state.users && {count: state.users.count, names: state.users.names, ts: state.users.ts, sid: state.users.sid};
-  const data = {app: 'packing', version: 4, owner: state.owner, users: U, bags: state.bags, exportedAt: new Date().toISOString(), items: state.items};
+  const data = {app: 'packing', version: 4, kind, owner: state.owner, users: U, bags: state.bags, exportedAt: new Date().toISOString(), items: state.items};
   const d = new Date();
   const stamp = `${d.getFullYear()}-${String(d.getMonth() + 1).padStart(2, '0')}-${String(d.getDate()).padStart(2, '0')}`;
   const who = single() ? nm(solo()) : state.owner ? nm(state.owner) : '';
@@ -1430,17 +1430,17 @@ function exportData() {
 function markExported() { state.lastExport = now(); save(); }
 
 async function shareFile() {
-  const {base, text} = exportData();
+  const {base, text} = exportData('sync');
   /* Chrome on Android only shares certain file types; .json is not one of them, .txt is. */
   const file = new File([text], base + '.txt', {type: 'text/plain'});
   if (navigator.canShare && navigator.canShare({files: [file]})) {
     try { await navigator.share({files: [file], title: 'Packing'}); markExported(); return; }
     catch (e) { if (e && e.name === 'AbortError') return; }
   }
-  downloadFile(); toast('השליחה לא נתמכת כאן — הקובץ נשמר בהורדות');
+  downloadFile('sync'); toast('השליחה לא נתמכת כאן — הקובץ נשמר בהורדות');
 }
-function downloadFile() {
-  const {base, text} = exportData();
+function downloadFile(kind = 'backup') {
+  const {base, text} = exportData(kind);
   const a = document.createElement('a');
   a.href = URL.createObjectURL(new Blob([text], {type: 'application/json'}));
   a.download = base + '.json';
@@ -1474,7 +1474,8 @@ async function readImport(file) {
     if (ans === null) return;
     m.flip = ans;
   }
-  pendingImport = {items, users, from, flip: m.flip, first: !!m.first, bags: obj.bags ? cleanBags(obj.bags) : null};
+  const kind = obj.kind === 'backup' || obj.kind === 'sync' ? obj.kind : null;   // older files don't say
+  pendingImport = {items, users, from, kind, flip: m.flip, first: !!m.first, bags: obj.bags ? cleanBags(obj.bags) : null};
   const liveCount = items.filter(i => !i.deleted).length;
   const fromName = from && users && users.count === 2 ? users.names[from] : '';
   const here = live().length;
@@ -1891,14 +1892,14 @@ function bind() {
     if (u && u.countChanged) msg += single() ? ' · עברנו לרשימה אחת, כמו בטלפון השני' : ' · עברנו לשני משתמשים, כמו בטלפון השני';
     else if (u && u.changed && state.owner) msg += ' · שמות המשתמשים עודכנו';
     if (dupKeys(active()).size > dupsBefore) msg += ' · ⚠️ נמצאו כפילויות';
-    afterImport(msg, from);
+    afterImport(msg, from, null, p.kind);
   };
   /* after loading a file: if this phone still needs setup, show it there; otherwise a toast */
-  const afterImport = (msg, from, undo) => {
+  const afterImport = (msg, from, undo, kind) => {
     const open = $('#setupDlg').open;
     if (!open && configured()) { undo ? toast(msg, 'בטל', undo) : toast(msg); return; }
     if (!open) openSetup(true);
-    su.loaded = {n: live().length, from};
+    su.loaded = {n: live().length, from, kind};
     refreshSetupFromState();
   };
   $('#iMerge').addEventListener('click', () => {
@@ -1917,11 +1918,15 @@ function bind() {
     const fileById = new Map(items.map(i => [i.id, i]));
     const here = live();
     const onlyHere = here.filter(i => { const f = fileById.get(i.id); return !f || f.deleted; }).length;
-    const newerHere = here.filter(i => { const f = fileById.get(i.id); return f && !f.deleted && i.updatedAt > f.updatedAt; }).length;
+    const differs = (i, f) => FIELDS.some(k => k === 'bag' ? i.bag !== (p.flip ? flip(f.bag) : f.bag) : i[k] !== f[k]);
+    const newerHere = here.filter(i => { const f = fileById.get(i.id); return f && !f.deleted && differs(i, f); }).length;   // what actually goes back
+    const backHere = state.items.filter(i => i.deleted && fileById.has(i.id) && !fileById.get(i.id).deleted).length;   // deleted here since the backup
     const lines = [`הרשימה עכשיו: <span class="nb">${many(here.length, 'פריט אחד', 'פריטים')}</span> · בקובץ: ${many(fileLive.length, 'פריט אחד', 'פריטים')}`];
     if (onlyHere) lines.push(`<b>${many(onlyHere, 'פריט אחד שנמצא רק בטלפון הזה יימחק', 'פריטים שנמצאים רק בטלפון הזה יימחקו')}</b>`);
     if (newerHere) lines.push(`<b>${many(newerHere, 'פריט אחד ששינית כאן אחרי שהקובץ נשמר יחזור לגרסה הישנה', 'פריטים ששינית כאן אחרי שהקובץ נשמר יחזרו לגרסה הישנה')}</b> (מזוודה, ״ארוז״, שם)`);
-    if (!onlyHere && !newerHere) lines.push('לפי הבדיקה לא יאבד שום פריט — אבל מיזוג עדיין בטוח יותר');
+    if (backHere) lines.push(many(backHere, 'פריט אחד שמחקת כאן יחזור', 'פריטים שמחקת כאן יחזרו'));
+    if (!onlyHere && !newerHere && !backHere) lines.push('לפי הבדיקה לא יאבד שום פריט — אבל מיזוג עדיין בטוח יותר');
+    if ((users || state.users) && (users || state.users).count === 2 && (onlyHere || newerHere || backHere)) lines.push('השינויים יעברו גם לטלפון השני בסנכרון הבא');
     $('#rList').innerHTML = lines.map(l => `<li>${l}</li>`).join('');
     const fu = users || state.users;
     const mine = p.flip && state.owner ? flip(state.owner) : state.owner;
@@ -1939,16 +1944,39 @@ function bind() {
     const before = state.items, beforeUsers = state.users, beforeOwner = state.owner, beforeBags = state.bags, beforeUi = {tab: ui.tab, addBag: ui.addBag};
     let from = null;
     try {
-      const inc = applyIncoming(p); const items = inc.items, users = inc.users; from = inc.from;
-      if (inc.bags) state.bags = inc.bags;
-      if (users) adoptUsers(users, true);
+      const inc = applyIncoming(p); const users = inc.users; from = inc.from;
+      /* The restore is a change made now: whatever it puts back or removes gets today's time, so the next
+         sync carries it to the other phone instead of the other phone's newer copy undoing it. */
+      const T = Math.max(now(), ...state.items.map(i => i.updatedAt || 0)) + 1;
+      const local = new Map(state.items.map(i => [i.id, i])), inFile = new Set(inc.items.map(i => i.id));
+      const items = inc.items.map(f => {
+        const l = local.get(f.id); if (!l) return f;
+        const ts = {...f.ts}; let ch = false;
+        for (const k of FIELDS) if (f[k] !== l[k]) { ts[k] = T; ch = true; }
+        return ch ? {...f, ts, updatedAt: T} : f;
+      });
+      for (const l of state.items) if (!inFile.has(l.id))
+        items.push(l.deleted ? l : {...l, deleted: true, ts: {...l.ts, deleted: T}, updatedAt: T});   // only on this phone: removed (everywhere)
+      if (inc.bags) {
+        const nb = copyBags(inc.bags); let bch = false;
+        for (const k of BAG_KEYS) if (bagGet(nb, k) !== bagGet(state.bags, k)) { nb.t[k] = T; bch = true; }
+        if (bch) nb.ts = Math.max(nb.ts, T);
+        state.bags = nb;
+      }
+      if (users) {
+        const pu = state.users; adoptUsers(users, true);
+        if (pu) { const u = state.users, ts = {...u.ts};
+          if (u.count !== pu.count) ts.count = T;
+          for (const k of ['p1', 'p2']) if (u.names[k] !== pu.names[k]) ts[k] = T;
+          state.users = {...u, ts}; }
+      }
       state.items = items;
     } catch (e) {
       state.items = before; state.users = beforeUsers; state.owner = beforeOwner; state.bags = beforeBags; Object.assign(ui, beforeUi);
       toast('ההחלפה נכשלה — הרשימה לא השתנתה'); return;
     }
     resetOrder(); commit();
-    afterImport('הרשימה הוחלפה בקובץ', from, () => { state.items = before; state.users = beforeUsers; state.owner = beforeOwner; state.bags = beforeBags; Object.assign(ui, beforeUi); resetOrder(); commit(); toast('ההחלפה בוטלה — הרשימה הקודמת חזרה'); });
+    afterImport('הרשימה הוחלפה בקובץ', from, () => { state.items = before; state.users = beforeUsers; state.owner = beforeOwner; state.bags = beforeBags; Object.assign(ui, beforeUi); resetOrder(); commit(); toast('ההחלפה בוטלה — הרשימה הקודמת חזרה'); }, p.kind);
   });
   $('#rCancel').addEventListener('click', () => $('#replaceDlg').close());
   $('#replaceDlg').addEventListener('close', () => { replaceP = null; });
@@ -2129,7 +2157,10 @@ function refreshSetupFromState() {
   su.fresh = !u;
   su.count = u ? u.count : (su.count || 2);
   if (state.owner) su.owner = state.owner;
-  else if (su.loaded && su.loaded.from && u && u.count === 2) su.owner = flip(su.loaded.from);   // the other phone's person isn't you
+  else if (su.loaded && su.loaded.from && u && u.count === 2)
+    su.owner = su.loaded.kind === 'backup' ? su.loaded.from      // your own backup: the phone is yours again
+      : su.loaded.kind === 'sync' ? flip(su.loaded.from)          // a file from the other phone: its person isn't you
+      : null;                                                     // an older file doesn't say: ask
   fillSetupNames();
   paintSetup();
 }
@@ -2138,9 +2169,9 @@ function paintSetup() {
   $('#suTitle').textContent = L ? 'כמעט סיימנו' : su.first ? 'ברוכים הבאים ל-Packing' : 'משתמשים';
   $('#suImport').hidden = !(su.first && su.fresh && !L);
   $('#suImpT').textContent = two ? 'יש כבר רשימה בטלפון השני?' : 'יש לך קובץ גיבוי?';
-  $('#suImpD').textContent = two ? 'טענו את הקובץ שקיבלתם ממנו בוואטסאפ' : 'פתיחת קובץ גיבוי ששמרת';
+  $('#suImpD').textContent = two ? 'טענו את הקובץ שקיבלתם ממנו בוואטסאפ, או קובץ גיבוי' : 'פתיחת קובץ גיבוי ששמרת';
   $('#suLoaded').hidden = !L;
-  if (L) $('#suLoaded').textContent = `✓ הרשימה נטענה — ${many(L.n, 'פריט אחד', 'פריטים')}.` + (two ? ' נשאר רק לבחור מי את/ה:' : ' אפשר לשמור.');
+  if (L) $('#suLoaded').textContent = `✓ הרשימה נטענה — ${many(L.n, 'פריט אחד', 'פריטים')}.` + (two ? (L.kind === 'backup' ? ' זה גיבוי של ' + iso(nm(L.from)) + ' — בדקו של מי הטלפון הזה:' : ' נשאר רק לבחור מי את/ה:') : ' אפשר לשמור.');
   $('#suNew').hidden = !!L;
   $('#suLead').textContent = su.first && su.fresh ? 'או התחילו רשימה חדשה. כמה אנשים אורזים איתה?' : 'כמה אנשים אורזים עם הרשימה?';
   document.querySelectorAll('#suCount button').forEach(b => b.classList.toggle('on', +b.dataset.count === su.count));
